@@ -24,7 +24,6 @@ LINKS = (('R-bloggers', 'http://www.r-bloggers.com/'),
          ('StatsBlogs', 'www.statsblogs.com'),)
 
 # Social
-GITHUB_URL = 'https://github.com/nacnudus'
 TWITTER_USERNAME = 'nacnudus'
 SOCIAL = (('Github', 'https://github.com/nacnudus'),
           ('Twitter', 'https://twitter.com/nacnudus'),
