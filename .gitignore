@@ -1,10 +1,10 @@
-*~
-._*
-.ropeproject
-*.lock
 *.DS_Store
-*.swp
+*.lock
 *.out
 *.pid
 *.py[cod]
+*.swp
+*~
+._*
+.ropeproject
 output
