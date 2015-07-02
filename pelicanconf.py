@@ -23,6 +23,8 @@ AUTHOR_FEED_RSS = None
 LINKS = (('R-bloggers', 'http://www.r-bloggers.com/'),
          ('StatsBlogs', 'www.statsblogs.com'),)
 
+TWITTER_USERNAME = 'nacnudus'
+
 DEFAULT_PAGINATION = False
 
 # Uncomment following line if you want document-relative URLs when developing
