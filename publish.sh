@@ -1,4 +1,4 @@
 #!/bin/bash
-pelican content -o output -s publishconf.py
+make publish
 ghp-import output
 git push origin gh-pages
