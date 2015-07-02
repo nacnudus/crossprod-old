@@ -15,10 +15,6 @@ RELATIVE_URLS = False
 
 DELETE_OUTPUT_DIRECTORY = True
 
-# Personal
-GITHUB_URL = 'https://github.com/nacnudus'
-TWITTER_USERNAME = 'nacnudus'
-
 # Following items are often useful when publishing
 
 #DISQUS_SITENAME = ""
