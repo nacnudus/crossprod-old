@@ -23,9 +23,12 @@ AUTHOR_FEED_RSS = None
 LINKS = (('R-bloggers', 'http://www.r-bloggers.com/'),
          ('StatsBlogs', 'www.statsblogs.com'),)
 
-# Personal
+# Social
 GITHUB_URL = 'https://github.com/nacnudus'
 TWITTER_USERNAME = 'nacnudus'
+SOCIAL = (('Github', 'https://github.com/nacnudus'),
+          ('Twitter', 'https://twitter.com/nacnudus'),
+          ('LinkedIn', 'https://nz.linkedin.com/in/duncangarmonsway'),)
 
 DEFAULT_PAGINATION = False
 
