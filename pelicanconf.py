@@ -34,6 +34,12 @@ DEFAULT_PAGINATION = False
 # Uncomment following line if you want document-relative URLs when developing
 #RELATIVE_URLS = True
 
+# Other stuff to include in the web root
+EXTRA_PATH_METADATA = {
+    'extra/favicon/favicon.ico': {'path': 'favicon.ico'}
+}
+
+
 # "elegant" theme
 # Required config for the "elegant" theme
 THEME = '../pelican-themes/elegant'
