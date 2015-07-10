@@ -54,6 +54,9 @@ DEFAULT_CATEGORY = 'Miscellaneous'
 USE_FOLDER_AS_CATEGORY = False
 TYPOGRIFY = True
 DEFAULT_PAGINATION = False
+ARTICLE_URL = u'{slug}'
+PAGE_URL = u'{slug}'
+PAGE_SAVE_AS = u'{slug}.html'
 
 # Favicons
 USE_SHORTCUT_ICONS = True
