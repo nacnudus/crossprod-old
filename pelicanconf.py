@@ -93,6 +93,7 @@ TWITTER_USERNAME = 'nacnudus'
 SOCIAL = (('Github', 'https://github.com/nacnudus'),
           ('Twitter', 'https://twitter.com/nacnudus'),
           ('LinkedIn', 'https://nz.linkedin.com/in/duncangarmonsway'),)
+DISQUS_SITENAME = "opreandr"
 
 # Search engine optimisation
 SITE_DESCRIPTION = u'My name is Duncan Garmonsway \u2013 a analyst who can code and knows about statistics. This is my personal blog.'
