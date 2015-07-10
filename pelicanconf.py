@@ -39,8 +39,10 @@ AUTHOR_SAVE_AS = ''
 RECENT_ARTICLES_COUNT = 10
 # COMMENTS_INTRO = ''
 # SITE_LICENSE ('')
-# MAILCHIMP_FORM_ACTION ('string') # MailChimp
 SITESUBTITLE = 'R for Operational Research'
+
+# MailChimp
+# Doesn't work with Github pages
 
 # Landing page
 # PROJECTS = [
