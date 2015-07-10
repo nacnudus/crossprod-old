@@ -27,7 +27,7 @@ AUTHOR_FEED_RSS = None
 # Required
 THEME = '../pelican-themes/elegant'
 PLUGIN_PATHS = ['../pelican-plugins']
-PLUGINS = ['sitemap', 'extract_toc', 'tipue_search', 'render_math']
+PLUGINS = ['sitemap', 'extract_toc', 'tipue_search', 'render_math', 'assets']
 MD_EXTENSIONS = ['codehilite(css_class=highlight)', 'extra', 'headerid', 'toc']
 DIRECT_TEMPLATES = (('index', 'tags', 'categories','archives', 'search', '404'))
 STATIC_PATHS = ['theme/images', 'images']
