@@ -76,12 +76,15 @@ USE_SHORTCUT_ICONS = True
 LINKS = (('R-bloggers', 'http://www.r-bloggers.com/'),
          ('StatsBlogs', 'www.statsblogs.com'),)
 
-# Social
+# Socialj
 TWITTER_USERNAME = 'nacnudus'
 # FEATURED_IMAGE = SITEURL + '/theme/images/apple-touch-icon-152x152.png'
 SOCIAL = (('Github', 'https://github.com/nacnudus'),
           ('Twitter', 'https://twitter.com/nacnudus'),
           ('LinkedIn', 'https://nz.linkedin.com/in/duncangarmonsway'),)
+
+# Search engine optimisation
+SITE_DESCRIPTION = u'My name is Duncan Garmonsway \u2013 a analyst who can code and knows about statistics. This is my personal blog.'
 
 SITEMAP = {
     'format': 'xml',
