@@ -47,6 +47,13 @@ LANDING_PAGE_ABOUT = {'title': 'I do data', 'details': 'My name is Duncan '
                       'government and now I study maths, statistics and '
                       'operations research at Victoria University of '
                       'Wellington.'}
+
+# labels
+SOCIAL_PROFILE_LABEL = u'Stay in Touch'
+RELATED_POSTS_LABEL = 'Keep Reading'
+SHARE_POST_INTRO = 'Like this post? Share on:'
+COMMENTS_INTRO = u'So what do you think? Did I miss something? Is any part unclear? Leave your comments below.'
+
 # -----------------------------------------------------------------------------#
 
 # Defaults
