@@ -22,24 +22,6 @@ AUTHOR_FEED_RSS = None
 # Uncomment following line if you want document-relative URLs when developing
 #RELATIVE_URLS = True
 
-# Favicons
-USE_SHORTCUT_ICONS = True
-# # Other stuff to include in the web root
-# EXTRA_PATH_METADATA = {
-#     'extra/favicon/favicon.ico': {'path': 'favicon.ico'}
-# }
-
-# Blogroll
-LINKS = (('R-bloggers', 'http://www.r-bloggers.com/'),
-         ('StatsBlogs', 'www.statsblogs.com'),)
-
-# Social
-TWITTER_USERNAME = 'nacnudus'
-SOCIAL = (('Github', 'https://github.com/nacnudus'),
-          ('Twitter', 'https://twitter.com/nacnudus'),
-          ('LinkedIn', 'https://nz.linkedin.com/in/duncangarmonsway'),)
-
-
 # "elegant" theme
 # -----------------------------------------------------------------------------#
 # Required
@@ -71,3 +53,21 @@ LANDING_PAGE_ABOUT = {'title': 'I do data', 'details': 'My name is Duncan '
 DEFAULT_PAGINATION = False
 DEFAULT_CATEGORY = 'Miscellaneous'
 USE_FOLDER_AS_CATEGORY = False
+
+# Favicons
+USE_SHORTCUT_ICONS = True
+# # Other stuff to include in the web root
+# EXTRA_PATH_METADATA = {
+#     'extra/favicon/favicon.ico': {'path': 'favicon.ico'}
+# }
+
+# Blogroll
+LINKS = (('R-bloggers', 'http://www.r-bloggers.com/'),
+         ('StatsBlogs', 'www.statsblogs.com'),)
+
+# Social
+TWITTER_USERNAME = 'nacnudus'
+SOCIAL = (('Github', 'https://github.com/nacnudus'),
+          ('Twitter', 'https://twitter.com/nacnudus'),
+          ('LinkedIn', 'https://nz.linkedin.com/in/duncangarmonsway'),)
+
