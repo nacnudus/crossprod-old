@@ -42,6 +42,15 @@ RECENT_ARTICLES_COUNT = 10
 # MAILCHIMP_FORM_ACTION ('string') # MailChimp
 SITESUBTITLE = 'R for Operational Research'
 
+# Landing page
+# PROJECTS = [
+#     {
+#         'name': 'This blog',
+#         'url':
+#         'https://nacnudus.github.io/opre/',
+#         'description': 'A blog about the R language and operations research'
+#     },
+# ]
 LANDING_PAGE_ABOUT = {'title': 'I do data', 'details': 'My name is Duncan '
                       'Garmonsway.  I did data things in the New Zealand '
                       'government and now I study maths, statistics and '
