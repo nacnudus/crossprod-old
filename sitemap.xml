@@ -5,29 +5,36 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>https://nacnudus.github.io/opre/</loc>
-<lastmod>2015-07-11T01:22:23-00:00</lastmod>
+<lastmod>2015-07-11T01:23:30-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>https://nacnudus.github.io/opre/archives.html</loc>
-<lastmod>2015-07-11T01:22:23-00:00</lastmod>
+<lastmod>2015-07-11T01:23:30-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>https://nacnudus.github.io/opre/tags.html</loc>
-<lastmod>2015-07-11T01:22:23-00:00</lastmod>
+<lastmod>2015-07-11T01:23:30-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>https://nacnudus.github.io/opre/categories.html</loc>
-<lastmod>2015-07-11T01:22:23-00:00</lastmod>
+<lastmod>2015-07-11T01:23:30-00:00</lastmod>
 <changefreq>daily</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
+<loc>https://nacnudus.github.io/opre/underwear-sizes-of-flood-victims</loc>
+<lastmod>2015-07-10T00:00:00+12:00</lastmod>
+<changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
