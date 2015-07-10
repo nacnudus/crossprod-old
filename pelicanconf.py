@@ -57,11 +57,11 @@ LANDING_PAGE_ABOUT = {'title': 'I do data', 'details': 'My name is Duncan '
                       'operations research at Victoria University of '
                       'Wellington.'}
 
-# labels
-SOCIAL_PROFILE_LABEL = u'Stay in Touch'
+# Labels
+SOCIAL_PROFILE_LABEL = u'Social'
 RELATED_POSTS_LABEL = 'Keep Reading'
 SHARE_POST_INTRO = 'Like this post? Share on:'
-COMMENTS_INTRO = u'So what do you think? Did I miss something? Is any part unclear? Leave your comments below.'
+COMMENTS_INTRO = u'Please comment below'
 
 # -----------------------------------------------------------------------------#
 
