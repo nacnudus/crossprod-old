@@ -2,6 +2,7 @@ Title: Underwear sizes of flood victims
 Date: 2015-07-10
 Author: Duncan Garmonsway
 Summary: What size of underwear would you donate?
+Disqus_identifier: undies
 
 The Wellington Cathedral of St Paul (in New Zealand) has this newsletter item:
 
