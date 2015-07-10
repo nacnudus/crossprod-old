@@ -78,6 +78,7 @@ LINKS = (('R-bloggers', 'http://www.r-bloggers.com/'),
 
 # Social
 TWITTER_USERNAME = 'nacnudus'
+# FEATURED_IMAGE = SITEURL + '/theme/images/apple-touch-icon-152x152.png'
 SOCIAL = (('Github', 'https://github.com/nacnudus'),
           ('Twitter', 'https://twitter.com/nacnudus'),
           ('LinkedIn', 'https://nz.linkedin.com/in/duncangarmonsway'),)
