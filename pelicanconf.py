@@ -50,9 +50,10 @@ LANDING_PAGE_ABOUT = {'title': 'I do data', 'details': 'My name is Duncan '
 # -----------------------------------------------------------------------------#
 
 # Defaults
-DEFAULT_PAGINATION = False
 DEFAULT_CATEGORY = 'Miscellaneous'
 USE_FOLDER_AS_CATEGORY = False
+TYPOGRIFY = True
+DEFAULT_PAGINATION = False
 
 # Favicons
 USE_SHORTCUT_ICONS = True
