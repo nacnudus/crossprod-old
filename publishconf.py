@@ -22,3 +22,4 @@ DELETE_OUTPUT_DIRECTORY = True
 
 DISQUS_SITENAME = 'opreandr'
 GOOGLE_ANALYTICS = "UA-45097885-3"
+FEATURED_IMAGE = SITEURL + '/theme/images/apple-touch-icon-152x152.png'
