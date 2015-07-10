@@ -87,7 +87,7 @@ USE_SHORTCUT_ICONS = True
 LINKS = (('R-bloggers', 'http://www.r-bloggers.com/'),
          ('StatsBlogs', 'www.statsblogs.com'),)
 
-# Social
+# Socialj
 TWITTER_USERNAME = 'nacnudus'
 # FEATURED_IMAGE = SITEURL + '/theme/images/apple-touch-icon-152x152.png'
 SOCIAL = (('Github', 'https://github.com/nacnudus'),
