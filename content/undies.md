@@ -35,7 +35,7 @@ know people.  This is a small country.
 
 Secondly, donors may also know children in Wanganui, whereas they probably
 aren't children themselves.  This is an important point for the third strategy:
-sampling from a shop in Wellington.  [Bendon Lingerie](www.bendonlingerie.co.nz)
+sampling from a shop in Wellington.  [Bendon Lingerie](http://www.bendonlingerie.co.nz)
 surely doesn't stock children's sizes.
 
 The final strategy might be best, since a clothes shop in Wanganui probably
