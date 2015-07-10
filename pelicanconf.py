@@ -92,8 +92,9 @@ TWITTER_USERNAME = 'nacnudus'
 # FEATURED_IMAGE = SITEURL + '/theme/images/apple-touch-icon-152x152.png'
 SOCIAL = (('Github', 'https://github.com/nacnudus'),
           ('Twitter', 'https://twitter.com/nacnudus'),
-          ('LinkedIn', 'https://nz.linkedin.com/in/duncangarmonsway'),)
-DISQUS_SITENAME = "opreandr"
+          ('LinkedIn', 'https://nz.linkedin.com/in/duncangarmonsway'),
+          ('RSS', 'http://oncrashreboot.com/feeds/all.atom.xml'),
+          )
 
 # Search engine optimisation
 SITE_DESCRIPTION = u'My name is Duncan Garmonsway \u2013 a analyst who can code and knows about statistics. This is my personal blog.'
