@@ -19,6 +19,16 @@ TRANSLATION_FEED_ATOM = None
 AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 
+# Uncomment following line if you want document-relative URLs when developing
+#RELATIVE_URLS = True
+
+# Favicons
+USE_SHORTCUT_ICONS = True
+# # Other stuff to include in the web root
+# EXTRA_PATH_METADATA = {
+#     'extra/favicon/favicon.ico': {'path': 'favicon.ico'}
+# }
+
 # Blogroll
 LINKS = (('R-bloggers', 'http://www.r-bloggers.com/'),
          ('StatsBlogs', 'www.statsblogs.com'),)
@@ -29,19 +39,10 @@ SOCIAL = (('Github', 'https://github.com/nacnudus'),
           ('Twitter', 'https://twitter.com/nacnudus'),
           ('LinkedIn', 'https://nz.linkedin.com/in/duncangarmonsway'),)
 
-DEFAULT_PAGINATION = False
-
-# Uncomment following line if you want document-relative URLs when developing
-#RELATIVE_URLS = True
-
-# Other stuff to include in the web root
-EXTRA_PATH_METADATA = {
-    'extra/favicon/favicon.ico': {'path': 'favicon.ico'}
-}
-
 
 # "elegant" theme
-# Required config for the "elegant" theme
+# -----------------------------------------------------------------------------#
+# Required
 THEME = '../pelican-themes/elegant'
 PLUGIN_PATHS = ['../pelican-plugins']
 PLUGINS = ['sitemap', 'extract_toc', 'tipue_search', 'render_math']
@@ -51,15 +52,22 @@ STATIC_PATHS = ['theme/images', 'images', 'extra/favicon']
 TAG_SAVE_AS = ''
 CATEGORY_SAVE_AS = ''
 AUTHOR_SAVE_AS = ''
-# Optional config for the "elegant" theme
+
+# Optional from here on
 RECENT_ARTICLES_COUNT = 10
 # COMMENTS_INTRO = ''
 # SITE_LICENSE ('')
-SITE_DESCRIPTION = 'About applying the R language to operational research.'
-# EMAIL_SUBSCRIPTION_LABEL ('string') # MailChimp
-# EMAIL_FIELD_PLACEHOLDER ('string') # MailChimp
-# SUBSCRIBE_BUTTON_TITLE ('string') # MailChimp
 # MAILCHIMP_FORM_ACTION ('string') # MailChimp
 SITESUBTITLE = 'R for Operational Research'
-LANDING_PAGE_ABOUT = {'I do data', 'My name is Duncan Garmonsway.  I did data things in the New Zealand government and now I study maths, statistics and operations research at Victoria University of Wellington.'}
-# # PROJECTS ([{},...])
+
+LANDING_PAGE_ABOUT = {'title': 'I do data', 'details': 'My name is Duncan '
+                      'Garmonsway.  I did data things in the New Zealand '
+                      'government and now I study maths, statistics and '
+                      'operations research at Victoria University of '
+                      'Wellington.'}
+# -----------------------------------------------------------------------------#
+
+# Defaults
+DEFAULT_PAGINATION = False
+DEFAULT_CATEGORY = 'Miscellaneous'
+USE_FOLDER_AS_CATEGORY = False
