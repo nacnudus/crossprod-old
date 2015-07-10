@@ -50,7 +50,7 @@ SITESUBTITLE = 'R for Operational Research'
 #     {
 #         'name': 'This blog',
 #         'url':
-#         'https://nacnudus.github.io/opre/',
+#         'http://nacnudus.github.io/opre/',
 #         'description': 'A blog about the R language and operations research'
 #     },
 # ]
