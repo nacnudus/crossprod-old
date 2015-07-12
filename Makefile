@@ -84,6 +84,13 @@ else
 	cd $(OUTPUTDIR) && $(PY) -m pelican.server 80 0.0.0.0
 endif
 
+render:
+	$(PELICAN) $(INPUTDIR) -o $(OUTPUTDIR) -s $(CONFFILE) $(PELICANOPTS)
+ifdef PORT
+	cd $(OUTPUTDIR) && $(PY) -m pelican.server $(PORT)
+else
+	cd $(OUTPUTDIR) && $(PY) -m pelican.server
+endif
 
 devserver:
 ifdef PORT
