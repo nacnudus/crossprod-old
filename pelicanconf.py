@@ -28,10 +28,10 @@ AUTHOR_FEED_RSS = None
 THEME = '../pelican-themes/elegant'
 PLUGIN_PATHS = ['../pelican-plugins']
 PLUGINS = ['sitemap', 'extract_toc', 'tipue_search', 'render_math', 'assets'
-           , 'neighbors', 'share_post']
+           , 'neighbors', 'share_post', 'rmd_reader']
 MD_EXTENSIONS = ['codehilite(css_class=highlight)', 'extra', 'headerid', 'toc']
 DIRECT_TEMPLATES = (('index', 'tags', 'categories','archives', 'search', '404'))
-STATIC_PATHS = ['theme/images', 'images']
+STATIC_PATHS = ['theme/images', 'images', 'figure']
 TAG_SAVE_AS = ''
 CATEGORY_SAVE_AS = ''
 AUTHOR_SAVE_AS = ''
