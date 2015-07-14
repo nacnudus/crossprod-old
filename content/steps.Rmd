@@ -17,7 +17,7 @@ While the strong van man carried two boxes at a time down the steps, I carred
 only one, and then ran back up for another.  The final score was seven to him,
 and six to me.  How did I keep up?  Without being unkind, the van man's strength
 came with bulk.  Taking his own body into account, he carried a lot more than I
-did, half of it *up* the steps.
+did, half of the journeys *up* the steps.
 
 It would be interesting to find out how well animal bodies optimise themselves
 for physical exertion.  If a professional house mover is on a healthy diet, does
