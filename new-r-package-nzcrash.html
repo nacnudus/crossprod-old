@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <meta charset="utf-8"> 
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="author" content="Duncan Garmonsway" />
+        <meta name="copyright" content="Duncan Garmonsway" />
+
+        <meta name="description" content="Redistributing NZ crash data in tidy form
+" />
+        <meta name="twitter:creator" content="@nacnudus">
+        <meta property="og:type" content="article" />
+        <meta name="twitter:card" content="summary">
+
+<meta name="keywords" content=", Miscellaneous, " />
+
+<meta property="og:title" content="New R package: nzcrash "/>
+<meta property="og:url" content="http://nacnudus.github.io/opre/new-r-package-nzcrash" />
+<meta property="og:description" content="Redistributing NZ crash data in tidy form" />
+<meta property="og:site_name" content="OPRE" />
+<meta property="og:article:author" content="Duncan Garmonsway" />
+<meta property="og:article:published_time" content="2015-07-13T00:00:00+12:00" />
+<meta name="twitter:title" content="New R package: nzcrash ">
+<meta name="twitter:description" content="Redistributing NZ crash data in tidy form">
+<meta property="og:image" content="http://nacnudus.github.io/opre/theme/images/apple-touch-icon-152x152.png" />
+<meta name="twitter:image" content="http://nacnudus.github.io/opre/theme/images/apple-touch-icon-152x152.png" >
+
+        <title>New R package: nzcrash  · OPRE
+</title>
+        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+        <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.1/css/font-awesome.css" rel="stylesheet">
+<link rel="stylesheet" href="http://nacnudus.github.io/opre/theme/css/style.min.css?7aeecf36">
+        <link rel="shortcut icon" href="http://nacnudus.github.io/opre/theme/images/favicon.ico" type="image/x-icon" type="image/png" />
+        <link rel="icon" href="http://nacnudus.github.io/opre/theme/images/apple-touch-icon-152x152.png" type="image/png" />
+        <link rel="apple-touch-icon" href="http://nacnudus.github.io/opre/theme/images/apple-touch-icon.png"  type="image/png" />
+        <link rel="apple-touch-icon" sizes="57x57" href="http://nacnudus.github.io/opre/theme/images/apple-touch-icon-57x57.png" type="image/png" />
+        <link rel="apple-touch-icon" sizes="72x72" href="http://nacnudus.github.io/opre/theme/images/apple-touch-icon-72x72.png" type="image/png" />
+        <link rel="apple-touch-icon" sizes="76x76" href="http://nacnudus.github.io/opre/theme/images/apple-touch-icon-76x76.png" type="image/png" />
+        <link rel="apple-touch-icon" sizes="114x114" href="http://nacnudus.github.io/opre/theme/images/apple-touch-icon-114x114.png" type="image/png" />
+        <link rel="apple-touch-icon" sizes="120x120" href="http://nacnudus.github.io/opre/theme/images/apple-touch-icon-120x120.png" type="image/png" />
+        <link rel="apple-touch-icon" sizes="144x144" href="http://nacnudus.github.io/opre/theme/images/apple-touch-icon-144x144.png" type="image/png" />
+        <link rel="apple-touch-icon" sizes="152x152" href="http://nacnudus.github.io/opre/theme/images/apple-touch-icon-152x152.png" type="image/png" />
+        <link href="http://nacnudus.github.io/opre/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="OPRE - Full Atom Feed" />
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+     })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-45097885-3', 'auto');
+    ga('send', 'pageview');
+</script>
+    </head>
+    <body>
+        <div id="content-sans-footer">
+        <div class="navbar navbar-static-top">
+            <div class="navbar-inner">
+                <div class="container-fluid">
+                    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </a>
+                    <a class="brand" href="http://nacnudus.github.io/opre/"><span class=site-name>OPRE</span></a>
+                    <div class="nav-collapse collapse">
+                        <ul class="nav pull-right top-menu">
+                            <li ><a href="http://nacnudus.github.io/opre">Home</a></li>
+                            <li ><a href="http://nacnudus.github.io/opre/categories.html">Categories</a></li>
+                            <li ><a href="http://nacnudus.github.io/opre/tags.html">Tags</a></li>
+                            <li ><a href="http://nacnudus.github.io/opre/archives.html">Archives</a></li>
+                            <li><form class="navbar-search" action="http://nacnudus.github.io/opre/search.html" onsubmit="return validateForm(this.elements['q'].value);"> <input type="text" class="search-query" placeholder="Search" name="q" id="tipue_search_input"></form></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span1"></div>
+                <div class="span10">
+<article>
+<div class="row-fluid">
+    <header class="page-header span10 offset2">
+    <h1><a href="http://nacnudus.github.io/opre/new-r-package-nzcrash"> New R package:&nbsp;nzcrash  </a></h1>
+    </header>
+</div>
+
+<div class="row-fluid">
+        <div class="span8 offset2 article-content">
+
+            
+            <h1 id="introducing-the-nzcrash-package">Introducing the nzcrash&nbsp;package</h1>
+<p>This <a href="https://github.com/nacnudus/nzcrash">package</a> redistributes crash statistics already available from the New Zealand Transport Agency, but in a more convenient&nbsp;form.</p>
+<p>It&#8217;s a large package (over 20 megabytes,&nbsp;compressed).</p>
+<div class="highlight"><pre><span class="kn">library</span><span class="p">(</span>nzcrash<span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>dplyr<span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>tidyr<span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>magrittr<span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>stringr<span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>ggplot2<span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>scales<span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>lubridate<span class="p">)</span>
+</pre></div>
+
+
+<h2 id="datasets">Datasets</h2>
+<p>The <code>crashes</code> dataset describes most facts about a crash. The datasets <code>causes</code>, <code>vehicles</code>, and <code>objects_struck</code> describe facts that are in a many-to-one relationship with crashes. They can be joined to the <code>crashes</code> dataset by the common <code>id</code> column. The <code>causes</code> dataset can additionally be joined to the <code>vehicles</code> dataset by the combination of the <code>id</code> and <code>vehicle_id</code> columns. This is most useful when the resulting table is also joined to the <code>crashes</code> dataset.</p>
+<h2 id="up-to-date-ness">Up-to-date-ness</h2>
+<p>The data was last scraped from the <span class="caps">NZTA</span> website on 2015-07-20. At that time, the <span class="caps">NZTA</span> had published data up to the&nbsp;2015-03-10.</p>
+<div class="highlight"><pre><span class="kp">dim</span><span class="p">(</span>crashes<span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre>## [1] 540888     32
+</pre></div>
+
+
+<div class="highlight"><pre><span class="kp">dim</span><span class="p">(</span>causes<span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre>## [1] 888072      7
+</pre></div>
+
+
+<div class="highlight"><pre><span class="kp">dim</span><span class="p">(</span>vehicles<span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre>## [1] 979930      3
+</pre></div>
+
+
+<div class="highlight"><pre><span class="kp">dim</span><span class="p">(</span>objects_struck<span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre>## [1] 261276      3
+</pre></div>
+
+
+<h2 id="accuracy">Accuracy</h2>
+<p>The <a href="http://www.transport.govt.nz/research/roadtoll/#5"><span class="caps">NZTA</span></a>, doesn&#8217;t agree with <a href="http://www.transport.govt.nz/research/roadtoll/annualroadtollhistoricalinformation/">itself</a> about recent annual road tolls, and this dataset gives a third&nbsp;opinion.</p>
+<div class="highlight"><pre>crashes <span class="o">%&gt;%</span> 
+  filter<span class="p">(</span>severity <span class="o">==</span> <span class="s">&quot;fatal&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  group_by<span class="p">(</span>year <span class="o">=</span> year<span class="p">(</span><span class="kp">date</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  summarize<span class="p">(</span>fatalities <span class="o">=</span> <span class="kp">sum</span><span class="p">(</span>fatalities<span class="p">))</span>
+</pre></div>
+
+
+<div class="highlight"><pre>## Source: local data frame [16 x 2]
+## 
+##    year fatalities
+## 1  2000        462
+## 2  2001        455
+## 3  2002        405
+## 4  2003        461
+## 5  2004        435
+## 6  2005        405
+## 7  2006        393
+## 8  2007        421
+## 9  2008        366
+## 10 2009        384
+## 11 2010        375
+## 12 2011        284
+## 13 2012        308
+## 14 2013        256
+## 15 2014        279
+## 16 2015         34
+</pre></div>
+
+
+<h2 id="severity">Severity</h2>
+<p>Crashes categorised as &#8220;fatal&#8221;, &#8220;serious&#8221;, &#8220;minor&#8221; or &#8220;non-injury&#8221;, based on the casualties. If there are any fatalities, then the crash is a &#8220;fatal&#8221; crash, otherwise if there are any &#8216;severe&#8217; injuries, the crash is a &#8220;serious&#8221;&nbsp;crash.</p>
+<p>The definition of a &#8216;severe&#8217; injury is not&nbsp;clear.</p>
+<p>Minor and non-injury crashes are likely to be under-recorded since they often do not involve the police, who write most of the crash reports upon which these datasets are&nbsp;based.</p>
+<p>A common mistake is to confuse the number of fatal crashes with the number of&nbsp;fatalities.</p>
+<div class="highlight"><pre>crashes <span class="o">%&gt;%</span> filter<span class="p">(</span>severity <span class="o">==</span> <span class="s">&quot;fatal&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span> <span class="kp">nrow</span>
+</pre></div>
+
+
+<div class="highlight"><pre>## [1] 5042
+</pre></div>
+
+
+<div class="highlight"><pre><span class="kp">sum</span><span class="p">(</span>crashes<span class="o">$</span>fatalities<span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre>## [1] 5723
+</pre></div>
+
+
+<h2 id="dates-and-times">Dates and&nbsp;times</h2>
+<p>Three columns of the <code>crashes</code> dataset describe the date and time of the crash in the <span class="caps">NZST</span> time zone&nbsp;(Pacific/Auckland).</p>
+<ul>
+<li><code>date</code> gives the date without the&nbsp;time</li>
+<li><code>time</code> gives the time where this is available, and <span class="caps">NA</span> otherwise. Times are stored as date-times on the first of January,&nbsp;1970.</li>
+<li><code>datetime</code> gives the date and time in one value when both are available, and <span class="caps">NA</span> otherwise. <code>date</code> is always available, however <code>time</code> is&nbsp;not.</li>
+</ul>
+<p>When aggregating by some function of the date, e.g. by year, then always start from the <code>date</code> column unless you also need the time. This ensures against accidentally discounting crashes where a time is not&nbsp;recorded.</p>
+<div class="highlight"><pre>crashes <span class="o">%&gt;%</span>
+  filter<span class="p">(</span><span class="kp">is.na</span><span class="p">(</span>time<span class="p">))</span> <span class="o">%&gt;%</span>
+  count<span class="p">(</span>year <span class="o">=</span> year<span class="p">(</span><span class="kp">date</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  ggplot<span class="p">(</span>aes<span class="p">(</span>year<span class="p">,</span> n<span class="p">))</span> <span class="o">+</span>
+  geom_line<span class="p">()</span> <span class="o">+</span>
+  ggtitle<span class="p">(</span><span class="s">&quot;Crashes missing\ntime-of-day information&quot;</span><span class="p">)</span>
+
+crashes <span class="o">%&gt;%</span>
+  filter<span class="p">(</span><span class="kp">is.na</span><span class="p">(</span>time<span class="p">))</span> <span class="o">%&gt;%</span>
+  count<span class="p">(</span>year <span class="o">=</span> year<span class="p">(</span><span class="kp">date</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  mutate<span class="p">(</span>percent <span class="o">=</span> n<span class="o">/</span><span class="kp">sum</span><span class="p">(</span>n<span class="p">))</span> <span class="o">%&gt;%</span>
+  ggplot<span class="p">(</span>aes<span class="p">(</span>year<span class="p">,</span> percent<span class="p">))</span> <span class="o">+</span>
+  geom_line<span class="p">()</span> <span class="o">+</span>
+  scale_y_continuous<span class="p">(</span>labels <span class="o">=</span> percent<span class="p">)</span> <span class="o">+</span>
+  ggtitle<span class="p">(</span><span class="s">&quot;Percent of crashes missing\ntime-of-day information&quot;</span><span class="p">)</span>
+</pre></div>
+
+
+<p><img alt="" src="README_files/figure-markdown_github/unnamed-chunk-5-1.png" /> <img alt="" src="README_files/figure-markdown_github/unnamed-chunk-5-2.png" /></p>
+<h2 id="location-coordinates">Location&nbsp;coordinates</h2>
+<p>99.9% of crashes have coordinates. These have been converted from the <span class="caps">NZTM</span> projection to the <span class="caps">WGS84</span> projection for convenience with packages like <code>ggmap</code>.</p>
+<p>Because New Zealand is tall and skinny, you can easily spot the main population centres with a simple&nbsp;boxplot.</p>
+<div class="highlight"><pre>crashes <span class="o">%&gt;%</span>
+  ggplot<span class="p">(</span>aes<span class="p">(</span>northing<span class="p">))</span> <span class="o">+</span>
+  geom_histogram<span class="p">(</span>binwidth <span class="o">=</span> <span class="m">.1</span><span class="p">)</span>
+</pre></div>
+
+
+<p><img alt="" src="README_files/figure-markdown_github/unnamed-chunk-6-1.png" /></p>
+<h2 id="vehicles">Vehicles</h2>
+<p>There can be many vehicles in one crash, so vehicles are recorded in a separate <code>vehicles</code> dataset that can be joined to <code>crashes</code> by the common <code>id</code> column.</p>
+<div class="highlight"><pre>crashes <span class="o">%&gt;%</span>
+  inner_join<span class="p">(</span>vehicles<span class="p">,</span> by <span class="o">=</span> <span class="s">&quot;id&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  count<span class="p">(</span>vehicle<span class="p">)</span> <span class="o">%&gt;%</span> 
+  arrange<span class="p">(</span>desc<span class="p">(</span>n<span class="p">))</span>
+</pre></div>
+
+
+<div class="highlight"><pre>## Source: local data frame [12 x 2]
+## 
+##               vehicle      n
+## 1                 Car 728119
+## 2            Van, ute  87927
+## 3  SUV or 4x4 vehicle  48269
+## 4               Truck  44305
+## 5          Motorcycle  17733
+## 6                  NA  16996
+## 7             Bicycle  15713
+## 8                 Bus   8066
+## 9    Taxi or taxi van   6792
+## 10              Moped   3594
+## 11   Other or unknown   2043
+## 12         School bus    373
+</pre></div>
+
+
+<h2 id="objects-struck">Objects&nbsp;struck</h2>
+<p>There can be many objects struck in one crash, so these are recorded in a separate <code>objects_struck</code> dataset that can be joined to <code>crashes</code> by the common <code>id</code> column.</p>
+<p>Q: What are more fatal, trees or lamp&nbsp;posts?</p>
+<div class="highlight"><pre>crashes <span class="o">%&gt;%</span>
+  inner_join<span class="p">(</span>objects_struck<span class="p">,</span> by <span class="o">=</span> <span class="s">&quot;id&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  filter<span class="p">(</span>object <span class="o">%in%</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;Trees, shrubbery of a substantial nature&quot;</span>
+                               <span class="p">,</span> <span class="s">&quot;Utility pole, includes lighting columns&quot;</span><span class="p">)</span>
+  <span class="p">,</span> severity <span class="o">!=</span> <span class="s">&quot;non-injury&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span> <span class="c1"># non-injury crashes are poorly recorded</span>
+  count<span class="p">(</span>object<span class="p">,</span> severity<span class="p">)</span> <span class="o">%&gt;%</span> 
+  group_by<span class="p">(</span>object<span class="p">)</span> <span class="o">%&gt;%</span>
+  mutate<span class="p">(</span>percent <span class="o">=</span> n<span class="o">/</span><span class="kp">sum</span><span class="p">(</span>n<span class="p">))</span> <span class="o">%&gt;%</span>
+  select<span class="p">(</span><span class="o">-</span>n<span class="p">)</span> <span class="o">%&gt;%</span>
+  spread<span class="p">(</span>severity<span class="p">,</span> percent<span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre>## Source: local data frame [2 x 4]
+## 
+##                                     object      fatal   serious     minor
+## 1  Utility pole, includes lighting columns 0.04432701 0.2149482 0.7407248
+## 2 Trees, shrubbery of a substantial nature 0.06742092 0.2459016 0.6866774
+</pre></div>
+
+
+<p>A: Trees (Don&#8217;t worry, I know it&#8217;s harder than&nbsp;that.)</p>
+<h2 id="causes">Causes</h2>
+<p>Causes can be joined either to the <code>crashes</code> dataset (by the common <code>id</code> column), or to the <code>vehicles</code> dataset (by both of the commont <code>id</code> and <code>vehicle_id</code>)&nbsp;columns.</p>
+<p>The main cause groups are given in the <code>causes_category</code> column.</p>
+<div class="highlight"><pre>crashes <span class="o">%&gt;%</span>
+  inner_join<span class="p">(</span>causes<span class="p">,</span> by <span class="o">=</span> <span class="s">&quot;id&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  group_by<span class="p">(</span>cause_category<span class="p">,</span> id<span class="p">)</span> <span class="o">%&gt;%</span>
+  tally <span class="o">%&gt;%</span>
+  group_by<span class="p">(</span>cause_category<span class="p">)</span> <span class="o">%&gt;%</span>
+  summarize<span class="p">(</span>n <span class="o">=</span> n<span class="p">())</span> <span class="o">%&gt;%</span>
+  arrange<span class="p">(</span>desc<span class="p">(</span>n<span class="p">))</span> <span class="o">%&gt;%</span>
+  mutate<span class="p">(</span>cause_category <span class="o">=</span> <span class="kp">factor</span><span class="p">(</span>cause_category<span class="p">,</span> levels <span class="o">=</span> cause_category<span class="p">))</span> <span class="o">%&gt;%</span>
+  ggplot<span class="p">(</span>aes<span class="p">(</span>cause_category<span class="p">,</span> n<span class="p">))</span> <span class="o">+</span> 
+  geom_bar<span class="p">(</span>stat <span class="o">=</span> <span class="s">&quot;identity&quot;</span><span class="p">)</span> <span class="o">+</span>
+  theme<span class="p">(</span>axis.text.x <span class="o">=</span> element_text<span class="p">(</span>angle <span class="o">=</span> <span class="m">90</span><span class="p">,</span> hjust <span class="o">=</span> <span class="m">1</span><span class="p">,</span> vjust <span class="o">=</span> <span class="m">.5</span><span class="p">))</span>
+</pre></div>
+
+
+<p><img alt="" src="README_files/figure-markdown_github/unnamed-chunk-9-1.png" /></p>
+<p>That&#8217;s odd &#8212; where are speed, alcohol, and restraints? They&#8217;re given in <code>cause_subcategory</code>.</p>
+<div class="highlight"><pre>causes <span class="o">%&gt;%</span> 
+  filter<span class="p">(</span>cause_subcategory <span class="o">==</span> <span class="s">&quot;Too fast for conditions&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  count<span class="p">(</span>cause<span class="p">)</span> <span class="o">%&gt;%</span> 
+  arrange<span class="p">(</span>desc<span class="p">(</span>n<span class="p">))</span>
+</pre></div>
+
+
+<div class="highlight"><pre>## Source: local data frame [8 x 2]
+## 
+##                                cause     n
+## 1                          Cornering 37861
+## 2                        On straight 10196
+## 3                                 NA  7119
+## 4        To give way at intersection  1658
+## 5           At temporary speed limit  1010
+## 6              At crash or emergency    55
+## 7       Approaching railway crossing    44
+## 8 When passing stationary school bus    37
+</pre></div>
+
+
+<p>There&#8217;s nothing there about speed limit violations, because it&#8217;s impossible to tell what speed a vehicle was going at when it&nbsp;crashed.</p>
+<p>More worryingly, how is &#8220;Alcohol test below limit&#8221; a cause for a crash? Hopefully they filter those out when making policy&nbsp;decisions.</p>
+<div class="highlight"><pre><span class="kp">levels</span><span class="p">(</span>causes<span class="o">$</span>cause<span class="p">)</span> <span class="o">&lt;-</span>                <span class="c1"># Wrap facet labels</span>
+  str_wrap<span class="p">(</span><span class="kp">levels</span><span class="p">(</span>causes<span class="o">$</span>cause<span class="p">),</span> <span class="m">13</span><span class="p">)</span>
+crashes <span class="o">%&gt;%</span>
+  inner_join<span class="p">(</span>causes<span class="p">,</span> by <span class="o">=</span> <span class="s">&quot;id&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  filter<span class="p">(</span>cause_subcategory <span class="o">%in%</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;Alcohol or drugs&quot;</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  group_by<span class="p">(</span>cause<span class="p">,</span> id<span class="p">)</span> <span class="o">%&gt;%</span>
+  tally <span class="o">%&gt;%</span>
+  group_by<span class="p">(</span>cause<span class="p">)</span> <span class="o">%&gt;%</span>
+  summarize<span class="p">(</span>n <span class="o">=</span> n<span class="p">())</span> <span class="o">%&gt;%</span>               <span class="c1"># This extra step deals with many causes per crash</span>
+  arrange<span class="p">(</span>desc<span class="p">(</span>n<span class="p">))</span> <span class="o">%&gt;%</span>
+  mutate<span class="p">(</span>cause<span class="o">=</span> <span class="kp">factor</span><span class="p">(</span>cause<span class="p">,</span> levels <span class="o">=</span> cause<span class="p">))</span> <span class="o">%&gt;%</span>
+  ggplot<span class="p">(</span>aes<span class="p">(</span>cause<span class="p">,</span> n<span class="p">))</span> <span class="o">+</span> 
+  geom_bar<span class="p">(</span>stat <span class="o">=</span> <span class="s">&quot;identity&quot;</span><span class="p">)</span> <span class="o">+</span>
+  theme<span class="p">(</span>axis.text.x <span class="o">=</span> element_text<span class="p">(</span>angle <span class="o">=</span> <span class="m">90</span><span class="p">,</span> hjust <span class="o">=</span> <span class="m">1</span><span class="p">,</span> vjust <span class="o">=</span> <span class="m">.5</span><span class="p">))</span>
+</pre></div>
+
+
+<p><img alt="" src="README_files/figure-markdown_github/unnamed-chunk-11-1.png" /></p>
+<div class="highlight"><pre><span class="kp">rm</span><span class="p">(</span>causes<span class="p">)</span>                             <span class="c1"># Because we messed up the factor levels</span>
+</pre></div>
+
+
+<p>This time, join <code>causes</code> to both <code>vehicles</code> and <code>crashes</code> to assess the drunken cyclist&nbsp;menace.</p>
+<div class="highlight"><pre>crashes <span class="o">%&gt;%</span>
+  filter<span class="p">(</span>severity <span class="o">==</span> <span class="s">&quot;fatal&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  select<span class="p">(</span>id<span class="p">)</span> <span class="o">%&gt;%</span>
+  inner_join<span class="p">(</span>vehicles<span class="p">,</span> by <span class="o">=</span> <span class="s">&quot;id&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+  filter<span class="p">(</span>vehicle <span class="o">==</span> <span class="s">&quot;Bicycle&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  inner_join<span class="p">(</span>causes<span class="p">,</span> by <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;id&quot;</span><span class="p">,</span> <span class="s">&quot;vehicle_id&quot;</span><span class="p">))</span> <span class="o">%&gt;%</span> 
+  count<span class="p">(</span>cause<span class="p">)</span> <span class="o">%&gt;%</span>
+  arrange<span class="p">(</span>desc<span class="p">(</span>n<span class="p">))</span>
+</pre></div>
+
+
+<div class="highlight"><pre>## Source: local data frame [55 x 2]
+## 
+##                                                                  cause  n
+## 1  Behind when changing lanes position or direction (includes U-turns) 26
+## 2                                                                   NA 20
+## 3          When required to give way to traffic from another direction 10
+## 4                                                Wandering or wobbling  8
+## 5                                                     At Give Way sign  4
+## 6                           Cyclist or M/cyclist wearing dark clothing  4
+## 7                                        Driving or riding on footpath  4
+## 8                                             On left without due care  4
+## 9                              When pulling out or moving to the right  4
+## 10                                                 At steady red light  3
+## ..                                                                 ... ..
+</pre></div>
+
+
+<p>I think we all know what &#8220;Wandering or wobbling&#8221;&nbsp;means.</p>
+<p>Check out the <a href="https://github.com/nacnudus/nzcrash">package</a> on Github at&nbsp;https://github.com/nacnudus/nzcrash.</p>
+            <section>
+    <p id="post-share-links">
+    Like this post? Share on:
+    <a href="http://twitter.com/home?status=New%20R%20package%3A%C2%A0nzcrash%20http%3A//nacnudus.github.io/opre/new-r-package-nzcrash" target="_blank" title="Share on Twitter">Twitter</a>
+    ❄
+    <a href="http://www.facebook.com/sharer/sharer.php?s=100&amp;p%5Burl%5D=http%3A//nacnudus.github.io/opre/new-r-package-nzcrash" target="_blank" title="Share on Facebook">Facebook</a>
+    ❄
+    <a href="https://plus.google.com/share?url=http%3A//nacnudus.github.io/opre/new-r-package-nzcrash" target="_blank" title="Share on Google Plus">Google+</a>
+    ❄
+    <a href="mailto:?subject=New%20R%20package%3A%C2%A0nzcrash&amp;body=http%3A//nacnudus.github.io/opre/new-r-package-nzcrash" target="_blank" title="Share via Email">Email</a>
+    </p>
+</section>
+
+            <section>
+<p id="comment-message">Please comment below </p>
+<div class="accordion" id="accordion2">
+    <div class="accordion-group">
+        <div class="accordion-heading">
+            <a class="accordion-toggle disqus-comment-count" data-toggle="collapse" data-parent="#accordion2"
+                    data-disqus-identifier="nzcrash_release"
+                href="http://nacnudus.github.io/opre/new-r-package-nzcrash#disqus_thread">
+                Comments
+            </a>
+        </div>
+        <div id="disqus_thread" class="accordion-body collapse">
+            <div class="accordion-inner">
+                <div class="comments">
+                    <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'opreandr';
+        var disqus_identifier = 'nzcrash_release';
+    var disqus_url = 'http://nacnudus.github.io/opre/new-r-package-nzcrash';
+
+    (function() {
+         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+         dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+
+            <hr/>
+            <aside>
+            <nav>
+            <ul class="articles-timeline">
+                <li class="next-article"><a href="http://nacnudus.github.io/opre/the-tortoise-and-the-hare-move-house" title="Next: The tortoise and the hare move house">The tortoise and the hare move house</a> »</li>
+            </ul>
+            </nav>
+            </aside>
+        </div>
+        <section>
+        <div class="span2" style="float:right;font-size:0.9em;">
+            <h4>Published</h4>
+            <time pubdate="pubdate" datetime="2015-07-13T00:00:00+12:00">Jul 13, 2015</time>
+            <h4>Category</h4>
+            <a class="category-link" href="http://nacnudus.github.io/opre/categories.html#miscellaneous-ref">Miscellaneous</a>
+<h4>Social</h4>
+    <a href="https://github.com/nacnudus" title="My Github Profile" class="sidebar-social-links" target="_blank">
+    <i class="fa fa-github sidebar-social-links"></i></a>
+    <a href="https://twitter.com/nacnudus" title="My Twitter Profile" class="sidebar-social-links" target="_blank">
+    <i class="fa fa-twitter sidebar-social-links"></i></a>
+    <a href="https://nz.linkedin.com/in/duncangarmonsway" title="My LinkedIn Profile" class="sidebar-social-links" target="_blank">
+    <i class="fa fa-linkedin sidebar-social-links"></i></a>
+    <a href="http://oncrashreboot.com/feeds/all.atom.xml" title="Subscribe in a reader" class="sidebar-social-links" target="_blank">
+    <i class="fa fa-rss sidebar-social-links"></i></a>
+        </div>
+        </section>
+</div>
+</article>
+                </div>
+                <div class="span1"></div>
+            </div>
+        </div>
+        <div id="push"></div>
+    </div>
+<footer>
+<div id="footer">
+    <ul class="footer-content">
+        <li class="elegant-subtitle"><span class="site-name">OPRE</span> - R for Operational Research</li>
+        <li class="elegant-power">Powered by <a href="http://getpelican.com/" title="Pelican Home Page">Pelican</a>. Theme: <a href="http://oncrashreboot.com/pelican-elegant" title="Theme Elegant Home Page">Elegant</a> by <a href="http://oncrashreboot.com" title="Talha Mansoor Home Page">Talha Mansoor</a></li>
+    </ul>
+</div>
+</footer>            <script src="http://code.jquery.com/jquery.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+        <script>
+            function validateForm(query)
+            {
+                return (query.length > 0);
+            }
+        </script>
+
+            <script type="text/javascript">
+var disqus_shortname = 'opreandr';
+(function () {
+    var s = document.createElement('script'); s.async = true;
+    s.type = 'text/javascript';
+    s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+    (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+}());
+</script>
+<script  language="javascript" type="text/javascript">
+function uncollapse() {
+    if (window.location.hash.match(/^#comment-\d+$/)) {
+        $('#disqus_thread').collapse('show');
+    }
+}
+</script>
+<script type="text/javascript" language="JavaScript">
+uncollapse();
+window.onhashchange=function(){
+    if (window.location.hash.match(/^#comment-\d+$/))
+        window.location.reload(true);
+}
+</script>
+<script>
+$('#disqus_thread').on('shown', function () {
+    var link = document.getElementsByClassName('accordion-toggle');
+    var old_innerHTML = link[0].innerHTML;
+    $(link[0]).fadeOut(500, function() {
+        $(this).text('Click here to hide comments').fadeIn(500);
+    });
+    $('#disqus_thread').on('hidden', function () {
+        $(link[0]).fadeOut(500, function() {
+            $(this).text(old_innerHTML).fadeIn(500);
+        });
+    })
+})
+</script>
+
+
+    </body>
+    <!-- Theme: Elegant built for Pelican
+    License : http://oncrashreboot.com/pelican-elegant -->
+</html>

@@ -12,38 +12,289 @@ did, half of the journeys &lt;em&gt;up&lt;/em&gt; the&amp;nbsp;steps.&lt;/p&gt;
 &lt;p&gt;It would be interesting to find out how well animal bodies optimise themselves
 for physical exertion.  If a professional house mover is on a healthy diet, does
 their strength and bulk tend towards an optimum solution of the strength/bulk
-trade-off?  Anyone&amp;nbsp;know?&lt;/p&gt;</summary></entry><entry><title>Underwear sizes of flood victims</title><link href="http://nacnudus.github.io/opre/underwear-sizes-of-flood-victims" rel="alternate"></link><updated>2015-07-10T00:00:00+12:00</updated><author><name>Duncan Garmonsway</name></author><id>tag:nacnudus.github.io,2015-07-10:opre/underwear-sizes-of-flood-victims</id><summary type="html">&lt;p&gt;The Wellington Cathedral of St Paul (in New Zealand) has this newsletter&amp;nbsp;item:&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;&lt;strong&gt;Whanganui&amp;nbsp;Floods&lt;/strong&gt; &lt;/p&gt;
-&lt;p&gt;In response to the recent floods that have devastated
-parts of the Whanganui district, [someone] from the Parish of
-Eastern Whanganui is collecting &lt;span class="caps"&gt;NEW&lt;/span&gt; unides/knickers.  That&amp;#8217;s right - undies!
-These will be distributed to families in need in the region.  All shapes,
-sizes and colours will be gratefully&amp;nbsp;accepted.&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;What size of underwear ought donors to donate?  A few options come to&amp;nbsp;mind.&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Their own&amp;nbsp;size.&lt;/li&gt;
-&lt;li&gt;The size of someone they know in&amp;nbsp;Wanganui.&lt;/li&gt;
-&lt;li&gt;A random sample from a shop where they live (around&amp;nbsp;Wellington).&lt;/li&gt;
-&lt;li&gt;A random sample of a shop in&amp;nbsp;Wanganui.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Choosing your own size is an easy stragegy to implement, but it only works under
-certain assumption.  Are the donors of underwear similar in weight and balance
-of sexes to the receivers?  Does anyone have access to demographics of New
-Zealand Anglican&amp;nbsp;parishes?&lt;/p&gt;
-&lt;p&gt;Choosing the size of someone one knows in Wanganui has a couple of advantages
-over the first strategy.  First, parisoners of Wellington Cathedral may well
-know parishoners of Eastern Whanganui.  Supposing the receivers of undies are
-from all of Whanganui, not just the parishioners, it is still likely that people
-know people.  This is a small&amp;nbsp;country.&lt;/p&gt;
-&lt;p&gt;Secondly, donors may also know children in Wanganui, whereas they probably
-aren&amp;#8217;t children themselves.  This is an important point for the third strategy:
-sampling from a shop in Wellington.  &lt;a href="http://www.bendonlingerie.co.nz"&gt;Bendon Lingerie&lt;/a&gt;
-surely doesn&amp;#8217;t stock children&amp;#8217;s&amp;nbsp;sizes.&lt;/p&gt;
-&lt;p&gt;The final strategy might be best, since a clothes shop in Wanganui probably
-understands the local market as well as anyone.  But I&amp;#8217;d be concerned for people
-in the tails of the undie-size distribution.  The people in extreme need are the
-people at the extremes.  Since too-small undies can usually stretch, a good
-strategy would tends to under- rather than over-stimate the size of the
-population.  Overestimates are useless &amp;#8212; the dungers fall&amp;nbsp;down.&lt;/p&gt;</summary></entry></feed>
+trade-off?  Anyone&amp;nbsp;know?&lt;/p&gt;</summary></entry><entry><title>New R package: nzcrash</title><link href="http://nacnudus.github.io/opre/new-r-package-nzcrash" rel="alternate"></link><updated>2015-07-13T00:00:00+12:00</updated><author><name>Duncan Garmonsway</name></author><id>tag:nacnudus.github.io,2015-07-13:opre/new-r-package-nzcrash</id><summary type="html">&lt;h1 id="introducing-the-nzcrash-package"&gt;Introducing the nzcrash&amp;nbsp;package&lt;/h1&gt;
+&lt;p&gt;This &lt;a href="https://github.com/nacnudus/nzcrash"&gt;package&lt;/a&gt; redistributes crash statistics already available from the New Zealand Transport Agency, but in a more convenient&amp;nbsp;form.&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s a large package (over 20 megabytes,&amp;nbsp;compressed).&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;nzcrash&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="kn"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;dplyr&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="kn"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;tidyr&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="kn"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;magrittr&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="kn"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;stringr&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="kn"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;ggplot2&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="kn"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;scales&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="kn"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;lubridate&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2 id="datasets"&gt;Datasets&lt;/h2&gt;
+&lt;p&gt;The &lt;code&gt;crashes&lt;/code&gt; dataset describes most facts about a crash. The datasets &lt;code&gt;causes&lt;/code&gt;, &lt;code&gt;vehicles&lt;/code&gt;, and &lt;code&gt;objects_struck&lt;/code&gt; describe facts that are in a many-to-one relationship with crashes. They can be joined to the &lt;code&gt;crashes&lt;/code&gt; dataset by the common &lt;code&gt;id&lt;/code&gt; column. The &lt;code&gt;causes&lt;/code&gt; dataset can additionally be joined to the &lt;code&gt;vehicles&lt;/code&gt; dataset by the combination of the &lt;code&gt;id&lt;/code&gt; and &lt;code&gt;vehicle_id&lt;/code&gt; columns. This is most useful when the resulting table is also joined to the &lt;code&gt;crashes&lt;/code&gt; dataset.&lt;/p&gt;
+&lt;h2 id="up-to-date-ness"&gt;Up-to-date-ness&lt;/h2&gt;
+&lt;p&gt;The data was last scraped from the &lt;span class="caps"&gt;NZTA&lt;/span&gt; website on 2015-07-20. At that time, the &lt;span class="caps"&gt;NZTA&lt;/span&gt; had published data up to the&amp;nbsp;2015-03-10.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kp"&gt;dim&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;crashes&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## [1] 540888     32
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kp"&gt;dim&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;causes&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## [1] 888072      7
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kp"&gt;dim&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;vehicles&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## [1] 979930      3
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kp"&gt;dim&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;objects_struck&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## [1] 261276      3
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2 id="accuracy"&gt;Accuracy&lt;/h2&gt;
+&lt;p&gt;The &lt;a href="http://www.transport.govt.nz/research/roadtoll/#5"&gt;&lt;span class="caps"&gt;NZTA&lt;/span&gt;&lt;/a&gt;, doesn&amp;#8217;t agree with &lt;a href="http://www.transport.govt.nz/research/roadtoll/annualroadtollhistoricalinformation/"&gt;itself&lt;/a&gt; about recent annual road tolls, and this dataset gives a third&amp;nbsp;opinion.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
+  filter&lt;span class="p"&gt;(&lt;/span&gt;severity &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;fatal&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  group_by&lt;span class="p"&gt;(&lt;/span&gt;year &lt;span class="o"&gt;=&lt;/span&gt; year&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;date&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  summarize&lt;span class="p"&gt;(&lt;/span&gt;fatalities &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kp"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;fatalities&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## Source: local data frame [16 x 2]
+## 
+##    year fatalities
+## 1  2000        462
+## 2  2001        455
+## 3  2002        405
+## 4  2003        461
+## 5  2004        435
+## 6  2005        405
+## 7  2006        393
+## 8  2007        421
+## 9  2008        366
+## 10 2009        384
+## 11 2010        375
+## 12 2011        284
+## 13 2012        308
+## 14 2013        256
+## 15 2014        279
+## 16 2015         34
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2 id="severity"&gt;Severity&lt;/h2&gt;
+&lt;p&gt;Crashes categorised as &amp;#8220;fatal&amp;#8221;, &amp;#8220;serious&amp;#8221;, &amp;#8220;minor&amp;#8221; or &amp;#8220;non-injury&amp;#8221;, based on the casualties. If there are any fatalities, then the crash is a &amp;#8220;fatal&amp;#8221; crash, otherwise if there are any &amp;#8216;severe&amp;#8217; injuries, the crash is a &amp;#8220;serious&amp;#8221;&amp;nbsp;crash.&lt;/p&gt;
+&lt;p&gt;The definition of a &amp;#8216;severe&amp;#8217; injury is not&amp;nbsp;clear.&lt;/p&gt;
+&lt;p&gt;Minor and non-injury crashes are likely to be under-recorded since they often do not involve the police, who write most of the crash reports upon which these datasets are&amp;nbsp;based.&lt;/p&gt;
+&lt;p&gt;A common mistake is to confuse the number of fatal crashes with the number of&amp;nbsp;fatalities.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; filter&lt;span class="p"&gt;(&lt;/span&gt;severity &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;fatal&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; &lt;span class="kp"&gt;nrow&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## [1] 5042
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kp"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;crashes&lt;span class="o"&gt;$&lt;/span&gt;fatalities&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## [1] 5723
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2 id="dates-and-times"&gt;Dates and&amp;nbsp;times&lt;/h2&gt;
+&lt;p&gt;Three columns of the &lt;code&gt;crashes&lt;/code&gt; dataset describe the date and time of the crash in the &lt;span class="caps"&gt;NZST&lt;/span&gt; time zone&amp;nbsp;(Pacific/Auckland).&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;date&lt;/code&gt; gives the date without the&amp;nbsp;time&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;time&lt;/code&gt; gives the time where this is available, and &lt;span class="caps"&gt;NA&lt;/span&gt; otherwise. Times are stored as date-times on the first of January,&amp;nbsp;1970.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;datetime&lt;/code&gt; gives the date and time in one value when both are available, and &lt;span class="caps"&gt;NA&lt;/span&gt; otherwise. &lt;code&gt;date&lt;/code&gt; is always available, however &lt;code&gt;time&lt;/code&gt; is&amp;nbsp;not.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;When aggregating by some function of the date, e.g. by year, then always start from the &lt;code&gt;date&lt;/code&gt; column unless you also need the time. This ensures against accidentally discounting crashes where a time is not&amp;nbsp;recorded.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  filter&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;is.na&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;time&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  count&lt;span class="p"&gt;(&lt;/span&gt;year &lt;span class="o"&gt;=&lt;/span&gt; year&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;date&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  ggplot&lt;span class="p"&gt;(&lt;/span&gt;aes&lt;span class="p"&gt;(&lt;/span&gt;year&lt;span class="p"&gt;,&lt;/span&gt; n&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
+  geom_line&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
+  ggtitle&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Crashes missing\ntime-of-day information&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  filter&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;is.na&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;time&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  count&lt;span class="p"&gt;(&lt;/span&gt;year &lt;span class="o"&gt;=&lt;/span&gt; year&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;date&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  mutate&lt;span class="p"&gt;(&lt;/span&gt;percent &lt;span class="o"&gt;=&lt;/span&gt; n&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="kp"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;n&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  ggplot&lt;span class="p"&gt;(&lt;/span&gt;aes&lt;span class="p"&gt;(&lt;/span&gt;year&lt;span class="p"&gt;,&lt;/span&gt; percent&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
+  geom_line&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
+  scale_y_continuous&lt;span class="p"&gt;(&lt;/span&gt;labels &lt;span class="o"&gt;=&lt;/span&gt; percent&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
+  ggtitle&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Percent of crashes missing\ntime-of-day information&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="" src="README_files/figure-markdown_github/unnamed-chunk-5-1.png" /&gt; &lt;img alt="" src="README_files/figure-markdown_github/unnamed-chunk-5-2.png" /&gt;&lt;/p&gt;
+&lt;h2 id="location-coordinates"&gt;Location&amp;nbsp;coordinates&lt;/h2&gt;
+&lt;p&gt;99.9% of crashes have coordinates. These have been converted from the &lt;span class="caps"&gt;NZTM&lt;/span&gt; projection to the &lt;span class="caps"&gt;WGS84&lt;/span&gt; projection for convenience with packages like &lt;code&gt;ggmap&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Because New Zealand is tall and skinny, you can easily spot the main population centres with a simple&amp;nbsp;boxplot.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  ggplot&lt;span class="p"&gt;(&lt;/span&gt;aes&lt;span class="p"&gt;(&lt;/span&gt;northing&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
+  geom_histogram&lt;span class="p"&gt;(&lt;/span&gt;binwidth &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;.1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="" src="README_files/figure-markdown_github/unnamed-chunk-6-1.png" /&gt;&lt;/p&gt;
+&lt;h2 id="vehicles"&gt;Vehicles&lt;/h2&gt;
+&lt;p&gt;There can be many vehicles in one crash, so vehicles are recorded in a separate &lt;code&gt;vehicles&lt;/code&gt; dataset that can be joined to &lt;code&gt;crashes&lt;/code&gt; by the common &lt;code&gt;id&lt;/code&gt; column.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  inner_join&lt;span class="p"&gt;(&lt;/span&gt;vehicles&lt;span class="p"&gt;,&lt;/span&gt; by &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  count&lt;span class="p"&gt;(&lt;/span&gt;vehicle&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
+  arrange&lt;span class="p"&gt;(&lt;/span&gt;desc&lt;span class="p"&gt;(&lt;/span&gt;n&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## Source: local data frame [12 x 2]
+## 
+##               vehicle      n
+## 1                 Car 728119
+## 2            Van, ute  87927
+## 3  SUV or 4x4 vehicle  48269
+## 4               Truck  44305
+## 5          Motorcycle  17733
+## 6                  NA  16996
+## 7             Bicycle  15713
+## 8                 Bus   8066
+## 9    Taxi or taxi van   6792
+## 10              Moped   3594
+## 11   Other or unknown   2043
+## 12         School bus    373
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2 id="objects-struck"&gt;Objects&amp;nbsp;struck&lt;/h2&gt;
+&lt;p&gt;There can be many objects struck in one crash, so these are recorded in a separate &lt;code&gt;objects_struck&lt;/code&gt; dataset that can be joined to &lt;code&gt;crashes&lt;/code&gt; by the common &lt;code&gt;id&lt;/code&gt; column.&lt;/p&gt;
+&lt;p&gt;Q: What are more fatal, trees or lamp&amp;nbsp;posts?&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  inner_join&lt;span class="p"&gt;(&lt;/span&gt;objects_struck&lt;span class="p"&gt;,&lt;/span&gt; by &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  filter&lt;span class="p"&gt;(&lt;/span&gt;object &lt;span class="o"&gt;%in%&lt;/span&gt; &lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Trees, shrubbery of a substantial nature&amp;quot;&lt;/span&gt;
+                               &lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Utility pole, includes lighting columns&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="p"&gt;,&lt;/span&gt; severity &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;non-injury&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; &lt;span class="c1"&gt;# non-injury crashes are poorly recorded&lt;/span&gt;
+  count&lt;span class="p"&gt;(&lt;/span&gt;object&lt;span class="p"&gt;,&lt;/span&gt; severity&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
+  group_by&lt;span class="p"&gt;(&lt;/span&gt;object&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  mutate&lt;span class="p"&gt;(&lt;/span&gt;percent &lt;span class="o"&gt;=&lt;/span&gt; n&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="kp"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;n&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  select&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;n&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  spread&lt;span class="p"&gt;(&lt;/span&gt;severity&lt;span class="p"&gt;,&lt;/span&gt; percent&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## Source: local data frame [2 x 4]
+## 
+##                                     object      fatal   serious     minor
+## 1  Utility pole, includes lighting columns 0.04432701 0.2149482 0.7407248
+## 2 Trees, shrubbery of a substantial nature 0.06742092 0.2459016 0.6866774
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;A: Trees (Don&amp;#8217;t worry, I know it&amp;#8217;s harder than&amp;nbsp;that.)&lt;/p&gt;
+&lt;h2 id="causes"&gt;Causes&lt;/h2&gt;
+&lt;p&gt;Causes can be joined either to the &lt;code&gt;crashes&lt;/code&gt; dataset (by the common &lt;code&gt;id&lt;/code&gt; column), or to the &lt;code&gt;vehicles&lt;/code&gt; dataset (by both of the commont &lt;code&gt;id&lt;/code&gt; and &lt;code&gt;vehicle_id&lt;/code&gt;)&amp;nbsp;columns.&lt;/p&gt;
+&lt;p&gt;The main cause groups are given in the &lt;code&gt;causes_category&lt;/code&gt; column.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  inner_join&lt;span class="p"&gt;(&lt;/span&gt;causes&lt;span class="p"&gt;,&lt;/span&gt; by &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  group_by&lt;span class="p"&gt;(&lt;/span&gt;cause_category&lt;span class="p"&gt;,&lt;/span&gt; id&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  tally &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  group_by&lt;span class="p"&gt;(&lt;/span&gt;cause_category&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  summarize&lt;span class="p"&gt;(&lt;/span&gt;n &lt;span class="o"&gt;=&lt;/span&gt; n&lt;span class="p"&gt;())&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  arrange&lt;span class="p"&gt;(&lt;/span&gt;desc&lt;span class="p"&gt;(&lt;/span&gt;n&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  mutate&lt;span class="p"&gt;(&lt;/span&gt;cause_category &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kp"&gt;factor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;cause_category&lt;span class="p"&gt;,&lt;/span&gt; levels &lt;span class="o"&gt;=&lt;/span&gt; cause_category&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  ggplot&lt;span class="p"&gt;(&lt;/span&gt;aes&lt;span class="p"&gt;(&lt;/span&gt;cause_category&lt;span class="p"&gt;,&lt;/span&gt; n&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; 
+  geom_bar&lt;span class="p"&gt;(&lt;/span&gt;stat &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;identity&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
+  theme&lt;span class="p"&gt;(&lt;/span&gt;axis.text.x &lt;span class="o"&gt;=&lt;/span&gt; element_text&lt;span class="p"&gt;(&lt;/span&gt;angle &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;90&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; hjust &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; vjust &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;.5&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="" src="README_files/figure-markdown_github/unnamed-chunk-9-1.png" /&gt;&lt;/p&gt;
+&lt;p&gt;That&amp;#8217;s odd &amp;#8212; where are speed, alcohol, and restraints? They&amp;#8217;re given in &lt;code&gt;cause_subcategory&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;causes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
+  filter&lt;span class="p"&gt;(&lt;/span&gt;cause_subcategory &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Too fast for conditions&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  count&lt;span class="p"&gt;(&lt;/span&gt;cause&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
+  arrange&lt;span class="p"&gt;(&lt;/span&gt;desc&lt;span class="p"&gt;(&lt;/span&gt;n&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## Source: local data frame [8 x 2]
+## 
+##                                cause     n
+## 1                          Cornering 37861
+## 2                        On straight 10196
+## 3                                 NA  7119
+## 4        To give way at intersection  1658
+## 5           At temporary speed limit  1010
+## 6              At crash or emergency    55
+## 7       Approaching railway crossing    44
+## 8 When passing stationary school bus    37
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;There&amp;#8217;s nothing there about speed limit violations, because it&amp;#8217;s impossible to tell what speed a vehicle was going at when it&amp;nbsp;crashed.&lt;/p&gt;
+&lt;p&gt;More worryingly, how is &amp;#8220;Alcohol test below limit&amp;#8221; a cause for a crash? Hopefully they filter those out when making policy&amp;nbsp;decisions.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kp"&gt;levels&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;causes&lt;span class="o"&gt;$&lt;/span&gt;cause&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt;                &lt;span class="c1"&gt;# Wrap facet labels&lt;/span&gt;
+  str_wrap&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;levels&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;causes&lt;span class="o"&gt;$&lt;/span&gt;cause&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="m"&gt;13&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  inner_join&lt;span class="p"&gt;(&lt;/span&gt;causes&lt;span class="p"&gt;,&lt;/span&gt; by &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  filter&lt;span class="p"&gt;(&lt;/span&gt;cause_subcategory &lt;span class="o"&gt;%in%&lt;/span&gt; &lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Alcohol or drugs&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  group_by&lt;span class="p"&gt;(&lt;/span&gt;cause&lt;span class="p"&gt;,&lt;/span&gt; id&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  tally &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  group_by&lt;span class="p"&gt;(&lt;/span&gt;cause&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  summarize&lt;span class="p"&gt;(&lt;/span&gt;n &lt;span class="o"&gt;=&lt;/span&gt; n&lt;span class="p"&gt;())&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;               &lt;span class="c1"&gt;# This extra step deals with many causes per crash&lt;/span&gt;
+  arrange&lt;span class="p"&gt;(&lt;/span&gt;desc&lt;span class="p"&gt;(&lt;/span&gt;n&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  mutate&lt;span class="p"&gt;(&lt;/span&gt;cause&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kp"&gt;factor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;cause&lt;span class="p"&gt;,&lt;/span&gt; levels &lt;span class="o"&gt;=&lt;/span&gt; cause&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  ggplot&lt;span class="p"&gt;(&lt;/span&gt;aes&lt;span class="p"&gt;(&lt;/span&gt;cause&lt;span class="p"&gt;,&lt;/span&gt; n&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; 
+  geom_bar&lt;span class="p"&gt;(&lt;/span&gt;stat &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;identity&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
+  theme&lt;span class="p"&gt;(&lt;/span&gt;axis.text.x &lt;span class="o"&gt;=&lt;/span&gt; element_text&lt;span class="p"&gt;(&lt;/span&gt;angle &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;90&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; hjust &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; vjust &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;.5&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="" src="README_files/figure-markdown_github/unnamed-chunk-11-1.png" /&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kp"&gt;rm&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;causes&lt;span class="p"&gt;)&lt;/span&gt;                             &lt;span class="c1"&gt;# Because we messed up the factor levels&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This time, join &lt;code&gt;causes&lt;/code&gt; to both &lt;code&gt;vehicles&lt;/code&gt; and &lt;code&gt;crashes&lt;/code&gt; to assess the drunken cyclist&amp;nbsp;menace.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  filter&lt;span class="p"&gt;(&lt;/span&gt;severity &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;fatal&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  select&lt;span class="p"&gt;(&lt;/span&gt;id&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  inner_join&lt;span class="p"&gt;(&lt;/span&gt;vehicles&lt;span class="p"&gt;,&lt;/span&gt; by &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
+  filter&lt;span class="p"&gt;(&lt;/span&gt;vehicle &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Bicycle&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  inner_join&lt;span class="p"&gt;(&lt;/span&gt;causes&lt;span class="p"&gt;,&lt;/span&gt; by &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;vehicle_id&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
+  count&lt;span class="p"&gt;(&lt;/span&gt;cause&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  arrange&lt;span class="p"&gt;(&lt;/span&gt;desc&lt;span class="p"&gt;(&lt;/span&gt;n&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## Source: local data frame [55 x 2]
+## 
+##                                                                  cause  n
+## 1  Behind when changing lanes position or direction (includes U-turns) 26
+## 2                                                                   NA 20
+## 3          When required to give way to traffic from another direction 10
+## 4                                                Wandering or wobbling  8
+## 5                                                     At Give Way sign  4
+## 6                           Cyclist or M/cyclist wearing dark clothing  4
+## 7                                        Driving or riding on footpath  4
+## 8                                             On left without due care  4
+## 9                              When pulling out or moving to the right  4
+## 10                                                 At steady red light  3
+## ..                                                                 ... ..
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;I think we all know what &amp;#8220;Wandering or wobbling&amp;#8221;&amp;nbsp;means.&lt;/p&gt;
+&lt;p&gt;Check out the &lt;a href="https://github.com/nacnudus/nzcrash"&gt;package&lt;/a&gt; on Github at&amp;nbsp;https://github.com/nacnudus/nzcrash.&lt;/p&gt;</summary></entry></feed>
