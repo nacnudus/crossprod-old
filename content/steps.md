@@ -9,7 +9,7 @@ Someone in my flat emigrated last week, leaving behind 13 boxes for the shipping
 company.  When the van man arrived and saw the 40 steps leading up to our flat,
 he nearly passed out.  I offered to help.
 
-The van man man and I are different builds.
+The van man and I are different builds.
 
 ![](./images/451px-strong-vs-weak-clip-art-1502408.gif)
 
