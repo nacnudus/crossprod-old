@@ -3,6 +3,7 @@ Date: 2015-07-13
 Author: Duncan Garmonsway
 Summary: Redistributing NZ crash data in tidy form
 Disqus_identifier: nzcrash_release
+Tags: R
 
 Introducing the nzcrash package
 ===============================
