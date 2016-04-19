@@ -34,7 +34,7 @@ This post does three things:
 * Explains where all the time goes.
 
 Many people who promote R quote the number of R blogs as given on the
-[R-Bloggers](http://www.r-bloggers.com/) website, which syndicates literally
+[R-Bloggers](http://www.r-bloggers.com/) website by Tal Galili, which syndicates literally
 hundreds of R-related blogs (573 at the time of writing).  But the number tends
 only to increase.  How many actual posts are there in a given week/month, from
 how many different blogs?
