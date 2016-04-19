@@ -20,6 +20,6 @@ DELETE_OUTPUT_DIRECTORY = True
 
 # Following items are often useful when publishing
 
-DISQUS_SITENAME = 'opreandr'
+DISQUS_SITENAME = 'crossprod'
 GOOGLE_ANALYTICS = "UA-45097885-3"
 FEATURED_IMAGE = SITEURL + '/theme/images/apple-touch-icon-152x152.png'
