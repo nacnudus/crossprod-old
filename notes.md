@@ -19,7 +19,9 @@ python environment and the /home/nacnudus/opre directory.
 * `make devserver` serves it locally, and regenerates it when posts are edited.
   `make stopserver` in another terminal will allow you to cancel the process
   with `ctrl+c`.
-* `make publish` publishes to GitHub, available at https://nacnudus.github.io/opre/
+* `make publish` *doesn't* publish, rather makes it as though it were
+  publishing, using the `publishconf.py` script.
+* `make github` publishes to GitHub, available at https://nacnudus.github.io/opre/
 * Read the Makefile for other `make` commands
 
 ## Viewing the site
