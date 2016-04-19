@@ -1,0 +1,211 @@
+Title: Queueing and Simmering (part 1)
+Date: 2015-12-12
+Author: Duncan Garmonsway
+Summary: Queuing theory in R (part 1)
+Disqus_identifier: simmer01
+
+```{r pelican_conf, echo=FALSE}
+#set this to true when ready to publish
+ready_to_publish = FALSE
+
+# hook_plot <- knit_hooks$get('plot')
+# 
+# knit_hooks$set(plot=function(x, options) {
+#     if (!is.null(options$pelican.publish) && options$pelican.publish) {
+#         x <- paste0("{filename}", x)
+#     }
+#     hook_plot(x, options)
+# })
+# opts_chunk$set(pelican.publish = ready_to_publish)
+knitr::opts_chunk$set(fig.path='./figure/')
+
+knitr::opts_chunk$set(dev = 'Cairo_svg')
+```
+
+A major new version of a new-ish Discrete-Event Simulation (DES) package called
+[simmer](https://github.com/Bart6114/simmer) was released on CRAN last month,
+and is being developed rapidly on GitHub.  This is an opportunity to post about
+basic queueing theory in R, and in later posts to promote another handy package
+called [queueing](https://cran.r-project.org/package=queueing) for solving
+queueing networks theoretically.
+
+This is the first in a series of posts roughly following [The Bank
+Tutorial](https://pythonhosted.org/SimPy/Tutorials/TheBank.html), which is an
+excellent vignette for DES for Python called
+[SimPy](https://pythonhosted.org/SimPy/index.html).  Note that the vignette and
+this post were both written for version 2.2 (using Python 2.7), which I used at
+university earlier this year.  Version 3 is a complete rewrite and is somewhat
+different.
+
+Without further ado:
+
+```{r setup, message = FALSE, warning = FALSE}
+library(simmer)
+```
+
+In our first model, a single customer arrives at the bank at fixed time (rather
+than a random one), five minutes after the bank opens.  He cases the joint for
+ten minutes, then leaves.  
+
+In `simmer` speak, we define two thingummies, the 'trajectory' of the customer,
+and the 'system' of the bank.  The glue between the trajectory and the system is
+the 'generator', which spawns 'arrivals', in this case a single customer.  In
+`simmer` syntax, the generator is defined as part of the system, so we only
+write two blocks of code, the trajectory and the system.
+
+```{r}
+# The trajectory (customer)
+t0 <- create_trajectory(name = "customer") %>%
+  # Spend 10 minutes looking for security flaws
+  timeout(10)
+  # No instruction is needed to exit the system
+print(t0)
+
+# The system (bank)
+s0 <- simmer("bank") %>%
+  # Spawn an arrival (customer)
+  add_generator("customer", t0, at(5)) 
+print(s0)
+```
+
+We now run the simulation using something unusual in R, a function that
+modifies its argument in place.
+
+```{r}
+# The clock time before we start (arbitrary units)
+s0 %>% now
+
+# Run the simulation once
+
+# The time now
+s0 %>% now
+
+# See what happened
+get_mon_arrivals(s0)
+```
+
+Compared with the equivalent in `SymPy`, we have saved two lines of code.
+Here's six lines of `simmer`, followed by eight lines of `SimyPy`.
+
+```r
+library(simmer)
+
+t0 <- create_trajectory(name = "customer") %>%
+  timeout(10)
+
+s0 <- simmer("bank") %>%
+  add_generator("customer", t0, at(5)) 
+
+s0 %>% run
+```
+
+```python
+from SimPy.Simulation import *                           
+
+class Customer(Process):                                 
+    def visit(self,timeInBank):                          
+        yield hold,self,timeInBank                       
+
+initialize()                                             
+c = Customer(name="Klaus")                               
+activate(c, c.visit(timeInBank), at = 5. 0)                   
+simulate(until = 100.0)       
+```
+
+Next we add the fancy in-simulation progress reports from the original Bank
+Tutorial.  We do this  by using the `timeout` instruction's ability to execute a
+function full of arbitrary code, as long as it returns a numeric value of how
+much time to pass. Since we are only interested in the arbitrary code and not
+the time, we return zero time.
+
+```{r}
+t0 <- create_trajectory(name = "customer") %>%
+  timeout(function() {
+            cat(paste0(s0 %>% now(), ": Here I am\n"))
+            return(0)}) %>%
+  timeout(10) %>%
+  timeout(function() {
+            cat(paste0(s0 %>% now(), ": I must leave\n"))
+            return(0)})
+
+s0 <- simmer("bank") %>%
+  add_generator("customer", t0, at(5)) 
+
+s0 %>% run
+```
+
+Note that we accessed the current model time while inside the simulation.
+
+Finally, we can name the customer by setting an attribute with
+`set_attribute()`.  Except that we can't because attributes must be numeric.  Oh
+well, to this bank, a customer is only a number. 
+
+```{r}
+t1 <- create_trajectory(name = "customer") %>%
+  set_attribute("name", 1337) %>%
+  timeout(function(attrs) {
+            cat(paste0(s1 %>% now(), " ", attrs[["name"]], ": Here I am\n"))
+            return(10)}) %>%
+  timeout(function(attrs) {
+            cat(paste0(s1 %>% now(), " ", attrs[["name"]], ": I must leave\n"))
+            return(0)})
+
+s1 <- simmer("bank") %>%
+  add_generator("customer", t1, at(5)) 
+
+s1 %>% run
+```
+
+With the extra calls to `return()`, this is now one line more verbose than the
+`Simpy` equivalent would be, even though we collapsed the `timeout(10)` into the
+previous timeout.  Let's claim that line back by running a more realistic,
+random simulation.  
+
+```{r}
+library(simmer)
+set.seed(2015-12-19)
+
+t2 <- create_trajectory(name = "customer") %>%
+  set_attribute("name", 1337) %>%
+  timeout(function(attrs) {
+            cat(paste0(s2 %>% now(), " ", attrs[["name"]], ": Here I am\n"))
+            return(10)}) %>%
+  timeout(function(attrs) {
+            cat(paste0(s2 %>% now(), " ", attrs[["name"]], ": I must leave\n"))
+            return(0)})
+
+s2 <- simmer("bank") %>%
+  add_generator("customer", t2, at(rexp(1, 1/5))) 
+
+s2 %>% run
+```
+
+Note that the seed must be set *before* the generator is defined, because `at()`
+sets up a sequence of times in memory, and wraps them in a function that
+retrieves them in order until they run out.  The key point is that the random
+draw occurs when the `at()` function is executed (model definition time), not
+when the function that `at()` returns is executed (model run time).  This is
+demonstrated as follows.
+
+```{r}
+# The first two random draws with a given seed
+set.seed(2015-12-19)
+x <- rexp(3, 1/5)
+diff(x)
+x
+
+# The same draws, wrapped by the `at()` function
+set.seed(2015-12-19)
+when <- at(rexp(3, 1/5))
+when() # Same draw as above
+when() # Likewise
+when() # -1 means stop, no more arrivals
+# huh?
+
+set.seed(2015-12-19)
+when <- at(rexp(2, 1/5))
+set.seed(9999)
+when() # Drawn from the first seed, not the second
+```
+
+The next post will continue The Bank tutorial by adding more customers.
