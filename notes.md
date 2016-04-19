@@ -1,9 +1,9 @@
-# OPRE
+# Crossprod
 
 ## Python/virtualenv
 
-Before you do anything, do `workon opre`, which will put you in the correct
-python environment and the /home/nacnudus/opre directory.
+Before you do anything, do `workon crossprod`, which will put you in the correct
+python environment and the /home/nacnudus/crossprod directory.
 
 ## Writing posts
 
@@ -21,7 +21,7 @@ python environment and the /home/nacnudus/opre directory.
   with `ctrl+c`.
 * `make publish` *doesn't* publish, rather makes it as though it were
   publishing, using the `publishconf.py` script.
-* `make github` publishes to GitHub, available at https://nacnudus.github.io/opre/
+* `make github` publishes to GitHub, available at https://nacnudus.github.io/crossprod/
 * Read the Makefile for other `make` commands
 
 ## Viewing the site

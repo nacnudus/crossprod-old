@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 AUTHOR = u'Duncan Garmonsway'
-SITENAME = u'OPRE'
+SITENAME = u'Crossprod'
 SITEURL = u'http://localhost:8000'
 
 PATH = 'content'
@@ -39,7 +39,7 @@ AUTHOR_SAVE_AS = ''
 # Optional from here on
 RECENT_ARTICLES_COUNT = 10
 # SITE_LICENSE ('')
-SITESUBTITLE = 'R for Operational Research'
+SITESUBTITLE = 'R, data, and frustration'
 
 # MailChimp
 # Doesn't work with Github pages
@@ -49,15 +49,15 @@ SITESUBTITLE = 'R for Operational Research'
 #     {
 #         'name': 'This blog',
 #         'url':
-#         'http://nacnudus.github.io/opre/',
-#         'description': 'A blog about the R language and operations research'
+#         'http://nacnudus.github.io/crossprod/',
+#         'description': 'A blog about the R, data, and frustration'
 #     },
 # ]
-LANDING_PAGE_ABOUT = {'title': 'OPRE', 'details': 'My name is Duncan '
+LANDING_PAGE_ABOUT = {'title': 'Crossprod', 'details': 'My name is Duncan '
                       'Garmonsway.  I began doing data things in the New '
-                      'Zealand government, and am now working in Glasgow, '
-                      'Scotland, UK. I am an analyst who can code and who '
-                      'knows undergrad statistics. This is my personal blog.'}
+                      'Zealand government, and am now working in Glasgow. '
+                      'I write about R, data, and overcoming technical '
+                      'frustrations to meet analytical needs. '}
 
 # Labels
 SOCIAL_PROFILE_LABEL = u'Social'
@@ -96,7 +96,7 @@ SOCIAL = (('Github', 'https://github.com/nacnudus'),
           )
 
 # Search engine optimisation
-SITE_DESCRIPTION = u'My name is Duncan Garmonsway \u2013 a analyst who can code and knows undergrad statistics. This is my personal blog.'
+SITE_DESCRIPTION = u'A blog about R, data, and frustration'
 
 SITEMAP = {
     'format': 'xml',
