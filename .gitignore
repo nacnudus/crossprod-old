@@ -8,3 +8,7 @@
 ._*
 .ropeproject
 output
+content/figure
+content/data/temp
+cache
+content/*_cache
