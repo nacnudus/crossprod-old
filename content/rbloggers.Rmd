@@ -33,14 +33,15 @@ This post does three things:
 * Shows that I can use semi-structured non-csv data (job interview weakness).
 * Explains where all the time goes.
 
-Many people who promote R quote the number of R blogs as given on the R-Bloggers
-website, which syndicates literally hundreds of R-related blogs.  But the number
-tends only to increase.  How many actual posts are there in a given week/month,
-from how many different blogs?
+Many people who promote R quote the number of R blogs as given on the
+[R-Bloggers](http://www.r-bloggers.com/) website, which syndicates literally
+hundreds of R-related blogs (573 at the time of writing).  But the number tends
+only to increase.  How many actual posts are there in a given week/month, from
+how many different blogs?
 
 ## The gist of it
 
-I subscribed to the R-Bloggers daily digest emails in late 2014, giving me a
+I subscribed to the [R-Bloggers](http://www.r-bloggers.com/) daily digest emails in late 2014, giving me a
 good time-series of posts.
 
 The initial dump is easy from Gmail (define a filter > use it to apply a
@@ -61,10 +62,10 @@ remaining steps are also easy.
 
 ## The answer
 
-It turns out that there are about XXX blogs active in a given month, posting
-YYY posts (Revolutions is the only one that regularly posts more than once per
-week).  Nothing much has changed in the last year.  For some
-arbitrary definition of "dead blog", a survival analysis could be done.
+It turns out that there are about 75 blogs active in a given month, posting
+about 160 posts (Revolutions is the only one that regularly posts more than once
+per week).  Nothing much has changed in the last year.  For some arbitrary
+definition of "dead blog", a survival analysis could be done.
 
 ```{r rbloggers-periodical, echo = FALSE}
 library(dplyr)

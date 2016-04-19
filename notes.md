@@ -7,8 +7,9 @@ python environment and the /home/nacnudus/opre directory.
 
 ## Writing posts
 
-* Commit drafts to the `drafts` branch first, then merge into master.
-* Always name chunks that produce figures, otherwise the automatically-named
+* Commit drafts to their own branch first (not `drafts`, in case you don't want
+  to publish them in order), then merge into master.  Always name chunks that
+* produce figures, otherwise the automatically-named
   figure files of different posts will overwrite one another.
 
 ## (Re)generating the site
@@ -18,6 +19,11 @@ python environment and the /home/nacnudus/opre directory.
 * `make devserver` serves it locally, and regenerates it when posts are edited.
   `make stopserver` in another terminal will allow you to cancel the process
   with `ctrl+c`.
-* `make publish` publishes to GitHub, available at https://nacnudus.github.io/opre/
+* `make publish` *doesn't* publish, rather makes it as though it were
+  publishing, using the `publishconf.py` script.
+* `make github` publishes to GitHub, available at https://nacnudus.github.io/opre/
 * Read the Makefile for other `make` commands
 
+## Viewing the site
+
+Use http, not https, or the Disqus comments won't load.
