@@ -68,7 +68,7 @@ about 160 posts (Revolutions is the only one that regularly posts more than once
 per week).  Nothing much has changed in the last year.  For some arbitrary
 definition of "dead blog", a survival analysis could be done.
 
-```{r rbloggers-periodical, echo = FALSE}
+```{r, echo = FALSE}
 library(dplyr)
 library(tidyr)
 library(tm.plugin.mail)
@@ -176,7 +176,7 @@ periodical <-
   ungroup
 ```
 
-```{r, echo = FALSE}
+```{r rbloggers-periodical, echo = FALSE}
 periodical %>%
   ggplot(aes(date, n, colour = period, linetype = measure)) +
   geom_line() +
