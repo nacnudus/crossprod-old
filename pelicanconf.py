@@ -53,11 +53,13 @@ SITESUBTITLE = 'R, data, and frustration'
 #         'description': 'A blog about the R, data, and frustration'
 #     },
 # ]
-LANDING_PAGE_ABOUT = {'title': 'Crossprod', 'details': 'My name is Duncan '
+LANDING_PAGE_ABOUT = {'title': 'Crossprod', 'details': '<p>My name is Duncan '
                       'Garmonsway.  I began doing data things in the New '
                       'Zealand government, and am now working in Glasgow. '
                       'I write about R, data, and overcoming technical '
-                      'frustrations to meet analytical needs. '}
+                      'frustrations to meet analytical needs.</p> '
+                      '<p>This blog is aggregated at '
+                      '<a href="http://www.r-bloggers.com/" title="R-Bloggers">R-Bloggers</a>.</p>'}
 
 # Labels
 SOCIAL_PROFILE_LABEL = u'Social'
