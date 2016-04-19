@@ -33,7 +33,7 @@ remaining steps are also&amp;nbsp;easy.&lt;/p&gt;
 about 160 posts (Revolutions is the only one that regularly posts more than once
 per week).  Nothing much has changed in the last year.  For some arbitrary
 definition of &amp;#8220;dead blog&amp;#8221;, a survival analysis could be&amp;nbsp;done.&lt;/p&gt;
-&lt;p&gt;&lt;img src="./figure/unnamed-chunk-1-1.svg" title="plot of chunk unnamed-chunk-1" alt="plot of chunk unnamed-chunk-1" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="./figure/rbloggers-periodical-1.svg" title="plot of chunk rbloggers-periodical" alt="plot of chunk rbloggers-periodical" width="960px" height="540px" /&gt;&lt;/p&gt;
 &lt;h2 id="where-the-time-went"&gt;Where the time&amp;nbsp;went&lt;/h2&gt;
 &lt;p&gt;This was an easy project, but a few quirks soaked up a lot of&amp;nbsp;time:&lt;/p&gt;
 &lt;ul&gt;
@@ -260,7 +260,7 @@ crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;&lt;img alt="" src="README_files/figure-markdown_github/unnamed-chunk-5-1.png" /&gt; &lt;img alt="" src="README_files/figure-markdown_github/unnamed-chunk-5-2.png" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-5-1.png" /&gt; &lt;img alt="" src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-5-2.png" /&gt;&lt;/p&gt;
 &lt;h2 id="location-coordinates"&gt;Location&amp;nbsp;coordinates&lt;/h2&gt;
 &lt;p&gt;99.9% of crashes have coordinates. These have been converted from the &lt;span class="caps"&gt;NZTM&lt;/span&gt; projection to the &lt;span class="caps"&gt;WGS84&lt;/span&gt; projection for convenience with packages like &lt;code&gt;ggmap&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;Because New Zealand is tall and skinny, you can easily spot the main population centres with a simple&amp;nbsp;boxplot.&lt;/p&gt;
@@ -270,7 +270,7 @@ crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;&lt;img alt="" src="README_files/figure-markdown_github/unnamed-chunk-6-1.png" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-6-1.png" /&gt;&lt;/p&gt;
 &lt;h2 id="vehicles"&gt;Vehicles&lt;/h2&gt;
 &lt;p&gt;There can be many vehicles in one crash, so vehicles are recorded in a separate &lt;code&gt;vehicles&lt;/code&gt; dataset that can be joined to &lt;code&gt;crashes&lt;/code&gt; by the common &lt;code&gt;id&lt;/code&gt; column.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
@@ -340,7 +340,7 @@ crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;&lt;img alt="" src="README_files/figure-markdown_github/unnamed-chunk-9-1.png" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-9-1.png" /&gt;&lt;/p&gt;
 &lt;p&gt;That&amp;#8217;s odd &amp;#8212; where are speed, alcohol, and restraints? They&amp;#8217;re given in &lt;code&gt;cause_subcategory&lt;/code&gt;.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;causes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
   filter&lt;span class="p"&gt;(&lt;/span&gt;cause_subcategory &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Too fast for conditions&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
@@ -382,7 +382,7 @@ crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;&lt;img alt="" src="README_files/figure-markdown_github/unnamed-chunk-11-1.png" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-11-1.png" /&gt;&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kp"&gt;rm&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;causes&lt;span class="p"&gt;)&lt;/span&gt;                             &lt;span class="c1"&gt;# Because we messed up the factor levels&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
