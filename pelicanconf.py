@@ -38,7 +38,6 @@ AUTHOR_SAVE_AS = ''
 
 # Optional from here on
 RECENT_ARTICLES_COUNT = 10
-# COMMENTS_INTRO = ''
 # SITE_LICENSE ('')
 SITESUBTITLE = 'R for Operational Research'
 
@@ -54,11 +53,11 @@ SITESUBTITLE = 'R for Operational Research'
 #         'description': 'A blog about the R language and operations research'
 #     },
 # ]
-LANDING_PAGE_ABOUT = {'title': 'I do data', 'details': 'My name is Duncan '
-                      'Garmonsway.  I did data things in the New Zealand '
-                      'government and now I study maths, statistics and '
-                      'operations research at Victoria University of '
-                      'Wellington.'}
+LANDING_PAGE_ABOUT = {'title': 'OPRE', 'details': 'My name is Duncan '
+                      'Garmonsway.  I began doing data things in the New '
+                      'Zealand government, and am now working in Glasgow, '
+                      'Scotland, UK. I am an analyst who can code and who '
+                      'knows undergrad statistics. This is my personal blog.'}
 
 # Labels
 SOCIAL_PROFILE_LABEL = u'Social'
@@ -88,16 +87,16 @@ USE_SHORTCUT_ICONS = True
 LINKS = (('R-bloggers', 'http://www.r-bloggers.com/'),
          ('StatsBlogs', 'www.statsblogs.com'),)
 
-# Socialj
+# Social
 TWITTER_USERNAME = 'nacnudus'
 SOCIAL = (('Github', 'https://github.com/nacnudus'),
           ('Twitter', 'https://twitter.com/nacnudus'),
           ('LinkedIn', 'https://nz.linkedin.com/in/duncangarmonsway'),
-          ('RSS', 'http://oncrashreboot.com/feeds/all.atom.xml'),
+          # ('RSS', 'http://oncrashreboot.com/feeds/all.atom.xml'),
           )
 
 # Search engine optimisation
-SITE_DESCRIPTION = u'My name is Duncan Garmonsway \u2013 a analyst who can code and knows about statistics. This is my personal blog.'
+SITE_DESCRIPTION = u'My name is Duncan Garmonsway \u2013 a analyst who can code and knows undergrad statistics. This is my personal blog.'
 
 SITEMAP = {
     'format': 'xml',
