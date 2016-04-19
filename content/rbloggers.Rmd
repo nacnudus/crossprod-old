@@ -3,6 +3,7 @@ Date: 2016-04-18
 Author: Duncan Garmonsway
 Summary: Parsing the daily digest emails
 Disqus_identifier: rbloggers
+Tags: R
 
 ```{r pelican_conf, echo=FALSE}
 #set this to true when ready to publish
