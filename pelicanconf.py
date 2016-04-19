@@ -53,7 +53,7 @@ SITESUBTITLE = 'R for Operational Research'
 #         'description': 'A blog about the R language and operations research'
 #     },
 # ]
-LANDING_PAGE_ABOUT = {'title': 'About', 'details': 'My name is Duncan '
+LANDING_PAGE_ABOUT = {'title': 'OPRE', 'details': 'My name is Duncan '
                       'Garmonsway.  I began doing data things in the New '
                       'Zealand government, and am now working in Glasgow, '
                       'Scotland, UK. I am an analyst who can code and who '
