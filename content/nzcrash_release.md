@@ -142,7 +142,7 @@ crashes %>%
   ggtitle("Percent of crashes missing\ntime-of-day information")
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-5-1.png) ![](README_files/figure-markdown_github/unnamed-chunk-5-2.png)
+![](nzcrash_release_files/figure-markdown_github/unnamed-chunk-5-1.png) ![](nzcrash_release_files/figure-markdown_github/unnamed-chunk-5-2.png)
 
 Location coordinates
 --------------------
@@ -157,7 +157,7 @@ crashes %>%
   geom_histogram(binwidth = .1)
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-6-1.png)
+![](nzcrash_release_files/figure-markdown_github/unnamed-chunk-6-1.png)
 
 Vehicles
 --------
@@ -236,7 +236,7 @@ crashes %>%
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = .5))
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-9-1.png)
+![](nzcrash_release_files/figure-markdown_github/unnamed-chunk-9-1.png)
 
 That's odd -- where are speed, alcohol, and restraints? They're given in `cause_subcategory`.
 
@@ -280,7 +280,7 @@ crashes %>%
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = .5))
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-11-1.png)
+![](nzcrash_release_files/figure-markdown_github/unnamed-chunk-11-1.png)
 
 ``` {.r}
 rm(causes)                             # Because we messed up the factor levels
