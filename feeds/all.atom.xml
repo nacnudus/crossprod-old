@@ -1,5 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>OPRE</title><link href="http://nacnudus.github.io/opre/" rel="alternate"></link><link href="http://nacnudus.github.io/opre/feeds/all.atom.xml" rel="self"></link><id>http://nacnudus.github.io/opre/</id><updated>2015-07-13T00:00:00+12:00</updated><entry><title>New R package: nzcrash</title><link href="http://nacnudus.github.io/opre/new-r-package-nzcrash" rel="alternate"></link><updated>2015-07-13T00:00:00+12:00</updated><author><name>Duncan Garmonsway</name></author><id>tag:nacnudus.github.io,2015-07-13:opre/new-r-package-nzcrash</id><summary type="html">&lt;h1 id="introducing-the-nzcrash-package"&gt;Introducing the nzcrash&amp;nbsp;package&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>OPRE</title><link href="http://nacnudus.github.io/opre/" rel="alternate"></link><link href="http://nacnudus.github.io/opre/feeds/all.atom.xml" rel="self"></link><id>http://nacnudus.github.io/opre/</id><updated>2015-07-14T00:00:00+12:00</updated><entry><title>The tortoise and the hare move house</title><link href="http://nacnudus.github.io/opre/the-tortoise-and-the-hare-move-house" rel="alternate"></link><updated>2015-07-14T00:00:00+12:00</updated><author><name>Duncan Garmonsway</name></author><id>tag:nacnudus.github.io,2015-07-14:opre/the-tortoise-and-the-hare-move-house</id><summary type="html">&lt;p&gt;Someone in my flat emigrated last week, leaving behind 13 boxes for the shipping
+company.  When the van man arrived and saw the 40 steps leading up to our flat,
+he nearly passed out.  I offered to&amp;nbsp;help.&lt;/p&gt;
+&lt;p&gt;The van man and I are different&amp;nbsp;builds.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="./images/451px-strong-vs-weak-clip-art-1502408.gif" /&gt;&lt;/p&gt;
+&lt;p&gt;While the strong van man carried two boxes at a time down the steps, I carred
+only one, and then ran back up for another.  The final score was seven to him,
+and six to me.  How did I keep up?  Without being unkind, the van man&amp;#8217;s strength
+came with bulk.  Taking his own body into account, he carried a lot more than I
+did, half of the journeys &lt;em&gt;up&lt;/em&gt; the&amp;nbsp;steps.&lt;/p&gt;
+&lt;p&gt;It would be interesting to find out how well animal bodies optimise themselves
+for physical exertion.  If a professional house mover is on a healthy diet, does
+their strength and bulk tend towards an optimum solution of the strength/bulk
+trade-off?  Anyone&amp;nbsp;know?&lt;/p&gt;</summary></entry><entry><title>A watched pot never boils</title><link href="http://nacnudus.github.io/opre/a-watched-pot-never-boils" rel="alternate"></link><updated>2015-07-13T00:00:00+12:00</updated><author><name>Duncan Garmonsway</name></author><id>tag:nacnudus.github.io,2015-07-13:opre/a-watched-pot-never-boils</id><summary type="html">&lt;p&gt;My tea-crazy flatmate has a fancy kettle, which brings the water to the
+temperature you choose.  It is frustratingly slow to&amp;nbsp;boil.&lt;/p&gt;
+&lt;p&gt;When I suspected that it slowed the rate of heating as it approached the target
+temperature, I spent a happy evening heating different volumes of water to
+different temperatures to see how the kettle behaved.  Then I lost almost all
+the data in a digital equivalent of spilling tea over my lab&amp;nbsp;notes.&lt;/p&gt;
+&lt;p&gt;Here is the single surviving&amp;nbsp;experiment.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="plot of chunk kettlefig" src="./figure/kettlefig-1.svg" /&gt;&lt;/p&gt;
+&lt;p&gt;Presumably the kettle avoids overshooting, so I tested that in one (lost)
+experiment with a very small amount of water and a low target temperature.  It
+did, indeed, overshoot, suggesting that the engineers optimised this kettle for
+precision, at the expense of&amp;nbsp;speed.&lt;/p&gt;
+&lt;p&gt;Another flatmate then suggested another experiment to test the reaction speed of
+the thermostat, by boiling the kettle, and then chucking a mug of cold water in.
+The thermostat responded immediately, which suggests that the problem is in fact
+the&amp;nbsp;element.&lt;/p&gt;</summary></entry><entry><title>New R package: nzcrash</title><link href="http://nacnudus.github.io/opre/new-r-package-nzcrash" rel="alternate"></link><updated>2015-07-13T00:00:00+12:00</updated><author><name>Duncan Garmonsway</name></author><id>tag:nacnudus.github.io,2015-07-13:opre/new-r-package-nzcrash</id><summary type="html">&lt;h1 id="introducing-the-nzcrash-package"&gt;Introducing the nzcrash&amp;nbsp;package&lt;/h1&gt;
 &lt;p&gt;This &lt;a href="https://github.com/nacnudus/nzcrash"&gt;package&lt;/a&gt; redistributes crash statistics already available from the New Zealand Transport Agency, but in a more convenient&amp;nbsp;form.&lt;/p&gt;
 &lt;p&gt;It&amp;#8217;s a large package (over 20 megabytes,&amp;nbsp;compressed).&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;nzcrash&lt;span class="p"&gt;)&lt;/span&gt;
@@ -284,4 +312,38 @@ crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
 
 
 &lt;p&gt;I think we all know what &amp;#8220;Wandering or wobbling&amp;#8221;&amp;nbsp;means.&lt;/p&gt;
-&lt;p&gt;Check out the &lt;a href="https://github.com/nacnudus/nzcrash"&gt;package&lt;/a&gt; on Github at&amp;nbsp;https://github.com/nacnudus/nzcrash.&lt;/p&gt;</summary></entry></feed>
+&lt;p&gt;Check out the &lt;a href="https://github.com/nacnudus/nzcrash"&gt;package&lt;/a&gt; on Github at&amp;nbsp;https://github.com/nacnudus/nzcrash.&lt;/p&gt;</summary></entry><entry><title>Underwear sizes of flood victims</title><link href="http://nacnudus.github.io/opre/underwear-sizes-of-flood-victims" rel="alternate"></link><updated>2015-07-10T00:00:00+12:00</updated><author><name>Duncan Garmonsway</name></author><id>tag:nacnudus.github.io,2015-07-10:opre/underwear-sizes-of-flood-victims</id><summary type="html">&lt;p&gt;The Wellington Cathedral of St Paul (in New Zealand) has this newsletter&amp;nbsp;item:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Whanganui&amp;nbsp;Floods&lt;/strong&gt; &lt;/p&gt;
+&lt;p&gt;In response to the recent floods that have devastated
+parts of the Whanganui district, [someone] from the Parish of
+Eastern Whanganui is collecting &lt;span class="caps"&gt;NEW&lt;/span&gt; unides/knickers.  That&amp;#8217;s right - undies!
+These will be distributed to families in need in the region.  All shapes,
+sizes and colours will be gratefully&amp;nbsp;accepted.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;What size of underwear ought donors to donate?  A few options come to&amp;nbsp;mind.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Their own&amp;nbsp;size.&lt;/li&gt;
+&lt;li&gt;The size of someone they know in&amp;nbsp;Wanganui.&lt;/li&gt;
+&lt;li&gt;A random sample from a shop where they live (around&amp;nbsp;Wellington).&lt;/li&gt;
+&lt;li&gt;A random sample of a shop in&amp;nbsp;Wanganui.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Choosing your own size is an easy stragegy to implement, but it only works under
+certain assumption.  Are the donors of underwear similar in weight and balance
+of sexes to the receivers?  Does anyone have access to demographics of New
+Zealand Anglican&amp;nbsp;parishes?&lt;/p&gt;
+&lt;p&gt;Choosing the size of someone one knows in Wanganui has a couple of advantages
+over the first strategy.  First, parisoners of Wellington Cathedral may well
+know parishoners of Eastern Whanganui.  Supposing the receivers of undies are
+from all of Whanganui, not just the parishioners, it is still likely that people
+know people.  This is a small&amp;nbsp;country.&lt;/p&gt;
+&lt;p&gt;Secondly, donors may also know children in Wanganui, whereas they probably
+aren&amp;#8217;t children themselves.  This is an important point for the third strategy:
+sampling from a shop in Wellington.  &lt;a href="http://www.bendonlingerie.co.nz"&gt;Bendon Lingerie&lt;/a&gt;
+surely doesn&amp;#8217;t stock children&amp;#8217;s&amp;nbsp;sizes.&lt;/p&gt;
+&lt;p&gt;The final strategy might be best, since a clothes shop in Wanganui probably
+understands the local market as well as anyone.  But I&amp;#8217;d be concerned for people
+in the tails of the undie-size distribution.  The people in extreme need are the
+people at the extremes.  Since too-small undies can usually stretch, a good
+strategy would tends to under- rather than over-stimate the size of the
+population.  Overestimates are useless &amp;#8212; the dungers fall&amp;nbsp;down.&lt;/p&gt;</summary></entry></feed>
