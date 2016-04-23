@@ -58,8 +58,9 @@ LANDING_PAGE_ABOUT = {'title': 'Crossprod', 'details': '<p>My name is Duncan '
                       'Zealand government, and am now working in Glasgow. '
                       'I write about R, data, and overcoming technical '
                       'frustrations to meet analytical needs.</p> '
-                      '<p>This blog is aggregated at '
-                      '<a href="http://www.r-bloggers.com/" title="R-Bloggers">R-Bloggers</a>.</p>'}
+                      '<p>Two excellent blog-aggregators that I read are '
+                      '<a href="http://www.r-bloggers.com/" title="R-Bloggers">R-Bloggers</a> '
+                      'and <a href="http://www.statsblogs.com/" title="StatsBlogs">StatsBlogs</a>.</p>'}
 
 # Labels
 SOCIAL_PROFILE_LABEL = u'Social'
