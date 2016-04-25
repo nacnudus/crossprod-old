@@ -5,7 +5,7 @@ Summary: Parsing the daily digest emails
 Disqus_identifier: rbloggers
 Tags: R
 
-```{r pelican_conf, echo=FALSE}
+```{r rbloggers-pelican_conf, echo=FALSE}
 knitr::opts_chunk$set(cache = TRUE)
 knitr::opts_chunk$set(fig.path='figure/')
 knitr::opts_chunk$set(fig.width =  12.2)
