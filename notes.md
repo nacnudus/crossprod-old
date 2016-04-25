@@ -8,9 +8,10 @@ python environment and the /home/nacnudus/crossprod directory.
 ## Writing posts
 
 * Commit drafts to their own branch first (not `drafts`, in case you don't want
-  to publish them in order), then merge into master.  Always name chunks that
-* produce figures, otherwise the automatically-named
-  figure files of different posts will overwrite one another.
+  to publish them in order), then merge into master.  
+* Name all chunks, otherwise the automatically-named
+  cache and figure files of different posts will overwrite one another.
+* Load packages in their own chunk (can't be cached).
 
 ## (Re)generating the site
 
