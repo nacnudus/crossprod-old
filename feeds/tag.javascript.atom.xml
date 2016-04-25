@@ -14,7 +14,7 @@
 
 &lt;p&gt;This post does five&amp;nbsp;things:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;Draws illustrates rounding bias with a&amp;nbsp;graph.&lt;/li&gt;
+&lt;li&gt;Illustrates rounding bias with a&amp;nbsp;graph.&lt;/li&gt;
 &lt;li&gt;Discovers that JavaScript (in my browser) rounds the other&amp;nbsp;way.&lt;/li&gt;
 &lt;li&gt;Encounters floating-point difficulties when emulating&amp;nbsp;JavaScript.&lt;/li&gt;
 &lt;li&gt;Calls JavaScript itself via the V8&amp;nbsp;package.&lt;/li&gt;
