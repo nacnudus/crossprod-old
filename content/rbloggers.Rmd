@@ -185,7 +185,7 @@ periodical %>%
   ggtitle("Number of R-Bloggers blogs/posts per week/month")
 ```
 
-## Where the time went
+## What took me so long
 
 This was an easy project, but a few quirks soaked up a lot of time:
 
