@@ -124,8 +124,105 @@ remaining steps are also&nbsp;easy.</p>
 about 160 posts (Revolutions is the only one that regularly posts more than once
 per week).  Nothing much has changed in the last year.  For some arbitrary
 definition of &#8220;dead blog&#8221;, a survival analysis could be&nbsp;done.</p>
-<p><img src="./figure/rbloggers-periodical-1.svg" title="plot of chunk rbloggers-periodical" alt="plot of chunk rbloggers-periodical" width="960px" height="540px" /></p>
-<h2 id="where-the-time-went">Where the time&nbsp;went</h2>
+<div class="highlight"><pre><span class="c1"># TODO: Implement the following manual steps in R</span>
+<span class="c1"># 1. Create a label in Gmail for the R-Bloggers digests</span>
+<span class="c1"># 2. Export emails with that label from Gmail</span>
+<span class="c1"># 3. Extract the exported file</span>
+<span class="c1"># 4. Run sed &#39;:a;N;$!ba;s/=\n//g&#39; rbloggers.mbox in the Mail directory, i.e.</span>
+<span class="c1">#    sed &#39;:a;N;$!ba;s/=\r\n//g&#39; ./Takeout/Mail/rbloggers.mbox &gt; ./clean.mbox</span>
+<span class="c1">#    This steps removes funny newlines that are in the original emails in my</span>
+<span class="c1">#    inbox.</span>
+
+mail_dir <span class="o">&lt;-</span> <span class="s">&quot;./data/temp&quot;</span>
+
+<span class="c1"># Extract the emails into individual files</span>
+convert_mbox_eml<span class="p">(</span><span class="s">&quot;./data/clean.mbox&quot;</span><span class="p">,</span> mail_dir<span class="p">)</span>
+
+<span class="c1"># Collect the file names</span>
+emails <span class="o">&lt;-</span> <span class="kp">list.files</span><span class="p">(</span>mail_dir<span class="p">,</span> full.names <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+
+<span class="c1"># Remove the &quot;confirm email address&quot; one</span>
+<span class="c1"># and the one that has no links to the original blogs</span>
+emails <span class="o">&lt;-</span> emails<span class="p">[</span><span class="kt">c</span><span class="p">(</span><span class="m">-2</span><span class="p">,</span> <span class="m">-342</span><span class="p">)]</span>
+
+<span class="c1"># Remove any that are replies</span>
+emails <span class="o">&lt;-</span> emails<span class="p">[</span><span class="kp">vapply</span><span class="p">(</span>emails<span class="p">,</span>
+                        <span class="kr">function</span><span class="p">(</span>filename<span class="p">)</span> <span class="p">{</span>
+                          <span class="o">!</span><span class="kp">any</span><span class="p">(</span><span class="kp">grepl</span><span class="p">(</span><span class="s">&quot;^In-Reply-To: &lt;&quot;</span><span class="p">,</span>
+                                     <span class="kp">readLines</span><span class="p">(</span>filename<span class="p">,</span> n <span class="o">=</span> <span class="m">10</span><span class="p">)))},</span>
+                        <span class="kc">TRUE</span><span class="p">)]</span>
+
+<span class="c1"># Collect the datetimes in the first line of each file</span>
+<span class="c1"># Also collect the journals from the subject lines</span>
+n <span class="o">&lt;-</span> <span class="kp">length</span><span class="p">(</span>emails<span class="p">)</span>
+datetimes <span class="o">&lt;-</span> <span class="kt">vector</span><span class="p">(</span><span class="s">&quot;character&quot;</span><span class="p">,</span> length <span class="o">=</span> n<span class="p">)</span>
+blogcounts <span class="o">&lt;-</span> <span class="kt">vector</span><span class="p">(</span><span class="s">&quot;character&quot;</span><span class="p">,</span> length <span class="o">=</span> n<span class="p">)</span>
+blogs  <span class="o">&lt;-</span> <span class="kt">vector</span><span class="p">(</span><span class="s">&quot;list&quot;</span><span class="p">,</span> length <span class="o">=</span> n<span class="p">)</span>
+i <span class="o">&lt;-</span> <span class="m">0</span>
+<span class="kr">for</span> <span class="p">(</span>filename <span class="kr">in</span> emails<span class="p">)</span> <span class="p">{</span>
+  i <span class="o">&lt;&lt;-</span> i <span class="o">+</span> <span class="m">1</span>
+  datetimes<span class="p">[</span>i<span class="p">]</span> <span class="o">&lt;-</span> <span class="kp">readLines</span><span class="p">(</span>filename<span class="p">,</span> n <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
+  <span class="c1"># Extract the links to the original blogs</span>
+  blogs<span class="p">[[</span>i<span class="p">]]</span> <span class="o">&lt;-</span> 
+    read_html<span class="p">(</span>filename<span class="p">)</span> <span class="o">%&gt;%</span>
+    xml_find_all<span class="p">(</span><span class="s">&quot;//*[(@id = &#39;3D\&quot;itemcontentlist\&quot;&#39;)]//div//div//strong[(((count(preceding-sibling::*) + 1) = 1) and parent::*)]//a&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+    xml_text
+<span class="p">}</span>
+
+<span class="c1"># Extract the datetime string</span>
+datetimes <span class="o">&lt;-</span>
+  datetimes <span class="o">%&gt;%</span>
+  str_sub<span class="p">(</span>start <span class="o">=</span> <span class="m">34</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="kp">strptime</span><span class="p">(</span>format <span class="o">=</span> <span class="s">&quot;%b %d %H:%M:%S %z %Y&quot;</span><span class="p">)</span>
+
+<span class="c1"># Link the datetime with individual blogs</span>
+<span class="kp">names</span><span class="p">(</span>blogs<span class="p">)</span> <span class="o">&lt;-</span> datetimes
+blogs <span class="o">&lt;-</span> stack<span class="p">(</span>blogs<span class="p">)</span>
+
+<span class="c1"># Recover the dates and clean the blog names</span>
+blogs <span class="o">&lt;-</span> 
+  blogs <span class="o">%&gt;%</span>
+  rename<span class="p">(</span>blog <span class="o">=</span> values<span class="p">,</span> datetime <span class="o">=</span> ind<span class="p">)</span> <span class="o">%&gt;%</span>
+  mutate<span class="p">(</span>datetime <span class="o">=</span> ymd_hms<span class="p">(</span>datetime<span class="p">),</span>
+         <span class="c1"># blog = str_replace(blog, fixed(&quot;=\\n&quot;), &quot;&quot;),</span>
+         blog <span class="o">=</span> str_replace<span class="p">(</span>blog<span class="p">,</span> fixed<span class="p">(</span><span class="s">&quot;=C2=BB&quot;</span><span class="p">),</span> <span class="s">&quot;»&quot;</span><span class="p">),</span>
+         blog <span class="o">=</span> str_replace<span class="p">(</span>blog<span class="p">,</span> fixed<span class="p">(</span><span class="s">&quot;=E2=80=93&quot;</span><span class="p">),</span> <span class="s">&quot;–&quot;</span><span class="p">),</span>
+         blog <span class="o">=</span> str_replace<span class="p">(</span>blog<span class="p">,</span> fixed<span class="p">(</span><span class="s">&quot;=E2=80=A6&quot;</span><span class="p">),</span> <span class="s">&quot;…&quot;</span><span class="p">),</span>
+         blog <span class="o">=</span> str_replace<span class="p">(</span>blog<span class="p">,</span> fixed<span class="p">(</span><span class="s">&quot;=C3=A6&quot;</span><span class="p">),</span> <span class="s">&quot;æ&quot;</span><span class="p">),</span>
+         blog <span class="o">=</span> str_replace<span class="p">(</span>blog<span class="p">,</span> fixed<span class="p">(</span><span class="s">&quot;=EA=B0=84=EB=93=9C=EB=A3=A8=EB=93=9C =ED=81=AC=EB=A6=AC=EC=8A=A4=ED=86=A0=ED=8C=8C&quot;</span><span class="p">),</span> <span class="s">&quot;(간드루드 크리스토파)&quot;</span><span class="p">),</span>
+         blog <span class="o">=</span> str_replace<span class="p">(</span>blog<span class="p">,</span> fixed<span class="p">(</span><span class="s">&quot;=D0=AF=D1=82=D0=BE=D0=BC=D0=B8=D0=B7=D0=BE&quot;</span><span class="p">),</span> <span class="s">&quot;Ятомизо&quot;</span><span class="p">),</span>
+         blog <span class="o">=</span> str_trim<span class="p">(</span>blog<span class="p">))</span>
+
+<span class="c1"># Number of different blogs per week/month/year</span>
+periodically <span class="o">&lt;-</span> <span class="kr">function</span><span class="p">(</span>x<span class="p">,</span> period<span class="p">)</span> <span class="p">{</span>
+  x <span class="o">%&gt;%</span> 
+    group_by_<span class="p">(</span>period<span class="p">,</span> <span class="s">&quot;blog&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+    summarise<span class="p">(</span>posts <span class="o">=</span> n<span class="p">())</span> <span class="o">%&gt;%</span>
+    group_by_<span class="p">(</span>period<span class="p">)</span> <span class="o">%&gt;%</span>
+    summarise<span class="p">(</span>posts <span class="o">=</span> <span class="kp">sum</span><span class="p">(</span>posts<span class="p">),</span>
+              blogs <span class="o">=</span> n<span class="p">())</span> <span class="o">%&gt;%</span>
+    gather<span class="p">(</span>measure<span class="p">,</span> n<span class="p">,</span> posts<span class="p">,</span> blogs<span class="p">)</span> <span class="o">%&gt;%</span>
+    rename_<span class="p">(</span><span class="s">&quot;date&quot;</span> <span class="o">=</span> period<span class="p">)</span> <span class="o">%&gt;%</span>
+    mutate<span class="p">(</span>period <span class="o">=</span> <span class="kp">paste0</span><span class="p">(</span>period<span class="p">,</span> <span class="s">&quot;ly&quot;</span><span class="p">))</span>
+<span class="p">}</span>
+periodical <span class="o">&lt;-</span> 
+  blogs <span class="o">%&gt;%</span>
+  mutate<span class="p">(</span>year <span class="o">=</span> ceiling_date<span class="p">(</span>datetime<span class="p">,</span> <span class="s">&quot;year&quot;</span><span class="p">),</span>
+         month <span class="o">=</span> ceiling_date<span class="p">(</span>datetime<span class="p">,</span> <span class="s">&quot;month&quot;</span><span class="p">),</span>
+         week <span class="o">=</span> ceiling_date<span class="p">(</span>datetime<span class="p">,</span> <span class="s">&quot;week&quot;</span><span class="p">))</span>
+monthly <span class="o">&lt;-</span> periodically<span class="p">(</span>periodical<span class="p">,</span> <span class="s">&quot;month&quot;</span><span class="p">)</span>
+weekly <span class="o">&lt;-</span> periodically<span class="p">(</span>periodical<span class="p">,</span> <span class="s">&quot;week&quot;</span><span class="p">)</span>
+periodical <span class="o">&lt;-</span> 
+  bind_rows<span class="p">(</span>monthly<span class="p">,</span> weekly<span class="p">)</span> <span class="o">%&gt;%</span>
+  group_by<span class="p">(</span>period<span class="p">)</span> <span class="o">%&gt;%</span>
+  filter<span class="p">(</span>date <span class="o">&gt;</span> <span class="kp">min</span><span class="p">(</span><span class="kp">date</span><span class="p">),</span>
+         date <span class="o">&lt;</span> <span class="kp">max</span><span class="p">(</span><span class="kp">date</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  ungroup
+</pre></div>
+
+
+<p><img src="http://nacnudus.github.io/crossprod/figure/rbloggers-periodical-1.svg" title="plot of chunk rbloggers-periodical" alt="plot of chunk rbloggers-periodical" width="960px" height="540px" /></p>
+<h2 id="what-took-me-so-long">What took me so&nbsp;long</h2>
 <p>This was an easy project, but a few quirks soaked up a lot of&nbsp;time:</p>
 <ul>
 <li>I wanted to initialise an empty list, to store information collected by
@@ -165,8 +262,8 @@ answer</a> explains how the following
 command works: <code>sed ':a;N;$!ba;s/=\r\n//g'dirty.mbox &gt; clean.mbox</code>.</p>
 <h2 id="reward">Reward</h2>
 <p>Thankyou for reading. Here are some more graphs, and some code&nbsp;fragments.</p>
-<p><img src="./figure/rbloggers-top10-1.svg" title="plot of chunk rbloggers-top10" alt="plot of chunk rbloggers-top10" width="960px" height="540px" /></p>
-<p><img src="./figure/rbloggers-rates-1.svg" title="plot of chunk rbloggers-rates" alt="plot of chunk rbloggers-rates" width="960px" height="540px" /></p>
+<p><img src="http://nacnudus.github.io/crossprod/figure/rbloggers-top10-1.svg" title="plot of chunk rbloggers-top10" alt="plot of chunk rbloggers-top10" width="960px" height="540px" /></p>
+<p><img src="http://nacnudus.github.io/crossprod/figure/rbloggers-rates-1.svg" title="plot of chunk rbloggers-rates" alt="plot of chunk rbloggers-rates" width="960px" height="540px" /></p>
 <div class="highlight"><pre><span class="c1"># NOTE: These are frangments of code.  They do not stand alone.</span>
 
 <span class="c1"># Collect the file names</span>
@@ -229,7 +326,7 @@ blogs <span class="o">&lt;-</span>
     Like this post? Share on:
     <a href="http://twitter.com/home?status=How%20many%20R-Bloggers%20are%C2%A0there%3F%20http%3A//nacnudus.github.io/crossprod/how-many-r-bloggers-are-there" target="_blank" title="Share on Twitter">Twitter</a>
     ❄
-    <a href="http://www.facebook.com/sharer/sharer.php?s=100&amp;p%5Burl%5D=http%3A//nacnudus.github.io/crossprod/how-many-r-bloggers-are-there" target="_blank" title="Share on Facebook">Facebook</a>
+    <a href="http://www.facebook.com/sharer/sharer.php?u=http%3A//nacnudus.github.io/crossprod/how-many-r-bloggers-are-there" target="_blank" title="Share on Facebook">Facebook</a>
     ❄
     <a href="https://plus.google.com/share?url=http%3A//nacnudus.github.io/crossprod/how-many-r-bloggers-are-there" target="_blank" title="Share on Google Plus">Google+</a>
     ❄

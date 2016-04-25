@@ -93,63 +93,33 @@
             <h1 id="introducing-the-nzcrash-package">Introducing the nzcrash&nbsp;package</h1>
 <p>This <a href="https://github.com/nacnudus/nzcrash">package</a> redistributes crash statistics already available from the New Zealand Transport Agency, but in a more convenient&nbsp;form.</p>
 <p>It&#8217;s a large package (over 20 megabytes,&nbsp;compressed).</p>
-<div class="highlight"><pre><span class="kn">library</span><span class="p">(</span>nzcrash<span class="p">)</span>
-<span class="kn">library</span><span class="p">(</span>dplyr<span class="p">)</span>
-<span class="kn">library</span><span class="p">(</span>tidyr<span class="p">)</span>
-<span class="kn">library</span><span class="p">(</span>magrittr<span class="p">)</span>
-<span class="kn">library</span><span class="p">(</span>stringr<span class="p">)</span>
-<span class="kn">library</span><span class="p">(</span>ggplot2<span class="p">)</span>
-<span class="kn">library</span><span class="p">(</span>scales<span class="p">)</span>
-<span class="kn">library</span><span class="p">(</span>lubridate<span class="p">)</span>
-</pre></div>
-
-
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(nzcrash)
+<span class="kw">library</span>(dplyr)
+<span class="kw">library</span>(tidyr)
+<span class="kw">library</span>(magrittr)
+<span class="kw">library</span>(stringr)
+<span class="kw">library</span>(ggplot2)
+<span class="kw">library</span>(scales)
+<span class="kw">library</span>(lubridate)</code></pre></div>
 <h2 id="datasets">Datasets</h2>
 <p>The <code>crashes</code> dataset describes most facts about a crash. The datasets <code>causes</code>, <code>vehicles</code>, and <code>objects_struck</code> describe facts that are in a many-to-one relationship with crashes. They can be joined to the <code>crashes</code> dataset by the common <code>id</code> column. The <code>causes</code> dataset can additionally be joined to the <code>vehicles</code> dataset by the combination of the <code>id</code> and <code>vehicle_id</code> columns. This is most useful when the resulting table is also joined to the <code>crashes</code> dataset.</p>
 <h2 id="up-to-date-ness">Up-to-date-ness</h2>
 <p>The data was last scraped from the <span class="caps">NZTA</span> website on 2015-07-20. At that time, the <span class="caps">NZTA</span> had published data up to the&nbsp;2015-03-10.</p>
-<div class="highlight"><pre><span class="kp">dim</span><span class="p">(</span>crashes<span class="p">)</span>
-</pre></div>
-
-
-<div class="highlight"><pre>## [1] 540888     32
-</pre></div>
-
-
-<div class="highlight"><pre><span class="kp">dim</span><span class="p">(</span>causes<span class="p">)</span>
-</pre></div>
-
-
-<div class="highlight"><pre>## [1] 888072      7
-</pre></div>
-
-
-<div class="highlight"><pre><span class="kp">dim</span><span class="p">(</span>vehicles<span class="p">)</span>
-</pre></div>
-
-
-<div class="highlight"><pre>## [1] 979930      3
-</pre></div>
-
-
-<div class="highlight"><pre><span class="kp">dim</span><span class="p">(</span>objects_struck<span class="p">)</span>
-</pre></div>
-
-
-<div class="highlight"><pre>## [1] 261276      3
-</pre></div>
-
-
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dim</span>(crashes)</code></pre></div>
+<pre><code>## [1] 540888     32</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dim</span>(causes)</code></pre></div>
+<pre><code>## [1] 888072      7</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dim</span>(vehicles)</code></pre></div>
+<pre><code>## [1] 979930      3</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dim</span>(objects_struck)</code></pre></div>
+<pre><code>## [1] 261276      3</code></pre>
 <h2 id="accuracy">Accuracy</h2>
 <p>The <a href="http://www.transport.govt.nz/research/roadtoll/#5"><span class="caps">NZTA</span></a>, doesn&#8217;t agree with <a href="http://www.transport.govt.nz/research/roadtoll/annualroadtollhistoricalinformation/">itself</a> about recent annual road tolls, and this dataset gives a third&nbsp;opinion.</p>
-<div class="highlight"><pre>crashes <span class="o">%&gt;%</span> 
-  filter<span class="p">(</span>severity <span class="o">==</span> <span class="s">&quot;fatal&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
-  group_by<span class="p">(</span>year <span class="o">=</span> year<span class="p">(</span><span class="kp">date</span><span class="p">))</span> <span class="o">%&gt;%</span>
-  summarize<span class="p">(</span>fatalities <span class="o">=</span> <span class="kp">sum</span><span class="p">(</span>fatalities<span class="p">))</span>
-</pre></div>
-
-
-<div class="highlight"><pre>## Source: local data frame [16 x 2]
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">crashes %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">filter</span>(severity ==<span class="st"> &quot;fatal&quot;</span>) %&gt;%
+<span class="st">  </span><span class="kw">group_by</span>(<span class="dt">year =</span> <span class="kw">year</span>(date)) %&gt;%
+<span class="st">  </span><span class="kw">summarize</span>(<span class="dt">fatalities =</span> <span class="kw">sum</span>(fatalities))</code></pre></div>
+<pre><code>## Source: local data frame [16 x 2]
 ## 
 ##    year fatalities
 ## 1  2000        462
@@ -167,31 +137,16 @@
 ## 13 2012        308
 ## 14 2013        256
 ## 15 2014        279
-## 16 2015         34
-</pre></div>
-
-
+## 16 2015         34</code></pre>
 <h2 id="severity">Severity</h2>
 <p>Crashes categorised as &#8220;fatal&#8221;, &#8220;serious&#8221;, &#8220;minor&#8221; or &#8220;non-injury&#8221;, based on the casualties. If there are any fatalities, then the crash is a &#8220;fatal&#8221; crash, otherwise if there are any &#8216;severe&#8217; injuries, the crash is a &#8220;serious&#8221;&nbsp;crash.</p>
 <p>The definition of a &#8216;severe&#8217; injury is not&nbsp;clear.</p>
 <p>Minor and non-injury crashes are likely to be under-recorded since they often do not involve the police, who write most of the crash reports upon which these datasets are&nbsp;based.</p>
 <p>A common mistake is to confuse the number of fatal crashes with the number of&nbsp;fatalities.</p>
-<div class="highlight"><pre>crashes <span class="o">%&gt;%</span> filter<span class="p">(</span>severity <span class="o">==</span> <span class="s">&quot;fatal&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span> <span class="kp">nrow</span>
-</pre></div>
-
-
-<div class="highlight"><pre>## [1] 5042
-</pre></div>
-
-
-<div class="highlight"><pre><span class="kp">sum</span><span class="p">(</span>crashes<span class="o">$</span>fatalities<span class="p">)</span>
-</pre></div>
-
-
-<div class="highlight"><pre>## [1] 5723
-</pre></div>
-
-
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">crashes %&gt;%<span class="st"> </span><span class="kw">filter</span>(severity ==<span class="st"> &quot;fatal&quot;</span>) %&gt;%<span class="st"> </span>nrow</code></pre></div>
+<pre><code>## [1] 5042</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>(crashes$fatalities)</code></pre></div>
+<pre><code>## [1] 5723</code></pre>
 <h2 id="dates-and-times">Dates and&nbsp;times</h2>
 <p>Three columns of the <code>crashes</code> dataset describe the date and time of the crash in the <span class="caps">NZST</span> time zone&nbsp;(Pacific/Auckland).</p>
 <ul>
@@ -200,45 +155,38 @@
 <li><code>datetime</code> gives the date and time in one value when both are available, and <span class="caps">NA</span> otherwise. <code>date</code> is always available, however <code>time</code> is&nbsp;not.</li>
 </ul>
 <p>When aggregating by some function of the date, e.g. by year, then always start from the <code>date</code> column unless you also need the time. This ensures against accidentally discounting crashes where a time is not&nbsp;recorded.</p>
-<div class="highlight"><pre>crashes <span class="o">%&gt;%</span>
-  filter<span class="p">(</span><span class="kp">is.na</span><span class="p">(</span>time<span class="p">))</span> <span class="o">%&gt;%</span>
-  count<span class="p">(</span>year <span class="o">=</span> year<span class="p">(</span><span class="kp">date</span><span class="p">))</span> <span class="o">%&gt;%</span>
-  ggplot<span class="p">(</span>aes<span class="p">(</span>year<span class="p">,</span> n<span class="p">))</span> <span class="o">+</span>
-  geom_line<span class="p">()</span> <span class="o">+</span>
-  ggtitle<span class="p">(</span><span class="s">&quot;Crashes missing\ntime-of-day information&quot;</span><span class="p">)</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">crashes %&gt;%
+<span class="st">  </span><span class="kw">filter</span>(<span class="kw">is.na</span>(time)) %&gt;%
+<span class="st">  </span><span class="kw">count</span>(<span class="dt">year =</span> <span class="kw">year</span>(date)) %&gt;%
+<span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(year, n)) +
+<span class="st">  </span><span class="kw">geom_line</span>() +
+<span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Crashes missing</span><span class="ch">\n</span><span class="st">time-of-day information&quot;</span>)
 
-crashes <span class="o">%&gt;%</span>
-  filter<span class="p">(</span><span class="kp">is.na</span><span class="p">(</span>time<span class="p">))</span> <span class="o">%&gt;%</span>
-  count<span class="p">(</span>year <span class="o">=</span> year<span class="p">(</span><span class="kp">date</span><span class="p">))</span> <span class="o">%&gt;%</span>
-  mutate<span class="p">(</span>percent <span class="o">=</span> n<span class="o">/</span><span class="kp">sum</span><span class="p">(</span>n<span class="p">))</span> <span class="o">%&gt;%</span>
-  ggplot<span class="p">(</span>aes<span class="p">(</span>year<span class="p">,</span> percent<span class="p">))</span> <span class="o">+</span>
-  geom_line<span class="p">()</span> <span class="o">+</span>
-  scale_y_continuous<span class="p">(</span>labels <span class="o">=</span> percent<span class="p">)</span> <span class="o">+</span>
-  ggtitle<span class="p">(</span><span class="s">&quot;Percent of crashes missing\ntime-of-day information&quot;</span><span class="p">)</span>
-</pre></div>
-
-
-<p><img alt="" src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-5-1.png" /> <img alt="" src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-5-2.png" /></p>
+crashes %&gt;%
+<span class="st">  </span><span class="kw">filter</span>(<span class="kw">is.na</span>(time)) %&gt;%
+<span class="st">  </span><span class="kw">count</span>(<span class="dt">year =</span> <span class="kw">year</span>(date)) %&gt;%
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">percent =</span> n/<span class="kw">sum</span>(n)) %&gt;%
+<span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(year, percent)) +
+<span class="st">  </span><span class="kw">geom_line</span>() +
+<span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="dt">labels =</span> percent) +
+<span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Percent of crashes missing</span><span class="ch">\n</span><span class="st">time-of-day information&quot;</span>)</code></pre></div>
+<p><img src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-5-1.png" /> <img src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-5-2.png" /></p>
 <h2 id="location-coordinates">Location&nbsp;coordinates</h2>
 <p>99.9% of crashes have coordinates. These have been converted from the <span class="caps">NZTM</span> projection to the <span class="caps">WGS84</span> projection for convenience with packages like <code>ggmap</code>.</p>
 <p>Because New Zealand is tall and skinny, you can easily spot the main population centres with a simple&nbsp;boxplot.</p>
-<div class="highlight"><pre>crashes <span class="o">%&gt;%</span>
-  ggplot<span class="p">(</span>aes<span class="p">(</span>northing<span class="p">))</span> <span class="o">+</span>
-  geom_histogram<span class="p">(</span>binwidth <span class="o">=</span> <span class="m">.1</span><span class="p">)</span>
-</pre></div>
-
-
-<p><img alt="" src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-6-1.png" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">crashes %&gt;%
+<span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(northing)) +
+<span class="st">  </span><span class="kw">geom_histogram</span>(<span class="dt">binwidth =</span> .<span class="dv">1</span>)</code></pre></div>
+<figure>
+<img src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-6-1.png" />
+</figure>
 <h2 id="vehicles">Vehicles</h2>
 <p>There can be many vehicles in one crash, so vehicles are recorded in a separate <code>vehicles</code> dataset that can be joined to <code>crashes</code> by the common <code>id</code> column.</p>
-<div class="highlight"><pre>crashes <span class="o">%&gt;%</span>
-  inner_join<span class="p">(</span>vehicles<span class="p">,</span> by <span class="o">=</span> <span class="s">&quot;id&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
-  count<span class="p">(</span>vehicle<span class="p">)</span> <span class="o">%&gt;%</span> 
-  arrange<span class="p">(</span>desc<span class="p">(</span>n<span class="p">))</span>
-</pre></div>
-
-
-<div class="highlight"><pre>## Source: local data frame [12 x 2]
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">crashes %&gt;%
+<span class="st">  </span><span class="kw">inner_join</span>(vehicles, <span class="dt">by =</span> <span class="st">&quot;id&quot;</span>) %&gt;%
+<span class="st">  </span><span class="kw">count</span>(vehicle) %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">arrange</span>(<span class="kw">desc</span>(n))</code></pre></div>
+<pre><code>## Source: local data frame [12 x 2]
 ## 
 ##               vehicle      n
 ## 1                 Car 728119
@@ -252,62 +200,49 @@ crashes <span class="o">%&gt;%</span>
 ## 9    Taxi or taxi van   6792
 ## 10              Moped   3594
 ## 11   Other or unknown   2043
-## 12         School bus    373
-</pre></div>
-
-
+## 12         School bus    373</code></pre>
 <h2 id="objects-struck">Objects&nbsp;struck</h2>
 <p>There can be many objects struck in one crash, so these are recorded in a separate <code>objects_struck</code> dataset that can be joined to <code>crashes</code> by the common <code>id</code> column.</p>
 <p>Q: What are more fatal, trees or lamp&nbsp;posts?</p>
-<div class="highlight"><pre>crashes <span class="o">%&gt;%</span>
-  inner_join<span class="p">(</span>objects_struck<span class="p">,</span> by <span class="o">=</span> <span class="s">&quot;id&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
-  filter<span class="p">(</span>object <span class="o">%in%</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;Trees, shrubbery of a substantial nature&quot;</span>
-                               <span class="p">,</span> <span class="s">&quot;Utility pole, includes lighting columns&quot;</span><span class="p">)</span>
-  <span class="p">,</span> severity <span class="o">!=</span> <span class="s">&quot;non-injury&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span> <span class="c1"># non-injury crashes are poorly recorded</span>
-  count<span class="p">(</span>object<span class="p">,</span> severity<span class="p">)</span> <span class="o">%&gt;%</span> 
-  group_by<span class="p">(</span>object<span class="p">)</span> <span class="o">%&gt;%</span>
-  mutate<span class="p">(</span>percent <span class="o">=</span> n<span class="o">/</span><span class="kp">sum</span><span class="p">(</span>n<span class="p">))</span> <span class="o">%&gt;%</span>
-  select<span class="p">(</span><span class="o">-</span>n<span class="p">)</span> <span class="o">%&gt;%</span>
-  spread<span class="p">(</span>severity<span class="p">,</span> percent<span class="p">)</span>
-</pre></div>
-
-
-<div class="highlight"><pre>## Source: local data frame [2 x 4]
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">crashes %&gt;%
+<span class="st">  </span><span class="kw">inner_join</span>(objects_struck, <span class="dt">by =</span> <span class="st">&quot;id&quot;</span>) %&gt;%
+<span class="st">  </span><span class="kw">filter</span>(object %in%<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Trees, shrubbery of a substantial nature&quot;</span>
+                               , <span class="st">&quot;Utility pole, includes lighting columns&quot;</span>)
+  , severity !=<span class="st"> &quot;non-injury&quot;</span>) %&gt;%<span class="st"> </span><span class="co"># non-injury crashes are poorly recorded</span>
+<span class="st">  </span><span class="kw">count</span>(object, severity) %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">group_by</span>(object) %&gt;%
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">percent =</span> n/<span class="kw">sum</span>(n)) %&gt;%
+<span class="st">  </span><span class="kw">select</span>(-n) %&gt;%
+<span class="st">  </span><span class="kw">spread</span>(severity, percent)</code></pre></div>
+<pre><code>## Source: local data frame [2 x 4]
 ## 
 ##                                     object      fatal   serious     minor
 ## 1  Utility pole, includes lighting columns 0.04432701 0.2149482 0.7407248
-## 2 Trees, shrubbery of a substantial nature 0.06742092 0.2459016 0.6866774
-</pre></div>
-
-
+## 2 Trees, shrubbery of a substantial nature 0.06742092 0.2459016 0.6866774</code></pre>
 <p>A: Trees (Don&#8217;t worry, I know it&#8217;s harder than&nbsp;that.)</p>
 <h2 id="causes">Causes</h2>
 <p>Causes can be joined either to the <code>crashes</code> dataset (by the common <code>id</code> column), or to the <code>vehicles</code> dataset (by both of the commont <code>id</code> and <code>vehicle_id</code>)&nbsp;columns.</p>
 <p>The main cause groups are given in the <code>causes_category</code> column.</p>
-<div class="highlight"><pre>crashes <span class="o">%&gt;%</span>
-  inner_join<span class="p">(</span>causes<span class="p">,</span> by <span class="o">=</span> <span class="s">&quot;id&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
-  group_by<span class="p">(</span>cause_category<span class="p">,</span> id<span class="p">)</span> <span class="o">%&gt;%</span>
-  tally <span class="o">%&gt;%</span>
-  group_by<span class="p">(</span>cause_category<span class="p">)</span> <span class="o">%&gt;%</span>
-  summarize<span class="p">(</span>n <span class="o">=</span> n<span class="p">())</span> <span class="o">%&gt;%</span>
-  arrange<span class="p">(</span>desc<span class="p">(</span>n<span class="p">))</span> <span class="o">%&gt;%</span>
-  mutate<span class="p">(</span>cause_category <span class="o">=</span> <span class="kp">factor</span><span class="p">(</span>cause_category<span class="p">,</span> levels <span class="o">=</span> cause_category<span class="p">))</span> <span class="o">%&gt;%</span>
-  ggplot<span class="p">(</span>aes<span class="p">(</span>cause_category<span class="p">,</span> n<span class="p">))</span> <span class="o">+</span> 
-  geom_bar<span class="p">(</span>stat <span class="o">=</span> <span class="s">&quot;identity&quot;</span><span class="p">)</span> <span class="o">+</span>
-  theme<span class="p">(</span>axis.text.x <span class="o">=</span> element_text<span class="p">(</span>angle <span class="o">=</span> <span class="m">90</span><span class="p">,</span> hjust <span class="o">=</span> <span class="m">1</span><span class="p">,</span> vjust <span class="o">=</span> <span class="m">.5</span><span class="p">))</span>
-</pre></div>
-
-
-<p><img alt="" src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-9-1.png" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">crashes %&gt;%
+<span class="st">  </span><span class="kw">inner_join</span>(causes, <span class="dt">by =</span> <span class="st">&quot;id&quot;</span>) %&gt;%
+<span class="st">  </span><span class="kw">group_by</span>(cause_category, id) %&gt;%
+<span class="st">  </span>tally %&gt;%
+<span class="st">  </span><span class="kw">group_by</span>(cause_category) %&gt;%
+<span class="st">  </span><span class="kw">summarize</span>(<span class="dt">n =</span> <span class="kw">n</span>()) %&gt;%
+<span class="st">  </span><span class="kw">arrange</span>(<span class="kw">desc</span>(n)) %&gt;%
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">cause_category =</span> <span class="kw">factor</span>(cause_category, <span class="dt">levels =</span> cause_category)) %&gt;%
+<span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(cause_category, n)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_bar</span>(<span class="dt">stat =</span> <span class="st">&quot;identity&quot;</span>) +
+<span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="dv">90</span>, <span class="dt">hjust =</span> <span class="dv">1</span>, <span class="dt">vjust =</span> .<span class="dv">5</span>))</code></pre></div>
+<figure>
+<img src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-9-1.png" />
+</figure>
 <p>That&#8217;s odd &#8212; where are speed, alcohol, and restraints? They&#8217;re given in <code>cause_subcategory</code>.</p>
-<div class="highlight"><pre>causes <span class="o">%&gt;%</span> 
-  filter<span class="p">(</span>cause_subcategory <span class="o">==</span> <span class="s">&quot;Too fast for conditions&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
-  count<span class="p">(</span>cause<span class="p">)</span> <span class="o">%&gt;%</span> 
-  arrange<span class="p">(</span>desc<span class="p">(</span>n<span class="p">))</span>
-</pre></div>
-
-
-<div class="highlight"><pre>## Source: local data frame [8 x 2]
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">causes %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">filter</span>(cause_subcategory ==<span class="st"> &quot;Too fast for conditions&quot;</span>) %&gt;%
+<span class="st">  </span><span class="kw">count</span>(cause) %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">arrange</span>(<span class="kw">desc</span>(n))</code></pre></div>
+<pre><code>## Source: local data frame [8 x 2]
 ## 
 ##                                cause     n
 ## 1                          Cornering 37861
@@ -317,47 +252,37 @@ crashes <span class="o">%&gt;%</span>
 ## 5           At temporary speed limit  1010
 ## 6              At crash or emergency    55
 ## 7       Approaching railway crossing    44
-## 8 When passing stationary school bus    37
-</pre></div>
-
-
+## 8 When passing stationary school bus    37</code></pre>
 <p>There&#8217;s nothing there about speed limit violations, because it&#8217;s impossible to tell what speed a vehicle was going at when it&nbsp;crashed.</p>
 <p>More worryingly, how is &#8220;Alcohol test below limit&#8221; a cause for a crash? Hopefully they filter those out when making policy&nbsp;decisions.</p>
-<div class="highlight"><pre><span class="kp">levels</span><span class="p">(</span>causes<span class="o">$</span>cause<span class="p">)</span> <span class="o">&lt;-</span>                <span class="c1"># Wrap facet labels</span>
-  str_wrap<span class="p">(</span><span class="kp">levels</span><span class="p">(</span>causes<span class="o">$</span>cause<span class="p">),</span> <span class="m">13</span><span class="p">)</span>
-crashes <span class="o">%&gt;%</span>
-  inner_join<span class="p">(</span>causes<span class="p">,</span> by <span class="o">=</span> <span class="s">&quot;id&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
-  filter<span class="p">(</span>cause_subcategory <span class="o">%in%</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;Alcohol or drugs&quot;</span><span class="p">))</span> <span class="o">%&gt;%</span>
-  group_by<span class="p">(</span>cause<span class="p">,</span> id<span class="p">)</span> <span class="o">%&gt;%</span>
-  tally <span class="o">%&gt;%</span>
-  group_by<span class="p">(</span>cause<span class="p">)</span> <span class="o">%&gt;%</span>
-  summarize<span class="p">(</span>n <span class="o">=</span> n<span class="p">())</span> <span class="o">%&gt;%</span>               <span class="c1"># This extra step deals with many causes per crash</span>
-  arrange<span class="p">(</span>desc<span class="p">(</span>n<span class="p">))</span> <span class="o">%&gt;%</span>
-  mutate<span class="p">(</span>cause<span class="o">=</span> <span class="kp">factor</span><span class="p">(</span>cause<span class="p">,</span> levels <span class="o">=</span> cause<span class="p">))</span> <span class="o">%&gt;%</span>
-  ggplot<span class="p">(</span>aes<span class="p">(</span>cause<span class="p">,</span> n<span class="p">))</span> <span class="o">+</span> 
-  geom_bar<span class="p">(</span>stat <span class="o">=</span> <span class="s">&quot;identity&quot;</span><span class="p">)</span> <span class="o">+</span>
-  theme<span class="p">(</span>axis.text.x <span class="o">=</span> element_text<span class="p">(</span>angle <span class="o">=</span> <span class="m">90</span><span class="p">,</span> hjust <span class="o">=</span> <span class="m">1</span><span class="p">,</span> vjust <span class="o">=</span> <span class="m">.5</span><span class="p">))</span>
-</pre></div>
-
-
-<p><img alt="" src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-11-1.png" /></p>
-<div class="highlight"><pre><span class="kp">rm</span><span class="p">(</span>causes<span class="p">)</span>                             <span class="c1"># Because we messed up the factor levels</span>
-</pre></div>
-
-
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">levels</span>(causes$cause) &lt;-<span class="st">                </span><span class="co"># Wrap facet labels</span>
+<span class="st">  </span><span class="kw">str_wrap</span>(<span class="kw">levels</span>(causes$cause), <span class="dv">13</span>)
+crashes %&gt;%
+<span class="st">  </span><span class="kw">inner_join</span>(causes, <span class="dt">by =</span> <span class="st">&quot;id&quot;</span>) %&gt;%
+<span class="st">  </span><span class="kw">filter</span>(cause_subcategory %in%<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Alcohol or drugs&quot;</span>)) %&gt;%
+<span class="st">  </span><span class="kw">group_by</span>(cause, id) %&gt;%
+<span class="st">  </span>tally %&gt;%
+<span class="st">  </span><span class="kw">group_by</span>(cause) %&gt;%
+<span class="st">  </span><span class="kw">summarize</span>(<span class="dt">n =</span> <span class="kw">n</span>()) %&gt;%<span class="st">               </span><span class="co"># This extra step deals with many causes per crash</span>
+<span class="st">  </span><span class="kw">arrange</span>(<span class="kw">desc</span>(n)) %&gt;%
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">cause=</span> <span class="kw">factor</span>(cause, <span class="dt">levels =</span> cause)) %&gt;%
+<span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(cause, n)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_bar</span>(<span class="dt">stat =</span> <span class="st">&quot;identity&quot;</span>) +
+<span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="dv">90</span>, <span class="dt">hjust =</span> <span class="dv">1</span>, <span class="dt">vjust =</span> .<span class="dv">5</span>))</code></pre></div>
+<figure>
+<img src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-11-1.png" />
+</figure>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">rm</span>(causes)                             <span class="co"># Because we messed up the factor levels</span></code></pre></div>
 <p>This time, join <code>causes</code> to both <code>vehicles</code> and <code>crashes</code> to assess the drunken cyclist&nbsp;menace.</p>
-<div class="highlight"><pre>crashes <span class="o">%&gt;%</span>
-  filter<span class="p">(</span>severity <span class="o">==</span> <span class="s">&quot;fatal&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
-  select<span class="p">(</span>id<span class="p">)</span> <span class="o">%&gt;%</span>
-  inner_join<span class="p">(</span>vehicles<span class="p">,</span> by <span class="o">=</span> <span class="s">&quot;id&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span> 
-  filter<span class="p">(</span>vehicle <span class="o">==</span> <span class="s">&quot;Bicycle&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
-  inner_join<span class="p">(</span>causes<span class="p">,</span> by <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;id&quot;</span><span class="p">,</span> <span class="s">&quot;vehicle_id&quot;</span><span class="p">))</span> <span class="o">%&gt;%</span> 
-  count<span class="p">(</span>cause<span class="p">)</span> <span class="o">%&gt;%</span>
-  arrange<span class="p">(</span>desc<span class="p">(</span>n<span class="p">))</span>
-</pre></div>
-
-
-<div class="highlight"><pre>## Source: local data frame [55 x 2]
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">crashes %&gt;%
+<span class="st">  </span><span class="kw">filter</span>(severity ==<span class="st"> &quot;fatal&quot;</span>) %&gt;%
+<span class="st">  </span><span class="kw">select</span>(id) %&gt;%
+<span class="st">  </span><span class="kw">inner_join</span>(vehicles, <span class="dt">by =</span> <span class="st">&quot;id&quot;</span>) %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">filter</span>(vehicle ==<span class="st"> &quot;Bicycle&quot;</span>) %&gt;%
+<span class="st">  </span><span class="kw">inner_join</span>(causes, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;vehicle_id&quot;</span>)) %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">count</span>(cause) %&gt;%
+<span class="st">  </span><span class="kw">arrange</span>(<span class="kw">desc</span>(n))</code></pre></div>
+<pre><code>## Source: local data frame [55 x 2]
 ## 
 ##                                                                  cause  n
 ## 1  Behind when changing lanes position or direction (includes U-turns) 26
@@ -370,18 +295,16 @@ crashes <span class="o">%&gt;%</span>
 ## 8                                             On left without due care  4
 ## 9                              When pulling out or moving to the right  4
 ## 10                                                 At steady red light  3
-## ..                                                                 ... ..
-</pre></div>
-
-
+## ..                                                                 ... ..</code></pre>
 <p>I think we all know what &#8220;Wandering or wobbling&#8221;&nbsp;means.</p>
 <p>Check out the <a href="https://github.com/nacnudus/nzcrash">package</a> on Github at&nbsp;https://github.com/nacnudus/nzcrash.</p>
+
             <section>
     <p id="post-share-links">
     Like this post? Share on:
     <a href="http://twitter.com/home?status=New%20R%20package%3A%C2%A0nzcrash%20http%3A//nacnudus.github.io/crossprod/new-r-package-nzcrash" target="_blank" title="Share on Twitter">Twitter</a>
     ❄
-    <a href="http://www.facebook.com/sharer/sharer.php?s=100&amp;p%5Burl%5D=http%3A//nacnudus.github.io/crossprod/new-r-package-nzcrash" target="_blank" title="Share on Facebook">Facebook</a>
+    <a href="http://www.facebook.com/sharer/sharer.php?u=http%3A//nacnudus.github.io/crossprod/new-r-package-nzcrash" target="_blank" title="Share on Facebook">Facebook</a>
     ❄
     <a href="https://plus.google.com/share?url=http%3A//nacnudus.github.io/crossprod/new-r-package-nzcrash" target="_blank" title="Share on Google Plus">Google+</a>
     ❄

@@ -33,8 +33,105 @@ remaining steps are also&amp;nbsp;easy.&lt;/p&gt;
 about 160 posts (Revolutions is the only one that regularly posts more than once
 per week).  Nothing much has changed in the last year.  For some arbitrary
 definition of &amp;#8220;dead blog&amp;#8221;, a survival analysis could be&amp;nbsp;done.&lt;/p&gt;
-&lt;p&gt;&lt;img src="./figure/rbloggers-periodical-1.svg" title="plot of chunk rbloggers-periodical" alt="plot of chunk rbloggers-periodical" width="960px" height="540px" /&gt;&lt;/p&gt;
-&lt;h2 id="where-the-time-went"&gt;Where the time&amp;nbsp;went&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c1"&gt;# TODO: Implement the following manual steps in R&lt;/span&gt;
+&lt;span class="c1"&gt;# 1. Create a label in Gmail for the R-Bloggers digests&lt;/span&gt;
+&lt;span class="c1"&gt;# 2. Export emails with that label from Gmail&lt;/span&gt;
+&lt;span class="c1"&gt;# 3. Extract the exported file&lt;/span&gt;
+&lt;span class="c1"&gt;# 4. Run sed &amp;#39;:a;N;$!ba;s/=\n//g&amp;#39; rbloggers.mbox in the Mail directory, i.e.&lt;/span&gt;
+&lt;span class="c1"&gt;#    sed &amp;#39;:a;N;$!ba;s/=\r\n//g&amp;#39; ./Takeout/Mail/rbloggers.mbox &amp;gt; ./clean.mbox&lt;/span&gt;
+&lt;span class="c1"&gt;#    This steps removes funny newlines that are in the original emails in my&lt;/span&gt;
+&lt;span class="c1"&gt;#    inbox.&lt;/span&gt;
+
+mail_dir &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;./data/temp&amp;quot;&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Extract the emails into individual files&lt;/span&gt;
+convert_mbox_eml&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;./data/clean.mbox&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; mail_dir&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Collect the file names&lt;/span&gt;
+emails &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;list.files&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;mail_dir&lt;span class="p"&gt;,&lt;/span&gt; full.names &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Remove the &amp;quot;confirm email address&amp;quot; one&lt;/span&gt;
+&lt;span class="c1"&gt;# and the one that has no links to the original blogs&lt;/span&gt;
+emails &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; emails&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;-2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;-342&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Remove any that are replies&lt;/span&gt;
+emails &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; emails&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="kp"&gt;vapply&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;emails&lt;span class="p"&gt;,&lt;/span&gt;
+                        &lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;filename&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+                          &lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="kp"&gt;any&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;grepl&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;^In-Reply-To: &amp;lt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                                     &lt;span class="kp"&gt;readLines&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;filename&lt;span class="p"&gt;,&lt;/span&gt; n &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;10&lt;/span&gt;&lt;span class="p"&gt;)))},&lt;/span&gt;
+                        &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Collect the datetimes in the first line of each file&lt;/span&gt;
+&lt;span class="c1"&gt;# Also collect the journals from the subject lines&lt;/span&gt;
+n &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;length&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;emails&lt;span class="p"&gt;)&lt;/span&gt;
+datetimes &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kt"&gt;vector&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;character&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; length &lt;span class="o"&gt;=&lt;/span&gt; n&lt;span class="p"&gt;)&lt;/span&gt;
+blogcounts &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kt"&gt;vector&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;character&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; length &lt;span class="o"&gt;=&lt;/span&gt; n&lt;span class="p"&gt;)&lt;/span&gt;
+blogs  &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kt"&gt;vector&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;list&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; length &lt;span class="o"&gt;=&lt;/span&gt; n&lt;span class="p"&gt;)&lt;/span&gt;
+i &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;
+&lt;span class="kr"&gt;for&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;filename &lt;span class="kr"&gt;in&lt;/span&gt; emails&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  i &lt;span class="o"&gt;&amp;lt;&amp;lt;-&lt;/span&gt; i &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;
+  datetimes&lt;span class="p"&gt;[&lt;/span&gt;i&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;readLines&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;filename&lt;span class="p"&gt;,&lt;/span&gt; n &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="c1"&gt;# Extract the links to the original blogs&lt;/span&gt;
+  blogs&lt;span class="p"&gt;[[&lt;/span&gt;i&lt;span class="p"&gt;]]&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; 
+    read_html&lt;span class="p"&gt;(&lt;/span&gt;filename&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    xml_find_all&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;//*[(@id = &amp;#39;3D\&amp;quot;itemcontentlist\&amp;quot;&amp;#39;)]//div//div//strong[(((count(preceding-sibling::*) + 1) = 1) and parent::*)]//a&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    xml_text
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Extract the datetime string&lt;/span&gt;
+datetimes &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt;
+  datetimes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  str_sub&lt;span class="p"&gt;(&lt;/span&gt;start &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;34&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="kp"&gt;strptime&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;format &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;%b %d %H:%M:%S %z %Y&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Link the datetime with individual blogs&lt;/span&gt;
+&lt;span class="kp"&gt;names&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;blogs&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; datetimes
+blogs &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; stack&lt;span class="p"&gt;(&lt;/span&gt;blogs&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Recover the dates and clean the blog names&lt;/span&gt;
+blogs &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; 
+  blogs &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  rename&lt;span class="p"&gt;(&lt;/span&gt;blog &lt;span class="o"&gt;=&lt;/span&gt; values&lt;span class="p"&gt;,&lt;/span&gt; datetime &lt;span class="o"&gt;=&lt;/span&gt; ind&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  mutate&lt;span class="p"&gt;(&lt;/span&gt;datetime &lt;span class="o"&gt;=&lt;/span&gt; ymd_hms&lt;span class="p"&gt;(&lt;/span&gt;datetime&lt;span class="p"&gt;),&lt;/span&gt;
+         &lt;span class="c1"&gt;# blog = str_replace(blog, fixed(&amp;quot;=\\n&amp;quot;), &amp;quot;&amp;quot;),&lt;/span&gt;
+         blog &lt;span class="o"&gt;=&lt;/span&gt; str_replace&lt;span class="p"&gt;(&lt;/span&gt;blog&lt;span class="p"&gt;,&lt;/span&gt; fixed&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;=C2=BB&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;»&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+         blog &lt;span class="o"&gt;=&lt;/span&gt; str_replace&lt;span class="p"&gt;(&lt;/span&gt;blog&lt;span class="p"&gt;,&lt;/span&gt; fixed&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;=E2=80=93&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;–&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+         blog &lt;span class="o"&gt;=&lt;/span&gt; str_replace&lt;span class="p"&gt;(&lt;/span&gt;blog&lt;span class="p"&gt;,&lt;/span&gt; fixed&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;=E2=80=A6&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;…&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+         blog &lt;span class="o"&gt;=&lt;/span&gt; str_replace&lt;span class="p"&gt;(&lt;/span&gt;blog&lt;span class="p"&gt;,&lt;/span&gt; fixed&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;=C3=A6&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;æ&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+         blog &lt;span class="o"&gt;=&lt;/span&gt; str_replace&lt;span class="p"&gt;(&lt;/span&gt;blog&lt;span class="p"&gt;,&lt;/span&gt; fixed&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;=EA=B0=84=EB=93=9C=EB=A3=A8=EB=93=9C =ED=81=AC=EB=A6=AC=EC=8A=A4=ED=86=A0=ED=8C=8C&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;(간드루드 크리스토파)&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+         blog &lt;span class="o"&gt;=&lt;/span&gt; str_replace&lt;span class="p"&gt;(&lt;/span&gt;blog&lt;span class="p"&gt;,&lt;/span&gt; fixed&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;=D0=AF=D1=82=D0=BE=D0=BC=D0=B8=D0=B7=D0=BE&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Ятомизо&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+         blog &lt;span class="o"&gt;=&lt;/span&gt; str_trim&lt;span class="p"&gt;(&lt;/span&gt;blog&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Number of different blogs per week/month/year&lt;/span&gt;
+periodically &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;,&lt;/span&gt; period&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  x &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
+    group_by_&lt;span class="p"&gt;(&lt;/span&gt;period&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;blog&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    summarise&lt;span class="p"&gt;(&lt;/span&gt;posts &lt;span class="o"&gt;=&lt;/span&gt; n&lt;span class="p"&gt;())&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    group_by_&lt;span class="p"&gt;(&lt;/span&gt;period&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    summarise&lt;span class="p"&gt;(&lt;/span&gt;posts &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kp"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;posts&lt;span class="p"&gt;),&lt;/span&gt;
+              blogs &lt;span class="o"&gt;=&lt;/span&gt; n&lt;span class="p"&gt;())&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    gather&lt;span class="p"&gt;(&lt;/span&gt;measure&lt;span class="p"&gt;,&lt;/span&gt; n&lt;span class="p"&gt;,&lt;/span&gt; posts&lt;span class="p"&gt;,&lt;/span&gt; blogs&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    rename_&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;date&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; period&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    mutate&lt;span class="p"&gt;(&lt;/span&gt;period &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kp"&gt;paste0&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;period&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;ly&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+periodical &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; 
+  blogs &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  mutate&lt;span class="p"&gt;(&lt;/span&gt;year &lt;span class="o"&gt;=&lt;/span&gt; ceiling_date&lt;span class="p"&gt;(&lt;/span&gt;datetime&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;year&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+         month &lt;span class="o"&gt;=&lt;/span&gt; ceiling_date&lt;span class="p"&gt;(&lt;/span&gt;datetime&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;month&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+         week &lt;span class="o"&gt;=&lt;/span&gt; ceiling_date&lt;span class="p"&gt;(&lt;/span&gt;datetime&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;week&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+monthly &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; periodically&lt;span class="p"&gt;(&lt;/span&gt;periodical&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;month&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+weekly &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; periodically&lt;span class="p"&gt;(&lt;/span&gt;periodical&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;week&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+periodical &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; 
+  bind_rows&lt;span class="p"&gt;(&lt;/span&gt;monthly&lt;span class="p"&gt;,&lt;/span&gt; weekly&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  group_by&lt;span class="p"&gt;(&lt;/span&gt;period&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  filter&lt;span class="p"&gt;(&lt;/span&gt;date &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="kp"&gt;min&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;date&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+         date &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="kp"&gt;max&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;date&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  ungroup
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/rbloggers-periodical-1.svg" title="plot of chunk rbloggers-periodical" alt="plot of chunk rbloggers-periodical" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;h2 id="what-took-me-so-long"&gt;What took me so&amp;nbsp;long&lt;/h2&gt;
 &lt;p&gt;This was an easy project, but a few quirks soaked up a lot of&amp;nbsp;time:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;I wanted to initialise an empty list, to store information collected by
@@ -74,8 +171,8 @@ answer&lt;/a&gt; explains how the following
 command works: &lt;code&gt;sed ':a;N;$!ba;s/=\r\n//g'dirty.mbox &amp;gt; clean.mbox&lt;/code&gt;.&lt;/p&gt;
 &lt;h2 id="reward"&gt;Reward&lt;/h2&gt;
 &lt;p&gt;Thankyou for reading. Here are some more graphs, and some code&amp;nbsp;fragments.&lt;/p&gt;
-&lt;p&gt;&lt;img src="./figure/rbloggers-top10-1.svg" title="plot of chunk rbloggers-top10" alt="plot of chunk rbloggers-top10" width="960px" height="540px" /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src="./figure/rbloggers-rates-1.svg" title="plot of chunk rbloggers-rates" alt="plot of chunk rbloggers-rates" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/rbloggers-top10-1.svg" title="plot of chunk rbloggers-top10" alt="plot of chunk rbloggers-top10" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/rbloggers-rates-1.svg" title="plot of chunk rbloggers-rates" alt="plot of chunk rbloggers-rates" width="960px" height="540px" /&gt;&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c1"&gt;# NOTE: These are frangments of code.  They do not stand alone.&lt;/span&gt;
 
 &lt;span class="c1"&gt;# Collect the file names&lt;/span&gt;
@@ -135,63 +232,33 @@ blogs &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Duncan Garmonsway</dc:creator><pubDate>Mon, 18 Apr 2016 00:00:00 +1200</pubDate><guid>tag:nacnudus.github.io,2016-04-18:crossprod/how-many-r-bloggers-are-there</guid><category>R</category></item><item><title>New R package: nzcrash</title><link>http://nacnudus.github.io/crossprod/new-r-package-nzcrash</link><description>&lt;h1 id="introducing-the-nzcrash-package"&gt;Introducing the nzcrash&amp;nbsp;package&lt;/h1&gt;
 &lt;p&gt;This &lt;a href="https://github.com/nacnudus/nzcrash"&gt;package&lt;/a&gt; redistributes crash statistics already available from the New Zealand Transport Agency, but in a more convenient&amp;nbsp;form.&lt;/p&gt;
 &lt;p&gt;It&amp;#8217;s a large package (over 20 megabytes,&amp;nbsp;compressed).&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;nzcrash&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="kn"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;dplyr&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="kn"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;tidyr&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="kn"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;magrittr&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="kn"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;stringr&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="kn"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;ggplot2&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="kn"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;scales&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="kn"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;lubridate&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;&lt;span class="kw"&gt;library&lt;/span&gt;(nzcrash)
+&lt;span class="kw"&gt;library&lt;/span&gt;(dplyr)
+&lt;span class="kw"&gt;library&lt;/span&gt;(tidyr)
+&lt;span class="kw"&gt;library&lt;/span&gt;(magrittr)
+&lt;span class="kw"&gt;library&lt;/span&gt;(stringr)
+&lt;span class="kw"&gt;library&lt;/span&gt;(ggplot2)
+&lt;span class="kw"&gt;library&lt;/span&gt;(scales)
+&lt;span class="kw"&gt;library&lt;/span&gt;(lubridate)&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;h2 id="datasets"&gt;Datasets&lt;/h2&gt;
 &lt;p&gt;The &lt;code&gt;crashes&lt;/code&gt; dataset describes most facts about a crash. The datasets &lt;code&gt;causes&lt;/code&gt;, &lt;code&gt;vehicles&lt;/code&gt;, and &lt;code&gt;objects_struck&lt;/code&gt; describe facts that are in a many-to-one relationship with crashes. They can be joined to the &lt;code&gt;crashes&lt;/code&gt; dataset by the common &lt;code&gt;id&lt;/code&gt; column. The &lt;code&gt;causes&lt;/code&gt; dataset can additionally be joined to the &lt;code&gt;vehicles&lt;/code&gt; dataset by the combination of the &lt;code&gt;id&lt;/code&gt; and &lt;code&gt;vehicle_id&lt;/code&gt; columns. This is most useful when the resulting table is also joined to the &lt;code&gt;crashes&lt;/code&gt; dataset.&lt;/p&gt;
 &lt;h2 id="up-to-date-ness"&gt;Up-to-date-ness&lt;/h2&gt;
 &lt;p&gt;The data was last scraped from the &lt;span class="caps"&gt;NZTA&lt;/span&gt; website on 2015-07-20. At that time, the &lt;span class="caps"&gt;NZTA&lt;/span&gt; had published data up to the&amp;nbsp;2015-03-10.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kp"&gt;dim&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;crashes&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;## [1] 540888     32
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kp"&gt;dim&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;causes&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;## [1] 888072      7
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kp"&gt;dim&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;vehicles&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;## [1] 979930      3
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kp"&gt;dim&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;objects_struck&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;## [1] 261276      3
-&lt;/pre&gt;&lt;/div&gt;
-
-
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;&lt;span class="kw"&gt;dim&lt;/span&gt;(crashes)&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 540888     32&lt;/code&gt;&lt;/pre&gt;
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;&lt;span class="kw"&gt;dim&lt;/span&gt;(causes)&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 888072      7&lt;/code&gt;&lt;/pre&gt;
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;&lt;span class="kw"&gt;dim&lt;/span&gt;(vehicles)&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 979930      3&lt;/code&gt;&lt;/pre&gt;
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;&lt;span class="kw"&gt;dim&lt;/span&gt;(objects_struck)&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 261276      3&lt;/code&gt;&lt;/pre&gt;
 &lt;h2 id="accuracy"&gt;Accuracy&lt;/h2&gt;
 &lt;p&gt;The &lt;a href="http://www.transport.govt.nz/research/roadtoll/#5"&gt;&lt;span class="caps"&gt;NZTA&lt;/span&gt;&lt;/a&gt;, doesn&amp;#8217;t agree with &lt;a href="http://www.transport.govt.nz/research/roadtoll/annualroadtollhistoricalinformation/"&gt;itself&lt;/a&gt; about recent annual road tolls, and this dataset gives a third&amp;nbsp;opinion.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
-  filter&lt;span class="p"&gt;(&lt;/span&gt;severity &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;fatal&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  group_by&lt;span class="p"&gt;(&lt;/span&gt;year &lt;span class="o"&gt;=&lt;/span&gt; year&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;date&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  summarize&lt;span class="p"&gt;(&lt;/span&gt;fatalities &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kp"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;fatalities&lt;span class="p"&gt;))&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;## Source: local data frame [16 x 2]
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;crashes %&amp;gt;%&lt;span class="st"&gt; &lt;/span&gt;
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;filter&lt;/span&gt;(severity ==&lt;span class="st"&gt; &amp;quot;fatal&amp;quot;&lt;/span&gt;) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;group_by&lt;/span&gt;(&lt;span class="dt"&gt;year =&lt;/span&gt; &lt;span class="kw"&gt;year&lt;/span&gt;(date)) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;summarize&lt;/span&gt;(&lt;span class="dt"&gt;fatalities =&lt;/span&gt; &lt;span class="kw"&gt;sum&lt;/span&gt;(fatalities))&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;pre&gt;&lt;code&gt;## Source: local data frame [16 x 2]
 ## 
 ##    year fatalities
 ## 1  2000        462
@@ -209,31 +276,16 @@ blogs &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt;
 ## 13 2012        308
 ## 14 2013        256
 ## 15 2014        279
-## 16 2015         34
-&lt;/pre&gt;&lt;/div&gt;
-
-
+## 16 2015         34&lt;/code&gt;&lt;/pre&gt;
 &lt;h2 id="severity"&gt;Severity&lt;/h2&gt;
 &lt;p&gt;Crashes categorised as &amp;#8220;fatal&amp;#8221;, &amp;#8220;serious&amp;#8221;, &amp;#8220;minor&amp;#8221; or &amp;#8220;non-injury&amp;#8221;, based on the casualties. If there are any fatalities, then the crash is a &amp;#8220;fatal&amp;#8221; crash, otherwise if there are any &amp;#8216;severe&amp;#8217; injuries, the crash is a &amp;#8220;serious&amp;#8221;&amp;nbsp;crash.&lt;/p&gt;
 &lt;p&gt;The definition of a &amp;#8216;severe&amp;#8217; injury is not&amp;nbsp;clear.&lt;/p&gt;
 &lt;p&gt;Minor and non-injury crashes are likely to be under-recorded since they often do not involve the police, who write most of the crash reports upon which these datasets are&amp;nbsp;based.&lt;/p&gt;
 &lt;p&gt;A common mistake is to confuse the number of fatal crashes with the number of&amp;nbsp;fatalities.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; filter&lt;span class="p"&gt;(&lt;/span&gt;severity &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;fatal&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; &lt;span class="kp"&gt;nrow&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;## [1] 5042
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kp"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;crashes&lt;span class="o"&gt;$&lt;/span&gt;fatalities&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;## [1] 5723
-&lt;/pre&gt;&lt;/div&gt;
-
-
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;crashes %&amp;gt;%&lt;span class="st"&gt; &lt;/span&gt;&lt;span class="kw"&gt;filter&lt;/span&gt;(severity ==&lt;span class="st"&gt; &amp;quot;fatal&amp;quot;&lt;/span&gt;) %&amp;gt;%&lt;span class="st"&gt; &lt;/span&gt;nrow&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 5042&lt;/code&gt;&lt;/pre&gt;
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;&lt;span class="kw"&gt;sum&lt;/span&gt;(crashes$fatalities)&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 5723&lt;/code&gt;&lt;/pre&gt;
 &lt;h2 id="dates-and-times"&gt;Dates and&amp;nbsp;times&lt;/h2&gt;
 &lt;p&gt;Three columns of the &lt;code&gt;crashes&lt;/code&gt; dataset describe the date and time of the crash in the &lt;span class="caps"&gt;NZST&lt;/span&gt; time zone&amp;nbsp;(Pacific/Auckland).&lt;/p&gt;
 &lt;ul&gt;
@@ -242,45 +294,38 @@ blogs &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt;
 &lt;li&gt;&lt;code&gt;datetime&lt;/code&gt; gives the date and time in one value when both are available, and &lt;span class="caps"&gt;NA&lt;/span&gt; otherwise. &lt;code&gt;date&lt;/code&gt; is always available, however &lt;code&gt;time&lt;/code&gt; is&amp;nbsp;not.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;When aggregating by some function of the date, e.g. by year, then always start from the &lt;code&gt;date&lt;/code&gt; column unless you also need the time. This ensures against accidentally discounting crashes where a time is not&amp;nbsp;recorded.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  filter&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;is.na&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;time&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  count&lt;span class="p"&gt;(&lt;/span&gt;year &lt;span class="o"&gt;=&lt;/span&gt; year&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;date&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  ggplot&lt;span class="p"&gt;(&lt;/span&gt;aes&lt;span class="p"&gt;(&lt;/span&gt;year&lt;span class="p"&gt;,&lt;/span&gt; n&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
-  geom_line&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
-  ggtitle&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Crashes missing\ntime-of-day information&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;crashes %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;filter&lt;/span&gt;(&lt;span class="kw"&gt;is.na&lt;/span&gt;(time)) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;count&lt;/span&gt;(&lt;span class="dt"&gt;year =&lt;/span&gt; &lt;span class="kw"&gt;year&lt;/span&gt;(date)) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;ggplot&lt;/span&gt;(&lt;span class="kw"&gt;aes&lt;/span&gt;(year, n)) +
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;geom_line&lt;/span&gt;() +
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;ggtitle&lt;/span&gt;(&lt;span class="st"&gt;&amp;quot;Crashes missing&lt;/span&gt;&lt;span class="ch"&gt;\n&lt;/span&gt;&lt;span class="st"&gt;time-of-day information&amp;quot;&lt;/span&gt;)
 
-crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  filter&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;is.na&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;time&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  count&lt;span class="p"&gt;(&lt;/span&gt;year &lt;span class="o"&gt;=&lt;/span&gt; year&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;date&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  mutate&lt;span class="p"&gt;(&lt;/span&gt;percent &lt;span class="o"&gt;=&lt;/span&gt; n&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="kp"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;n&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  ggplot&lt;span class="p"&gt;(&lt;/span&gt;aes&lt;span class="p"&gt;(&lt;/span&gt;year&lt;span class="p"&gt;,&lt;/span&gt; percent&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
-  geom_line&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
-  scale_y_continuous&lt;span class="p"&gt;(&lt;/span&gt;labels &lt;span class="o"&gt;=&lt;/span&gt; percent&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
-  ggtitle&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Percent of crashes missing\ntime-of-day information&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;&lt;img alt="" src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-5-1.png" /&gt; &lt;img alt="" src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-5-2.png" /&gt;&lt;/p&gt;
+crashes %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;filter&lt;/span&gt;(&lt;span class="kw"&gt;is.na&lt;/span&gt;(time)) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;count&lt;/span&gt;(&lt;span class="dt"&gt;year =&lt;/span&gt; &lt;span class="kw"&gt;year&lt;/span&gt;(date)) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;mutate&lt;/span&gt;(&lt;span class="dt"&gt;percent =&lt;/span&gt; n/&lt;span class="kw"&gt;sum&lt;/span&gt;(n)) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;ggplot&lt;/span&gt;(&lt;span class="kw"&gt;aes&lt;/span&gt;(year, percent)) +
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;geom_line&lt;/span&gt;() +
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;scale_y_continuous&lt;/span&gt;(&lt;span class="dt"&gt;labels =&lt;/span&gt; percent) +
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;ggtitle&lt;/span&gt;(&lt;span class="st"&gt;&amp;quot;Percent of crashes missing&lt;/span&gt;&lt;span class="ch"&gt;\n&lt;/span&gt;&lt;span class="st"&gt;time-of-day information&amp;quot;&lt;/span&gt;)&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;img src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-5-1.png" /&gt; &lt;img src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-5-2.png" /&gt;&lt;/p&gt;
 &lt;h2 id="location-coordinates"&gt;Location&amp;nbsp;coordinates&lt;/h2&gt;
 &lt;p&gt;99.9% of crashes have coordinates. These have been converted from the &lt;span class="caps"&gt;NZTM&lt;/span&gt; projection to the &lt;span class="caps"&gt;WGS84&lt;/span&gt; projection for convenience with packages like &lt;code&gt;ggmap&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;Because New Zealand is tall and skinny, you can easily spot the main population centres with a simple&amp;nbsp;boxplot.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  ggplot&lt;span class="p"&gt;(&lt;/span&gt;aes&lt;span class="p"&gt;(&lt;/span&gt;northing&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
-  geom_histogram&lt;span class="p"&gt;(&lt;/span&gt;binwidth &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;.1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;&lt;img alt="" src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-6-1.png" /&gt;&lt;/p&gt;
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;crashes %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;ggplot&lt;/span&gt;(&lt;span class="kw"&gt;aes&lt;/span&gt;(northing)) +
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;geom_histogram&lt;/span&gt;(&lt;span class="dt"&gt;binwidth =&lt;/span&gt; .&lt;span class="dv"&gt;1&lt;/span&gt;)&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;figure&gt;
+&lt;img src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-6-1.png" /&gt;
+&lt;/figure&gt;
 &lt;h2 id="vehicles"&gt;Vehicles&lt;/h2&gt;
 &lt;p&gt;There can be many vehicles in one crash, so vehicles are recorded in a separate &lt;code&gt;vehicles&lt;/code&gt; dataset that can be joined to &lt;code&gt;crashes&lt;/code&gt; by the common &lt;code&gt;id&lt;/code&gt; column.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  inner_join&lt;span class="p"&gt;(&lt;/span&gt;vehicles&lt;span class="p"&gt;,&lt;/span&gt; by &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  count&lt;span class="p"&gt;(&lt;/span&gt;vehicle&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
-  arrange&lt;span class="p"&gt;(&lt;/span&gt;desc&lt;span class="p"&gt;(&lt;/span&gt;n&lt;span class="p"&gt;))&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;## Source: local data frame [12 x 2]
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;crashes %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;inner_join&lt;/span&gt;(vehicles, &lt;span class="dt"&gt;by =&lt;/span&gt; &lt;span class="st"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;count&lt;/span&gt;(vehicle) %&amp;gt;%&lt;span class="st"&gt; &lt;/span&gt;
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;arrange&lt;/span&gt;(&lt;span class="kw"&gt;desc&lt;/span&gt;(n))&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;pre&gt;&lt;code&gt;## Source: local data frame [12 x 2]
 ## 
 ##               vehicle      n
 ## 1                 Car 728119
@@ -294,62 +339,49 @@ crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
 ## 9    Taxi or taxi van   6792
 ## 10              Moped   3594
 ## 11   Other or unknown   2043
-## 12         School bus    373
-&lt;/pre&gt;&lt;/div&gt;
-
-
+## 12         School bus    373&lt;/code&gt;&lt;/pre&gt;
 &lt;h2 id="objects-struck"&gt;Objects&amp;nbsp;struck&lt;/h2&gt;
 &lt;p&gt;There can be many objects struck in one crash, so these are recorded in a separate &lt;code&gt;objects_struck&lt;/code&gt; dataset that can be joined to &lt;code&gt;crashes&lt;/code&gt; by the common &lt;code&gt;id&lt;/code&gt; column.&lt;/p&gt;
 &lt;p&gt;Q: What are more fatal, trees or lamp&amp;nbsp;posts?&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  inner_join&lt;span class="p"&gt;(&lt;/span&gt;objects_struck&lt;span class="p"&gt;,&lt;/span&gt; by &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  filter&lt;span class="p"&gt;(&lt;/span&gt;object &lt;span class="o"&gt;%in%&lt;/span&gt; &lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Trees, shrubbery of a substantial nature&amp;quot;&lt;/span&gt;
-                               &lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Utility pole, includes lighting columns&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-  &lt;span class="p"&gt;,&lt;/span&gt; severity &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;non-injury&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; &lt;span class="c1"&gt;# non-injury crashes are poorly recorded&lt;/span&gt;
-  count&lt;span class="p"&gt;(&lt;/span&gt;object&lt;span class="p"&gt;,&lt;/span&gt; severity&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
-  group_by&lt;span class="p"&gt;(&lt;/span&gt;object&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  mutate&lt;span class="p"&gt;(&lt;/span&gt;percent &lt;span class="o"&gt;=&lt;/span&gt; n&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="kp"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;n&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  select&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;n&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  spread&lt;span class="p"&gt;(&lt;/span&gt;severity&lt;span class="p"&gt;,&lt;/span&gt; percent&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;## Source: local data frame [2 x 4]
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;crashes %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;inner_join&lt;/span&gt;(objects_struck, &lt;span class="dt"&gt;by =&lt;/span&gt; &lt;span class="st"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;filter&lt;/span&gt;(object %in%&lt;span class="st"&gt; &lt;/span&gt;&lt;span class="kw"&gt;c&lt;/span&gt;(&lt;span class="st"&gt;&amp;quot;Trees, shrubbery of a substantial nature&amp;quot;&lt;/span&gt;
+                               , &lt;span class="st"&gt;&amp;quot;Utility pole, includes lighting columns&amp;quot;&lt;/span&gt;)
+  , severity !=&lt;span class="st"&gt; &amp;quot;non-injury&amp;quot;&lt;/span&gt;) %&amp;gt;%&lt;span class="st"&gt; &lt;/span&gt;&lt;span class="co"&gt;# non-injury crashes are poorly recorded&lt;/span&gt;
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;count&lt;/span&gt;(object, severity) %&amp;gt;%&lt;span class="st"&gt; &lt;/span&gt;
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;group_by&lt;/span&gt;(object) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;mutate&lt;/span&gt;(&lt;span class="dt"&gt;percent =&lt;/span&gt; n/&lt;span class="kw"&gt;sum&lt;/span&gt;(n)) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;select&lt;/span&gt;(-n) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;spread&lt;/span&gt;(severity, percent)&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;pre&gt;&lt;code&gt;## Source: local data frame [2 x 4]
 ## 
 ##                                     object      fatal   serious     minor
 ## 1  Utility pole, includes lighting columns 0.04432701 0.2149482 0.7407248
-## 2 Trees, shrubbery of a substantial nature 0.06742092 0.2459016 0.6866774
-&lt;/pre&gt;&lt;/div&gt;
-
-
+## 2 Trees, shrubbery of a substantial nature 0.06742092 0.2459016 0.6866774&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;A: Trees (Don&amp;#8217;t worry, I know it&amp;#8217;s harder than&amp;nbsp;that.)&lt;/p&gt;
 &lt;h2 id="causes"&gt;Causes&lt;/h2&gt;
 &lt;p&gt;Causes can be joined either to the &lt;code&gt;crashes&lt;/code&gt; dataset (by the common &lt;code&gt;id&lt;/code&gt; column), or to the &lt;code&gt;vehicles&lt;/code&gt; dataset (by both of the commont &lt;code&gt;id&lt;/code&gt; and &lt;code&gt;vehicle_id&lt;/code&gt;)&amp;nbsp;columns.&lt;/p&gt;
 &lt;p&gt;The main cause groups are given in the &lt;code&gt;causes_category&lt;/code&gt; column.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  inner_join&lt;span class="p"&gt;(&lt;/span&gt;causes&lt;span class="p"&gt;,&lt;/span&gt; by &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  group_by&lt;span class="p"&gt;(&lt;/span&gt;cause_category&lt;span class="p"&gt;,&lt;/span&gt; id&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  tally &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  group_by&lt;span class="p"&gt;(&lt;/span&gt;cause_category&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  summarize&lt;span class="p"&gt;(&lt;/span&gt;n &lt;span class="o"&gt;=&lt;/span&gt; n&lt;span class="p"&gt;())&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  arrange&lt;span class="p"&gt;(&lt;/span&gt;desc&lt;span class="p"&gt;(&lt;/span&gt;n&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  mutate&lt;span class="p"&gt;(&lt;/span&gt;cause_category &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kp"&gt;factor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;cause_category&lt;span class="p"&gt;,&lt;/span&gt; levels &lt;span class="o"&gt;=&lt;/span&gt; cause_category&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  ggplot&lt;span class="p"&gt;(&lt;/span&gt;aes&lt;span class="p"&gt;(&lt;/span&gt;cause_category&lt;span class="p"&gt;,&lt;/span&gt; n&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; 
-  geom_bar&lt;span class="p"&gt;(&lt;/span&gt;stat &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;identity&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
-  theme&lt;span class="p"&gt;(&lt;/span&gt;axis.text.x &lt;span class="o"&gt;=&lt;/span&gt; element_text&lt;span class="p"&gt;(&lt;/span&gt;angle &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;90&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; hjust &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; vjust &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;.5&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;&lt;img alt="" src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-9-1.png" /&gt;&lt;/p&gt;
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;crashes %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;inner_join&lt;/span&gt;(causes, &lt;span class="dt"&gt;by =&lt;/span&gt; &lt;span class="st"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;group_by&lt;/span&gt;(cause_category, id) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;tally %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;group_by&lt;/span&gt;(cause_category) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;summarize&lt;/span&gt;(&lt;span class="dt"&gt;n =&lt;/span&gt; &lt;span class="kw"&gt;n&lt;/span&gt;()) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;arrange&lt;/span&gt;(&lt;span class="kw"&gt;desc&lt;/span&gt;(n)) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;mutate&lt;/span&gt;(&lt;span class="dt"&gt;cause_category =&lt;/span&gt; &lt;span class="kw"&gt;factor&lt;/span&gt;(cause_category, &lt;span class="dt"&gt;levels =&lt;/span&gt; cause_category)) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;ggplot&lt;/span&gt;(&lt;span class="kw"&gt;aes&lt;/span&gt;(cause_category, n)) +&lt;span class="st"&gt; &lt;/span&gt;
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;geom_bar&lt;/span&gt;(&lt;span class="dt"&gt;stat =&lt;/span&gt; &lt;span class="st"&gt;&amp;quot;identity&amp;quot;&lt;/span&gt;) +
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;theme&lt;/span&gt;(&lt;span class="dt"&gt;axis.text.x =&lt;/span&gt; &lt;span class="kw"&gt;element_text&lt;/span&gt;(&lt;span class="dt"&gt;angle =&lt;/span&gt; &lt;span class="dv"&gt;90&lt;/span&gt;, &lt;span class="dt"&gt;hjust =&lt;/span&gt; &lt;span class="dv"&gt;1&lt;/span&gt;, &lt;span class="dt"&gt;vjust =&lt;/span&gt; .&lt;span class="dv"&gt;5&lt;/span&gt;))&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;figure&gt;
+&lt;img src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-9-1.png" /&gt;
+&lt;/figure&gt;
 &lt;p&gt;That&amp;#8217;s odd &amp;#8212; where are speed, alcohol, and restraints? They&amp;#8217;re given in &lt;code&gt;cause_subcategory&lt;/code&gt;.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;causes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
-  filter&lt;span class="p"&gt;(&lt;/span&gt;cause_subcategory &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Too fast for conditions&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  count&lt;span class="p"&gt;(&lt;/span&gt;cause&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
-  arrange&lt;span class="p"&gt;(&lt;/span&gt;desc&lt;span class="p"&gt;(&lt;/span&gt;n&lt;span class="p"&gt;))&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;## Source: local data frame [8 x 2]
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;causes %&amp;gt;%&lt;span class="st"&gt; &lt;/span&gt;
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;filter&lt;/span&gt;(cause_subcategory ==&lt;span class="st"&gt; &amp;quot;Too fast for conditions&amp;quot;&lt;/span&gt;) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;count&lt;/span&gt;(cause) %&amp;gt;%&lt;span class="st"&gt; &lt;/span&gt;
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;arrange&lt;/span&gt;(&lt;span class="kw"&gt;desc&lt;/span&gt;(n))&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;pre&gt;&lt;code&gt;## Source: local data frame [8 x 2]
 ## 
 ##                                cause     n
 ## 1                          Cornering 37861
@@ -359,47 +391,37 @@ crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
 ## 5           At temporary speed limit  1010
 ## 6              At crash or emergency    55
 ## 7       Approaching railway crossing    44
-## 8 When passing stationary school bus    37
-&lt;/pre&gt;&lt;/div&gt;
-
-
+## 8 When passing stationary school bus    37&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;There&amp;#8217;s nothing there about speed limit violations, because it&amp;#8217;s impossible to tell what speed a vehicle was going at when it&amp;nbsp;crashed.&lt;/p&gt;
 &lt;p&gt;More worryingly, how is &amp;#8220;Alcohol test below limit&amp;#8221; a cause for a crash? Hopefully they filter those out when making policy&amp;nbsp;decisions.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kp"&gt;levels&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;causes&lt;span class="o"&gt;$&lt;/span&gt;cause&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt;                &lt;span class="c1"&gt;# Wrap facet labels&lt;/span&gt;
-  str_wrap&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;levels&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;causes&lt;span class="o"&gt;$&lt;/span&gt;cause&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="m"&gt;13&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  inner_join&lt;span class="p"&gt;(&lt;/span&gt;causes&lt;span class="p"&gt;,&lt;/span&gt; by &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  filter&lt;span class="p"&gt;(&lt;/span&gt;cause_subcategory &lt;span class="o"&gt;%in%&lt;/span&gt; &lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Alcohol or drugs&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  group_by&lt;span class="p"&gt;(&lt;/span&gt;cause&lt;span class="p"&gt;,&lt;/span&gt; id&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  tally &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  group_by&lt;span class="p"&gt;(&lt;/span&gt;cause&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  summarize&lt;span class="p"&gt;(&lt;/span&gt;n &lt;span class="o"&gt;=&lt;/span&gt; n&lt;span class="p"&gt;())&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;               &lt;span class="c1"&gt;# This extra step deals with many causes per crash&lt;/span&gt;
-  arrange&lt;span class="p"&gt;(&lt;/span&gt;desc&lt;span class="p"&gt;(&lt;/span&gt;n&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  mutate&lt;span class="p"&gt;(&lt;/span&gt;cause&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kp"&gt;factor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;cause&lt;span class="p"&gt;,&lt;/span&gt; levels &lt;span class="o"&gt;=&lt;/span&gt; cause&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  ggplot&lt;span class="p"&gt;(&lt;/span&gt;aes&lt;span class="p"&gt;(&lt;/span&gt;cause&lt;span class="p"&gt;,&lt;/span&gt; n&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; 
-  geom_bar&lt;span class="p"&gt;(&lt;/span&gt;stat &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;identity&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
-  theme&lt;span class="p"&gt;(&lt;/span&gt;axis.text.x &lt;span class="o"&gt;=&lt;/span&gt; element_text&lt;span class="p"&gt;(&lt;/span&gt;angle &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;90&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; hjust &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; vjust &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;.5&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;&lt;img alt="" src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-11-1.png" /&gt;&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kp"&gt;rm&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;causes&lt;span class="p"&gt;)&lt;/span&gt;                             &lt;span class="c1"&gt;# Because we messed up the factor levels&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;&lt;span class="kw"&gt;levels&lt;/span&gt;(causes$cause) &amp;lt;-&lt;span class="st"&gt;                &lt;/span&gt;&lt;span class="co"&gt;# Wrap facet labels&lt;/span&gt;
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;str_wrap&lt;/span&gt;(&lt;span class="kw"&gt;levels&lt;/span&gt;(causes$cause), &lt;span class="dv"&gt;13&lt;/span&gt;)
+crashes %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;inner_join&lt;/span&gt;(causes, &lt;span class="dt"&gt;by =&lt;/span&gt; &lt;span class="st"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;filter&lt;/span&gt;(cause_subcategory %in%&lt;span class="st"&gt; &lt;/span&gt;&lt;span class="kw"&gt;c&lt;/span&gt;(&lt;span class="st"&gt;&amp;quot;Alcohol or drugs&amp;quot;&lt;/span&gt;)) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;group_by&lt;/span&gt;(cause, id) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;tally %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;group_by&lt;/span&gt;(cause) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;summarize&lt;/span&gt;(&lt;span class="dt"&gt;n =&lt;/span&gt; &lt;span class="kw"&gt;n&lt;/span&gt;()) %&amp;gt;%&lt;span class="st"&gt;               &lt;/span&gt;&lt;span class="co"&gt;# This extra step deals with many causes per crash&lt;/span&gt;
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;arrange&lt;/span&gt;(&lt;span class="kw"&gt;desc&lt;/span&gt;(n)) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;mutate&lt;/span&gt;(&lt;span class="dt"&gt;cause=&lt;/span&gt; &lt;span class="kw"&gt;factor&lt;/span&gt;(cause, &lt;span class="dt"&gt;levels =&lt;/span&gt; cause)) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;ggplot&lt;/span&gt;(&lt;span class="kw"&gt;aes&lt;/span&gt;(cause, n)) +&lt;span class="st"&gt; &lt;/span&gt;
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;geom_bar&lt;/span&gt;(&lt;span class="dt"&gt;stat =&lt;/span&gt; &lt;span class="st"&gt;&amp;quot;identity&amp;quot;&lt;/span&gt;) +
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;theme&lt;/span&gt;(&lt;span class="dt"&gt;axis.text.x =&lt;/span&gt; &lt;span class="kw"&gt;element_text&lt;/span&gt;(&lt;span class="dt"&gt;angle =&lt;/span&gt; &lt;span class="dv"&gt;90&lt;/span&gt;, &lt;span class="dt"&gt;hjust =&lt;/span&gt; &lt;span class="dv"&gt;1&lt;/span&gt;, &lt;span class="dt"&gt;vjust =&lt;/span&gt; .&lt;span class="dv"&gt;5&lt;/span&gt;))&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;figure&gt;
+&lt;img src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-11-1.png" /&gt;
+&lt;/figure&gt;
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;&lt;span class="kw"&gt;rm&lt;/span&gt;(causes)                             &lt;span class="co"&gt;# Because we messed up the factor levels&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;This time, join &lt;code&gt;causes&lt;/code&gt; to both &lt;code&gt;vehicles&lt;/code&gt; and &lt;code&gt;crashes&lt;/code&gt; to assess the drunken cyclist&amp;nbsp;menace.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  filter&lt;span class="p"&gt;(&lt;/span&gt;severity &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;fatal&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  select&lt;span class="p"&gt;(&lt;/span&gt;id&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  inner_join&lt;span class="p"&gt;(&lt;/span&gt;vehicles&lt;span class="p"&gt;,&lt;/span&gt; by &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
-  filter&lt;span class="p"&gt;(&lt;/span&gt;vehicle &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Bicycle&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  inner_join&lt;span class="p"&gt;(&lt;/span&gt;causes&lt;span class="p"&gt;,&lt;/span&gt; by &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;vehicle_id&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
-  count&lt;span class="p"&gt;(&lt;/span&gt;cause&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  arrange&lt;span class="p"&gt;(&lt;/span&gt;desc&lt;span class="p"&gt;(&lt;/span&gt;n&lt;span class="p"&gt;))&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;## Source: local data frame [55 x 2]
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;crashes %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;filter&lt;/span&gt;(severity ==&lt;span class="st"&gt; &amp;quot;fatal&amp;quot;&lt;/span&gt;) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;select&lt;/span&gt;(id) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;inner_join&lt;/span&gt;(vehicles, &lt;span class="dt"&gt;by =&lt;/span&gt; &lt;span class="st"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;) %&amp;gt;%&lt;span class="st"&gt; &lt;/span&gt;
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;filter&lt;/span&gt;(vehicle ==&lt;span class="st"&gt; &amp;quot;Bicycle&amp;quot;&lt;/span&gt;) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;inner_join&lt;/span&gt;(causes, &lt;span class="dt"&gt;by =&lt;/span&gt; &lt;span class="kw"&gt;c&lt;/span&gt;(&lt;span class="st"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;, &lt;span class="st"&gt;&amp;quot;vehicle_id&amp;quot;&lt;/span&gt;)) %&amp;gt;%&lt;span class="st"&gt; &lt;/span&gt;
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;count&lt;/span&gt;(cause) %&amp;gt;%
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;arrange&lt;/span&gt;(&lt;span class="kw"&gt;desc&lt;/span&gt;(n))&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;pre&gt;&lt;code&gt;## Source: local data frame [55 x 2]
 ## 
 ##                                                                  cause  n
 ## 1  Behind when changing lanes position or direction (includes U-turns) 26
@@ -412,9 +434,7 @@ crashes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
 ## 8                                             On left without due care  4
 ## 9                              When pulling out or moving to the right  4
 ## 10                                                 At steady red light  3
-## ..                                                                 ... ..
-&lt;/pre&gt;&lt;/div&gt;
-
-
+## ..                                                                 ... ..&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;I think we all know what &amp;#8220;Wandering or wobbling&amp;#8221;&amp;nbsp;means.&lt;/p&gt;
-&lt;p&gt;Check out the &lt;a href="https://github.com/nacnudus/nzcrash"&gt;package&lt;/a&gt; on Github at&amp;nbsp;https://github.com/nacnudus/nzcrash.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Duncan Garmonsway</dc:creator><pubDate>Mon, 13 Jul 2015 00:00:00 +1200</pubDate><guid>tag:nacnudus.github.io,2015-07-13:crossprod/new-r-package-nzcrash</guid><category>R</category></item></channel></rss>
+&lt;p&gt;Check out the &lt;a href="https://github.com/nacnudus/nzcrash"&gt;package&lt;/a&gt; on Github at&amp;nbsp;https://github.com/nacnudus/nzcrash.&lt;/p&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Duncan Garmonsway</dc:creator><pubDate>Mon, 13 Jul 2015 00:00:00 +1200</pubDate><guid>tag:nacnudus.github.io,2015-07-13:crossprod/new-r-package-nzcrash</guid><category>R</category></item></channel></rss>
