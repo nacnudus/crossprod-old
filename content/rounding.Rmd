@@ -5,7 +5,7 @@ Summary: Reproducing browser rounding in R
 Disqus_identifier: rbloggers
 Tags: R, JavaScript
 
-```{r pelican_conf, echo=FALSE}
+```{r rounding-pelican_conf, echo=FALSE}
 knitr::opts_chunk$set(cache = TRUE)
 knitr::opts_chunk$set(fig.path='./figure/')
 knitr::opts_chunk$set(fig.width =  12.2)
@@ -20,7 +20,7 @@ knitr::opts_chunk$set(warning = FALSE)
 
 A common source of confusion in R is rounding-to-even (example adapted from ?round):
 
-```{r, echo = TRUE}
+```{r rounding-confusion, echo = TRUE, cach = TRUE}
 x1 <- seq(-2, 4, by = .5)
 matrix(c(x1, round(x1)), nrow = 2, byrow = TRUE) #-- IEEE rounding !
 ```
@@ -40,11 +40,11 @@ halves (0.5, 1.5, etc.) away from zero.  The details of the difference are
 neatly explained in the [R
 Inferno](http://www.burns-stat.com/pages/Tutor/R_inferno.pdf), circle 8.1.52.
 
-```{r round-to-even}
+```{r rounding-to-even}
 # Round-to-even is the R default
 round_to_even <- round
 
-```{r round-away-from-zero}
+```{r rounding-away-from-zero}
 # Round-away-from-zero function adapted from http://stackoverflow.com/a/12688836/937932
 round_away_from_zero = function(x, digits = 0) {
   posneg = sign(x)
@@ -109,7 +109,7 @@ How odd is that?  So I adapted a [handy MATLAB
 implementation](https://www.mathworks.com/matlabcentral/fileexchange/40286-rounding-functions-collection)
 of rounding-to-odd, and compared it with the other two strategies.
 
-```{r round-to-odd}
+```{r rounding-to-odd}
 # Round-to-odd function adapted from
 # https://www.mathworks.com/matlabcentral/fileexchange/40286-rounding-functions-collection
 round_to_odd <- function(x, digits = 0) {
@@ -144,7 +144,7 @@ snag is that successive rounded operations will never reach zero (see comments
 on [this StackExchange
 answer](http://programmers.stackexchange.com/a/256269/111311)):
 
-```{r, echo = TRUE}
+```{r rounding-reach-zero, echo = TRUE}
 x <- 77
 for(i in 1:10) {
   x <<- round_to_odd(x/2)
@@ -163,12 +163,12 @@ for(i in 1:10) {
 Using my new round-to-odd function to emulate JavaScript behaviour, I
 encountered floating point errors.  For example, take the number 6.65:
 
-```{r, echo = TRUE}
+```{r rounding-floatingpoint1, echo = TRUE}
 sprintf("%.16f", c(6.65, 7 * 0.95, 7 - 0.35))
 ```
 
 The tiny differences don't affect rounding in R:
-```{r, echo = TRUE}
+```{r rounding-floatingpoint2, echo = TRUE}
 round_to_odd(c(6.65, 7 * 0.95, 7 - 0.35), 1)
 ```
 
@@ -188,8 +188,12 @@ calling JavaScript from R via the
 [V8](https://cran.r-project.org/web/packages/V8/index.html) package, which uses
 the V8 JavaScript engine, the same that my browser (Chrome) uses.
 
-```{r, echo = TRUE}
+```{r rounding-loadV8, echo = TRUE}
 library(V8)
+```
+
+```{r rounding-V8, echo = TRUE}
+# library(V8)
 ct <- V8::v8()
 roundjs <- function(x, digits) {
   sapply(x, function(y) {ct$get(paste0("Number((", sprintf("%.16f", y), ").toFixed(", digits, "))"))})
@@ -214,7 +218,7 @@ away from zero, so I had to find a round-away-from-zero function in R first.
 Even then, it didn't work for negatives when I ported it to R, probably due to
 fundamental language differences:
 
-```{r, echo = TRUE}
+```{r rounding-surprising, echo = TRUE}
 # Surprising behaviour of 
 -1.5 %% 2
 # Predictable behaviour (but different to MATLAB?)
@@ -232,7 +236,7 @@ values to the V8 engine, but when it didn't work, I suspected that the values
 were being passed as a string, and that R was rounding them as part of the
 conversion.  For example:
 
-```{r, echo = TRUE}
+```{r rounding-V8old, echo = TRUE}
 library(V8)
 roundjs <- function(x, digits) {
   ct <- V8::v8()
@@ -249,8 +253,8 @@ roundjs(c(6.65, 7 * 0.95, 7 - 0.35), 1)
 
 ## Code for the graphs
 
-```{r, ref.label = 'rounding-bias-1', echo = TRUE, eval = FALSE}
+```{r rounding-recall1, ref.label = 'rounding-bias-1', echo = TRUE, eval = FALSE}
 ```
 
-```{r, ref.label = 'rounding-bias-2', echo = TRUE, eval = FALSE}
+```{r rounding-recall2, ref.label = 'rounding-bias-2', echo = TRUE, eval = FALSE}
 ```
