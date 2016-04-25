@@ -27,7 +27,7 @@ matrix(c(x1, round(x1)), nrow = 2, byrow = TRUE) #-- IEEE rounding !
 
 This post does five things:
 
-* Draws illustrates rounding bias with a graph.
+* Illustrates rounding bias with a graph.
 * Discovers that JavaScript (in my browser) rounds the other way.
 * Encounters floating-point difficulties when emulating JavaScript.
 * Calls JavaScript itself via the V8 package.
