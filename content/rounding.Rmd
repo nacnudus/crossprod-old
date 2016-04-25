@@ -18,17 +18,20 @@ knitr::opts_chunk$set(warning = FALSE)
 
 ## round(0.5) == 0?  Eh?
 
-A great R-newbie gotcha is rounding-to-even (example adapted from ?round):
+A common source of confusion in R is rounding-to-even (example adapted from ?round):
 
 ```{r, echo = TRUE}
 x1 <- seq(-2, 4, by = .5)
 matrix(c(x1, round(x1)), nrow = 2, byrow = TRUE) #-- IEEE rounding !
 ```
 
-This post draws illustrates rounding bias with a graph, discovers that
-JavaScript (in my browser) rounds the other way, encounters floating-point
-difficulties when emulating JavaScript, and finally calls JavaScript itself via
-the V8 package.
+This post does five things:
+
+* Draws illustrates rounding bias with a graph.
+* Discovers that JavaScript (in my browser) rounds the other way.
+* Encounters floating-point difficulties when emulating JavaScript.
+* Calls JavaScript itself via the V8 package.
+* Explains where all the time goes.
 
 ## Graph of rounding bias
 
@@ -78,6 +81,8 @@ par(mfrow = c(2, 1))
   hist(bias_to_even, xlim = limits, col = "lightgreen")
   hist(bias_away_from_zero, xlim = limits, col = "lightblue")
 ```
+
+## JavaScript rounding in the Chrome browser
 
 But when I tried to emulated a website's behaviour in R, it turned out that
 Chrome was rounding towards odd numbers after the decimal point (anyone know
@@ -176,7 +181,7 @@ console.log((7 * 0.95).toFixed(1));
 console.log((7 - 0.35).toFixed(1));
 ```
 
-## Calling JavaScript V8 engine via V8 package
+## Calling JavaScript V8 engine via the V8 package
 
 At this point, I gave up on emulating JavaScript behaviour in R, and resorted to
 calling JavaScript from R via the
