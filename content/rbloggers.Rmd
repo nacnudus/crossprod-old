@@ -19,20 +19,26 @@ knitr::opts_chunk$set(warning = FALSE)
 
 This post does three things:
 
-* Finds out how many R-related blogs there are *really* (not a well-defined question).
+* Finds out how many R-related blogs there are *really* (not a well-defined
+  question).
 * Shows that I can use semi-structured non-csv data (job interview weakness).
 * Explains where all the time goes.
 
 Many people who promote R quote the number of R blogs as given on the
-[R-Bloggers](http://www.r-bloggers.com/) website by Tal Galili, which syndicates literally
-hundreds of R-related blogs (573 at the time of writing).  But the number tends
-only to increase.  How many actual posts are there in a given week/month, from
-how many different blogs?
+[R-Bloggers](http://www.r-bloggers.com/) website by Tal Galili, which syndicates
+literally hundreds of R-related blogs (573 at the time of writing).  But the
+number tends only to increase.  How many actual posts are there in a given
+week/month, from how many different blogs?
+
+## Update 30 April 2016
+
+I have a longer history of daily digest emails than I thought.  The data, and
+some of the text, has been updated to go back to October 2013.
 
 ## The gist of it
 
-I subscribed to the [R-Bloggers](http://www.r-bloggers.com/) daily digest emails in late 2014, giving me a
-good time-series of posts.
+I subscribed to the [R-Bloggers](http://www.r-bloggers.com/) daily digest emails
+in early 2014, giving me a good time-series of posts.
 
 The initial dump is easy from Gmail (define a filter > use it to apply a
 new label > request a dump of the labelled emails).  Since the dump is in a
@@ -68,7 +74,7 @@ library(ggplot2)
 library(scales)
 ```
 
-```{r rbloggers-wrangle, echo = TRUE}
+```{r rbloggers-wrangle, echo = FALSE}
 # TODO: Implement the following manual steps in R
 # 1. Create a label in Gmail for the R-Bloggers digests
 # 2. Export emails with that label from Gmail
@@ -78,10 +84,10 @@ library(scales)
 #    This steps removes funny newlines that are in the original emails in my
 #    inbox.
 
-mail_dir <- "./data/temp"
+mail_dir <- "./data/rbloggers/temp"
 
 # Extract the emails into individual files
-convert_mbox_eml("./data/clean.mbox", mail_dir)
+convert_mbox_eml("./data/rbloggers/clean.mbox", mail_dir)
 
 # Collect the file names
 emails <- list.files(mail_dir, full.names = TRUE)
@@ -119,6 +125,7 @@ datetimes <-
   datetimes %>%
   str_sub(start = 34) %>%
   strptime(format = "%b %d %H:%M:%S %z %Y")
+range(datetimes)
 
 # Link the datetime with individual blogs
 names(blogs) <- datetimes
@@ -212,7 +219,7 @@ multiple characters.  `sed` is one of those command-line tools that lurks for
 years before pouncing, and this was its moment, when I finally had to learn a
 bit more than merely `s/pattern/replacement/g`.  [This StackOverflow
 answer](http://stackoverflow.com/a/7697604/937932) explains how the following
-command works: `sed ':a;N;$!ba;s/=\r\n//g'dirty.mbox > clean.mbox`.
+command works: `sed ':a;N;$!ba;s/=\r\n//g' dirty.mbox > clean.mbox`.
 
 ## Reward
 
@@ -229,14 +236,32 @@ blogs %>%
   geom_bar(stat = "identity") +
   coord_flip() +
   xlab("") +
-  ylab("Number of posts since November 2014") +
-  ggtitle("Top-10 bloggers by number of posts since November 2014") +
+  ylab("Number of posts since October 2013") +
+  ggtitle("Top-10 bloggers by number of posts since October 2013") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 
 ```{r rbloggers-rates, echo = FALSE}
 # Rates of blogging (smoothed difference in days)
-logweek_trans <- function() {log_trans(9)}
+
+# A problem: If the smoother smooths to zeroes or negative values, then the log
+# transform won't work.  Here, I don't think there will ever be zeroes, so I can
+# use the first suggestion here:
+# http://stackoverflow.com/a/2782383/937932 
+# Which smooths on the logged values (which guarantees being above zero), but
+# plots on the exponentiated logged values (equivalent to the original).
+
+# The log transformation displays widely disparate rates on one scale, and the
+# fuss about log(7) is to get the axis to be labelled in one-week and four-week
+# bits.
+
+# The bug was hard to pin down, because it didn't apply consistently to any
+# given blog when that blog was removed from the data, and that's because the
+# smoothing function was applied *before* facetting (and again afterward), so
+# removing certain blogs affected the smoothing of the remaining blogs, which
+# meant that the blogs that were to blame on their own were able to hide among
+# the others.
+
 blogs %>%
   count(blog, datetime) %>%
   group_by(blog) %>%
@@ -244,16 +269,17 @@ blogs %>%
   mutate(days = difftime(datetime, lag(datetime), units = "days"),
          days = as.numeric(days),
          days = days + .1) %>%         # Avoid log(0) errors
-  filter(n() >= 30) %>%
+  filter(n() >= 55) %>% 
+  ungroup %>%
   ggplot(aes(datetime, days)) +
   geom_point(colour = "grey") +
   geom_smooth(se = FALSE) +
-  coord_trans(y = "logweek") +
   scale_y_continuous(breaks = c(7, 28)) +
-  scale_x_datetime(breaks = date_breaks("6 months"), labels = date_format("%b %Y")) +
+  coord_cartesian(ylim = c(0, 35)) +
+  scale_x_datetime(breaks = date_breaks("6 months"), labels = date_format("%b'%y")) +
   facet_wrap(~blog) +
   xlab("") +
-  ylab("Days between posts, on a log(7) scale") +
+  ylab("Days between posts") +
   ggtitle("Days between posts on most-prolific blogs") +
   theme(legend.position = "none")
 ```
