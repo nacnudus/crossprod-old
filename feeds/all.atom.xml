@@ -1,5 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Crossprod</title><link href="http://nacnudus.github.io/crossprod/" rel="alternate"></link><link href="http://nacnudus.github.io/crossprod/feeds/all.atom.xml" rel="self"></link><id>http://nacnudus.github.io/crossprod/</id><updated>2016-04-25T00:00:00+12:00</updated><entry><title>R rounding is weird? Try JavaScript!</title><link href="http://nacnudus.github.io/crossprod/r-rounding-is-weird-try-javascript" rel="alternate"></link><updated>2016-04-25T00:00:00+12:00</updated><author><name>Duncan Garmonsway</name></author><id>tag:nacnudus.github.io,2016-04-25:crossprod/r-rounding-is-weird-try-javascript</id><summary type="html">&lt;h2 id="round05-0-eh"&gt;round(0.5) == 0?&amp;nbsp;Eh?&lt;/h2&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Crossprod</title><link href="http://nacnudus.github.io/crossprod/" rel="alternate"></link><link href="http://nacnudus.github.io/crossprod/feeds/all.atom.xml" rel="self"></link><id>http://nacnudus.github.io/crossprod/</id><updated>2016-05-02T00:00:00+12:00</updated><entry><title>How many StatsBloggers are there?</title><link href="http://nacnudus.github.io/crossprod/how-many-statsbloggers-are-there" rel="alternate"></link><updated>2016-05-02T00:00:00+12:00</updated><author><name>Duncan Garmonsway</name></author><id>tag:nacnudus.github.io,2016-05-02:crossprod/how-many-statsbloggers-are-there</id><summary type="html">&lt;p&gt;This post does three&amp;nbsp;things:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Reproduces my &lt;a href="http://nacnudus.github.io/crossprod/how-many-r-bloggers-are-there"&gt;R-Bloggers post&lt;/a&gt; on the
+  &lt;a href="http://www.statsblogs.com/"&gt;StatsBlogs&lt;/a&gt; website, to discover how many
+  StatsBlogs blogs there are &lt;em&gt;really&lt;/em&gt;.&lt;/li&gt;
+&lt;li&gt;Considers how to interpret changes in diversity without knowingly observing
+  births/deaths of&amp;nbsp;blogs.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Many people who blog about statistics syndicate their posts on the the
+&lt;a href="http://www.statsblogs.com/"&gt;StatsBlogs&lt;/a&gt; website by the &lt;a href="http://www.talkstats.com/"&gt;Talk Stats
+forum&lt;/a&gt;.  The list of &amp;#8220;contributing blogs&amp;#8221; tends only
+to lengthen, but how many actual posts are there in a given week/month, from how
+many different&amp;nbsp;blogs?&lt;/p&gt;
+&lt;h2 id="the-gist-of-it"&gt;The gist of&amp;nbsp;it&lt;/h2&gt;
+&lt;p&gt;I subscribed to the &lt;a href="http://www.statsblogs.com/"&gt;StatsBlogs&lt;/a&gt; daily digest emails
+in February 2014, giving me a good time-series of posts.  See my &lt;a href="http://nacnudus.github.io/crossprod/how-many-r-bloggers-are-there"&gt;R-Bloggers
+post&lt;/a&gt; and the code at the end of this post for how I
+mined the emails for names and&amp;nbsp;dates.&lt;/p&gt;
+&lt;h2 id="the-trends"&gt;The&amp;nbsp;trends&lt;/h2&gt;
+&lt;p&gt;It turns out that there are have been about 30 blogs active in a given month,
+posting about 150 posts (the only one that regularly posts more than once per
+week is, no prizes for guessing, &lt;a href="http://andrewgelman.com/"&gt;Statistical Modeling, Causal Inference, and
+Social Science&lt;/a&gt;).  There was a change in mid-2015,
+either a step-change down from ~175 blogs/month, or the start of a decline.
+It&amp;#8217;s hard to say which.  When I first subscribed in February 2014, there were
+over 200 posts per month.  Please comment if you can suggest reasons for the&amp;nbsp;change.&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/statsblogs-periodical-1.svg" title="plot of chunk statsblogs-periodical" alt="plot of chunk statsblogs-periodical" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/statsblogs-top10-1.svg" title="plot of chunk statsblogs-top10" alt="plot of chunk statsblogs-top10" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/statsblogs-rates-1.svg" title="plot of chunk statsblogs-rates" alt="plot of chunk statsblogs-rates" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;h2 id="survival-modelling-without-birthdeath-observations"&gt;Survival modelling without birth/death&amp;nbsp;observations&lt;/h2&gt;
+&lt;p&gt;Can we do a survival analysis without knowingly observing births and deaths of
+blogs?  I haven&amp;#8217;t trawled the blogs to find their first-ever posts, and it would
+be hard even for an author to identify a last-ever post.  Without that crucial
+information, I doubt a hazard function can be estimated, though I don&amp;#8217;t know an
+awful lot about that kind of thing, so&amp;nbsp;maybe.&lt;/p&gt;
+&lt;p&gt;But what about diversity?  I think we could get somewhere even without births
+and deaths.  Here&amp;#8217;s the cumulative distribution of observed blogs (the number of
+different blogs observed), over the whole&amp;nbsp;period.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;blogs &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="c1"&gt;# Get the first observation of each blog&lt;/span&gt;
+  group_by&lt;span class="p"&gt;(&lt;/span&gt;blog&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  arrange&lt;span class="p"&gt;(&lt;/span&gt;datetime&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  slice&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  ungroup &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  arrange&lt;span class="p"&gt;(&lt;/span&gt;datetime&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  mutate&lt;span class="p"&gt;(&lt;/span&gt;cumulative &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;n&lt;span class="p"&gt;())&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  ggplot&lt;span class="p"&gt;(&lt;/span&gt;aes&lt;span class="p"&gt;(&lt;/span&gt;datetime&lt;span class="p"&gt;,&lt;/span&gt; cumulative&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
+  geom_line&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
+  xlab&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
+  ylab&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Number of different blogs observed&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
+  ggtitle&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Cumulative number of different blogs observed&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/statsblogs-cumdist-1.svg" title="plot of chunk statsblogs-cumdist" alt="plot of chunk statsblogs-cumdist" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;p&gt;Supposing the population of blogs were static, then the first six months
+of the cumulative distribution curve would make sense.  Lots of blogs post daily,
+weekly or monthly, so by the time a couple of months have gone by, many blogs
+have already been observed.  After that, things slacken, until after about six
+months the curve levels off &amp;#8212; all blogs have been&amp;nbsp;observed.&lt;/p&gt;
+&lt;p&gt;Except that it doesn&amp;#8217;t level off.  It continues to rise steadily, implying that
+new blogs are being syndicated.  On the other hand, the number of different
+blogs observed in a given month (first graph) is slowly declining, so some
+blogs must be posting less often, or ceasing altogether.  Given those slopes,
+the composition of the population must be&amp;nbsp;changing.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m no clever clogs, so I&amp;#8217;m not about to develop a statistic to describe those
+two slopes, to figure out their distribution, or to test hypotheses.  If anyone
+knows anything about this, please&amp;nbsp;comment!&lt;/p&gt;
+&lt;h2 id="what-took-so-long"&gt;What took so&amp;nbsp;long&lt;/h2&gt;
+&lt;p&gt;Almost nothing, since this post re-used the code from my &lt;a href="http://nacnudus.github.io/crossprod/how-many-r-bloggers-are-there"&gt;R-Bloggers
+post&lt;/a&gt;.  All I
+had to do was tweak the XPath, and then take a long bath to think about
+cumulative&amp;nbsp;distributions.&lt;/p&gt;
+&lt;h2 id="code"&gt;Code&lt;/h2&gt;
+&lt;p&gt;Nothing postworthy, so see
+&lt;a href="https://github.com/nacnudus/crossprod/tree/master/content"&gt;GitHub&lt;/a&gt; if you&amp;#8217;re&amp;nbsp;interested.&lt;/p&gt;</summary><category term="R"></category></entry><entry><title>R rounding is weird? Try JavaScript!</title><link href="http://nacnudus.github.io/crossprod/r-rounding-is-weird-try-javascript" rel="alternate"></link><updated>2016-04-25T00:00:00+12:00</updated><author><name>Duncan Garmonsway</name></author><id>tag:nacnudus.github.io,2016-04-25:crossprod/r-rounding-is-weird-try-javascript</id><summary type="html">&lt;h2 id="round05-0-eh"&gt;round(0.5) == 0?&amp;nbsp;Eh?&lt;/h2&gt;
 &lt;p&gt;A common source of confusion in R is rounding-to-even (example adapted from&amp;nbsp;?round):&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;x1 &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;seq&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;-2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; by &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;.5&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="kt"&gt;matrix&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x1&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kp"&gt;round&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x1&lt;span class="p"&gt;)),&lt;/span&gt; nrow &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; byrow &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;#-- IEEE rounding !&lt;/span&gt;

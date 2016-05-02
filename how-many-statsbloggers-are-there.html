@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <meta charset="utf-8"> 
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="author" content="Duncan Garmonsway" />
+        <meta name="copyright" content="Duncan Garmonsway" />
+
+        <meta name="description" content="Parsing the daily digest emails and thinking about modelling
+" />
+        <meta name="twitter:creator" content="@nacnudus">
+        <meta property="og:type" content="article" />
+        <meta name="twitter:card" content="summary">
+
+<meta name="keywords" content="R, Miscellaneous, " />
+
+<meta property="og:title" content="How many StatsBloggers are there? "/>
+<meta property="og:url" content="http://nacnudus.github.io/crossprod/how-many-statsbloggers-are-there" />
+<meta property="og:description" content="Parsing the daily digest emails and thinking about modelling" />
+<meta property="og:site_name" content="Crossprod" />
+<meta property="og:article:author" content="Duncan Garmonsway" />
+<meta property="og:article:published_time" content="2016-05-02T00:00:00+12:00" />
+<meta name="twitter:title" content="How many StatsBloggers are there? ">
+<meta name="twitter:description" content="Parsing the daily digest emails and thinking about modelling">
+<meta property="og:image" content="http://nacnudus.github.io/crossprod/theme/images/apple-touch-icon-152x152.png" />
+<meta name="twitter:image" content="http://nacnudus.github.io/crossprod/theme/images/apple-touch-icon-152x152.png" >
+
+        <title>How many StatsBloggers are there?  · Crossprod
+</title>
+        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+        <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.1/css/font-awesome.css" rel="stylesheet">
+<link rel="stylesheet" href="http://nacnudus.github.io/crossprod/theme/css/style.min.css?7aeecf36">
+        <link rel="shortcut icon" href="http://nacnudus.github.io/crossprod/theme/images/favicon.ico" type="image/x-icon" type="image/png" />
+        <link rel="icon" href="http://nacnudus.github.io/crossprod/theme/images/apple-touch-icon-152x152.png" type="image/png" />
+        <link rel="apple-touch-icon" href="http://nacnudus.github.io/crossprod/theme/images/apple-touch-icon.png"  type="image/png" />
+        <link rel="apple-touch-icon" sizes="57x57" href="http://nacnudus.github.io/crossprod/theme/images/apple-touch-icon-57x57.png" type="image/png" />
+        <link rel="apple-touch-icon" sizes="72x72" href="http://nacnudus.github.io/crossprod/theme/images/apple-touch-icon-72x72.png" type="image/png" />
+        <link rel="apple-touch-icon" sizes="76x76" href="http://nacnudus.github.io/crossprod/theme/images/apple-touch-icon-76x76.png" type="image/png" />
+        <link rel="apple-touch-icon" sizes="114x114" href="http://nacnudus.github.io/crossprod/theme/images/apple-touch-icon-114x114.png" type="image/png" />
+        <link rel="apple-touch-icon" sizes="120x120" href="http://nacnudus.github.io/crossprod/theme/images/apple-touch-icon-120x120.png" type="image/png" />
+        <link rel="apple-touch-icon" sizes="144x144" href="http://nacnudus.github.io/crossprod/theme/images/apple-touch-icon-144x144.png" type="image/png" />
+        <link rel="apple-touch-icon" sizes="152x152" href="http://nacnudus.github.io/crossprod/theme/images/apple-touch-icon-152x152.png" type="image/png" />
+        <link href="http://nacnudus.github.io/crossprod/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Crossprod - Full Atom Feed" />
+        <link href="http://nacnudus.github.io/crossprod/feeds/all.rss.xml" type="application/rss+xml" rel="alternate" title="Crossprod - Full RSS Feed" />
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+     })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-45097885-3', 'auto');
+    ga('send', 'pageview');
+</script>
+    </head>
+    <body>
+        <div id="content-sans-footer">
+        <div class="navbar navbar-static-top">
+            <div class="navbar-inner">
+                <div class="container-fluid">
+                    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </a>
+                    <a class="brand" href="http://nacnudus.github.io/crossprod/"><span class=site-name>Crossprod</span></a>
+                    <div class="nav-collapse collapse">
+                        <ul class="nav pull-right top-menu">
+                            <li ><a href="http://nacnudus.github.io/crossprod">Home</a></li>
+                            <li ><a href="http://nacnudus.github.io/crossprod/categories.html">Categories</a></li>
+                            <li ><a href="http://nacnudus.github.io/crossprod/tags.html">Tags</a></li>
+                            <li ><a href="http://nacnudus.github.io/crossprod/archives.html">Archives</a></li>
+                            <li><form class="navbar-search" action="http://nacnudus.github.io/crossprod/search.html" onsubmit="return validateForm(this.elements['q'].value);"> <input type="text" class="search-query" placeholder="Search" name="q" id="tipue_search_input"></form></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span1"></div>
+                <div class="span10">
+<article>
+<div class="row-fluid">
+    <header class="page-header span10 offset2">
+    <h1><a href="http://nacnudus.github.io/crossprod/how-many-statsbloggers-are-there"> How many StatsBloggers are&nbsp;there?  </a></h1>
+    </header>
+</div>
+
+<div class="row-fluid">
+        <div class="span8 offset2 article-content">
+
+            
+            <p>This post does three&nbsp;things:</p>
+<ul>
+<li>Reproduces my <a href="http://nacnudus.github.io/crossprod/how-many-r-bloggers-are-there">R-Bloggers post</a> on the
+  <a href="http://www.statsblogs.com/">StatsBlogs</a> website, to discover how many
+  StatsBlogs blogs there are <em>really</em>.</li>
+<li>Considers how to interpret changes in diversity without knowingly observing
+  births/deaths of&nbsp;blogs.</li>
+</ul>
+<p>Many people who blog about statistics syndicate their posts on the the
+<a href="http://www.statsblogs.com/">StatsBlogs</a> website by the <a href="http://www.talkstats.com/">Talk Stats
+forum</a>.  The list of &#8220;contributing blogs&#8221; tends only
+to lengthen, but how many actual posts are there in a given week/month, from how
+many different&nbsp;blogs?</p>
+<h2 id="the-gist-of-it">The gist of&nbsp;it</h2>
+<p>I subscribed to the <a href="http://www.statsblogs.com/">StatsBlogs</a> daily digest emails
+in February 2014, giving me a good time-series of posts.  See my <a href="http://nacnudus.github.io/crossprod/how-many-r-bloggers-are-there">R-Bloggers
+post</a> and the code at the end of this post for how I
+mined the emails for names and&nbsp;dates.</p>
+<h2 id="the-trends">The&nbsp;trends</h2>
+<p>It turns out that there are have been about 30 blogs active in a given month,
+posting about 150 posts (the only one that regularly posts more than once per
+week is, no prizes for guessing, <a href="http://andrewgelman.com/">Statistical Modeling, Causal Inference, and
+Social Science</a>).  There was a change in mid-2015,
+either a step-change down from ~175 blogs/month, or the start of a decline.
+It&#8217;s hard to say which.  When I first subscribed in February 2014, there were
+over 200 posts per month.  Please comment if you can suggest reasons for the&nbsp;change.</p>
+<p><img src="http://nacnudus.github.io/crossprod/figure/statsblogs-periodical-1.svg" title="plot of chunk statsblogs-periodical" alt="plot of chunk statsblogs-periodical" width="960px" height="540px" /></p>
+<p><img src="http://nacnudus.github.io/crossprod/figure/statsblogs-top10-1.svg" title="plot of chunk statsblogs-top10" alt="plot of chunk statsblogs-top10" width="960px" height="540px" /></p>
+<p><img src="http://nacnudus.github.io/crossprod/figure/statsblogs-rates-1.svg" title="plot of chunk statsblogs-rates" alt="plot of chunk statsblogs-rates" width="960px" height="540px" /></p>
+<h2 id="survival-modelling-without-birthdeath-observations">Survival modelling without birth/death&nbsp;observations</h2>
+<p>Can we do a survival analysis without knowingly observing births and deaths of
+blogs?  I haven&#8217;t trawled the blogs to find their first-ever posts, and it would
+be hard even for an author to identify a last-ever post.  Without that crucial
+information, I doubt a hazard function can be estimated, though I don&#8217;t know an
+awful lot about that kind of thing, so&nbsp;maybe.</p>
+<p>But what about diversity?  I think we could get somewhere even without births
+and deaths.  Here&#8217;s the cumulative distribution of observed blogs (the number of
+different blogs observed), over the whole&nbsp;period.</p>
+<div class="highlight"><pre>blogs <span class="o">%&gt;%</span>
+  <span class="c1"># Get the first observation of each blog</span>
+  group_by<span class="p">(</span>blog<span class="p">)</span> <span class="o">%&gt;%</span>
+  arrange<span class="p">(</span>datetime<span class="p">)</span> <span class="o">%&gt;%</span>
+  slice<span class="p">(</span><span class="m">1</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  ungroup <span class="o">%&gt;%</span>
+  arrange<span class="p">(</span>datetime<span class="p">)</span> <span class="o">%&gt;%</span>
+  mutate<span class="p">(</span>cumulative <span class="o">=</span> <span class="m">1</span><span class="o">:</span>n<span class="p">())</span> <span class="o">%&gt;%</span>
+  ggplot<span class="p">(</span>aes<span class="p">(</span>datetime<span class="p">,</span> cumulative<span class="p">))</span> <span class="o">+</span>
+  geom_line<span class="p">()</span> <span class="o">+</span>
+  xlab<span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">)</span> <span class="o">+</span>
+  ylab<span class="p">(</span><span class="s">&quot;Number of different blogs observed&quot;</span><span class="p">)</span> <span class="o">+</span>
+  ggtitle<span class="p">(</span><span class="s">&quot;Cumulative number of different blogs observed&quot;</span><span class="p">)</span>
+</pre></div>
+
+
+<p><img src="http://nacnudus.github.io/crossprod/figure/statsblogs-cumdist-1.svg" title="plot of chunk statsblogs-cumdist" alt="plot of chunk statsblogs-cumdist" width="960px" height="540px" /></p>
+<p>Supposing the population of blogs were static, then the first six months
+of the cumulative distribution curve would make sense.  Lots of blogs post daily,
+weekly or monthly, so by the time a couple of months have gone by, many blogs
+have already been observed.  After that, things slacken, until after about six
+months the curve levels off &#8212; all blogs have been&nbsp;observed.</p>
+<p>Except that it doesn&#8217;t level off.  It continues to rise steadily, implying that
+new blogs are being syndicated.  On the other hand, the number of different
+blogs observed in a given month (first graph) is slowly declining, so some
+blogs must be posting less often, or ceasing altogether.  Given those slopes,
+the composition of the population must be&nbsp;changing.</p>
+<p>I&#8217;m no clever clogs, so I&#8217;m not about to develop a statistic to describe those
+two slopes, to figure out their distribution, or to test hypotheses.  If anyone
+knows anything about this, please&nbsp;comment!</p>
+<h2 id="what-took-so-long">What took so&nbsp;long</h2>
+<p>Almost nothing, since this post re-used the code from my <a href="http://nacnudus.github.io/crossprod/how-many-r-bloggers-are-there">R-Bloggers
+post</a>.  All I
+had to do was tweak the XPath, and then take a long bath to think about
+cumulative&nbsp;distributions.</p>
+<h2 id="code">Code</h2>
+<p>Nothing postworthy, so see
+<a href="https://github.com/nacnudus/crossprod/tree/master/content">GitHub</a> if you&#8217;re&nbsp;interested.</p>
+            <section>
+    <p id="post-share-links">
+    Like this post? Share on:
+    <a href="http://twitter.com/home?status=How%20many%20StatsBloggers%20are%C2%A0there%3F%20http%3A//nacnudus.github.io/crossprod/how-many-statsbloggers-are-there" target="_blank" title="Share on Twitter">Twitter</a>
+    ❄
+    <a href="http://www.facebook.com/sharer/sharer.php?u=http%3A//nacnudus.github.io/crossprod/how-many-statsbloggers-are-there" target="_blank" title="Share on Facebook">Facebook</a>
+    ❄
+    <a href="https://plus.google.com/share?url=http%3A//nacnudus.github.io/crossprod/how-many-statsbloggers-are-there" target="_blank" title="Share on Google Plus">Google+</a>
+    ❄
+    <a href="mailto:?subject=How%20many%20StatsBloggers%20are%C2%A0there%3F&amp;body=http%3A//nacnudus.github.io/crossprod/how-many-statsbloggers-are-there" target="_blank" title="Share via Email">Email</a>
+    </p>
+</section>
+
+            <section>
+<p id="comment-message">Please comment below </p>
+<div class="accordion" id="accordion2">
+    <div class="accordion-group">
+        <div class="accordion-heading">
+            <a class="accordion-toggle disqus-comment-count" data-toggle="collapse" data-parent="#accordion2"
+                    data-disqus-identifier="statsblogs"
+                href="http://nacnudus.github.io/crossprod/how-many-statsbloggers-are-there#disqus_thread">
+                Comments
+            </a>
+        </div>
+        <div id="disqus_thread" class="accordion-body collapse">
+            <div class="accordion-inner">
+                <div class="comments">
+                    <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'crossprod';
+        var disqus_identifier = 'statsblogs';
+    var disqus_url = 'http://nacnudus.github.io/crossprod/how-many-statsbloggers-are-there';
+
+    (function() {
+         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+         dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+
+            <hr/>
+            <aside>
+            <nav>
+            <ul class="articles-timeline">
+                <li class="previous-article">« <a href="http://nacnudus.github.io/crossprod/r-rounding-is-weird-try-javascript" title="Previous: R rounding is weird? Try JavaScript!">R rounding is weird? Try JavaScript!</a></li>
+            </ul>
+            </nav>
+            </aside>
+        </div>
+        <section>
+        <div class="span2" style="float:right;font-size:0.9em;">
+            <h4>Published</h4>
+            <time pubdate="pubdate" datetime="2016-05-02T00:00:00+12:00">May 2, 2016</time>
+            <h4>Category</h4>
+            <a class="category-link" href="http://nacnudus.github.io/crossprod/categories.html#miscellaneous-ref">Miscellaneous</a>
+            <h4>Tags</h4>
+            <ul class="list-of-tags tags-in-article">
+                <li><a href="http://nacnudus.github.io/crossprod/tags.html#r-ref">R
+                    <span>4</span>
+</a></li>
+            </ul>
+<h4>Social</h4>
+    <a href="https://github.com/nacnudus" title="My Github Profile" class="sidebar-social-links" target="_blank">
+    <i class="fa fa-github sidebar-social-links"></i></a>
+    <a href="https://twitter.com/nacnudus" title="My Twitter Profile" class="sidebar-social-links" target="_blank">
+    <i class="fa fa-twitter sidebar-social-links"></i></a>
+    <a href="https://nz.linkedin.com/in/duncangarmonsway" title="My LinkedIn Profile" class="sidebar-social-links" target="_blank">
+    <i class="fa fa-linkedin sidebar-social-links"></i></a>
+        </div>
+        </section>
+</div>
+</article>
+                </div>
+                <div class="span1"></div>
+            </div>
+        </div>
+        <div id="push"></div>
+    </div>
+<footer>
+<div id="footer">
+    <ul class="footer-content">
+        <li class="elegant-subtitle"><span class="site-name">Crossprod</span> - R, data, and frustration</li>
+        <li class="elegant-power">Powered by <a href="http://getpelican.com/" title="Pelican Home Page">Pelican</a>. Theme: <a href="http://oncrashreboot.com/pelican-elegant" title="Theme Elegant Home Page">Elegant</a> by <a href="http://oncrashreboot.com" title="Talha Mansoor Home Page">Talha Mansoor</a></li>
+    </ul>
+</div>
+</footer>            <script src="http://code.jquery.com/jquery.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+        <script>
+            function validateForm(query)
+            {
+                return (query.length > 0);
+            }
+        </script>
+
+            <script type="text/javascript">
+var disqus_shortname = 'crossprod';
+(function () {
+    var s = document.createElement('script'); s.async = true;
+    s.type = 'text/javascript';
+    s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+    (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+}());
+</script>
+<script  language="javascript" type="text/javascript">
+function uncollapse() {
+    if (window.location.hash.match(/^#comment-\d+$/)) {
+        $('#disqus_thread').collapse('show');
+    }
+}
+</script>
+<script type="text/javascript" language="JavaScript">
+uncollapse();
+window.onhashchange=function(){
+    if (window.location.hash.match(/^#comment-\d+$/))
+        window.location.reload(true);
+}
+</script>
+<script>
+$('#disqus_thread').on('shown', function () {
+    var link = document.getElementsByClassName('accordion-toggle');
+    var old_innerHTML = link[0].innerHTML;
+    $(link[0]).fadeOut(500, function() {
+        $(this).text('Click here to hide comments').fadeIn(500);
+    });
+    $('#disqus_thread').on('hidden', function () {
+        $(link[0]).fadeOut(500, function() {
+            $(this).text(old_innerHTML).fadeIn(500);
+        });
+    })
+})
+</script>
+
+
+    </body>
+    <!-- Theme: Elegant built for Pelican
+    License : http://oncrashreboot.com/pelican-elegant -->
+</html>
