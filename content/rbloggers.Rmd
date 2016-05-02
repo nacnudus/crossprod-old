@@ -33,7 +33,7 @@ week/month, from how many different blogs?
 ## Update 30 April 2016
 
 I have a longer history of daily digest emails than I thought.  The data, and
-some of the text, has been updated to go back to January 2014.
+some of the text, has been updated to go back to October 2013.
 
 ## The gist of it
 
@@ -125,6 +125,7 @@ datetimes <-
   datetimes %>%
   str_sub(start = 34) %>%
   strptime(format = "%b %d %H:%M:%S %z %Y")
+range(datetimes)
 
 # Link the datetime with individual blogs
 names(blogs) <- datetimes
@@ -235,8 +236,8 @@ blogs %>%
   geom_bar(stat = "identity") +
   coord_flip() +
   xlab("") +
-  ylab("Number of posts since November 2014") +
-  ggtitle("Top-10 bloggers by number of posts since November 2014") +
+  ylab("Number of posts since October 2013") +
+  ggtitle("Top-10 bloggers by number of posts since October 2013") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 
@@ -278,7 +279,7 @@ blogs %>%
   scale_x_datetime(breaks = date_breaks("6 months"), labels = date_format("%b'%y")) +
   facet_wrap(~blog) +
   xlab("") +
-  ylab("Days between posts, on a log(7) scale") +
+  ylab("Days between posts") +
   ggtitle("Days between posts on most-prolific blogs") +
   theme(legend.position = "none")
 ```
