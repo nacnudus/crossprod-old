@@ -5,25 +5,14 @@ Summary: Parsing the daily digest emails
 Disqus_identifier: rbloggers
 Tags: R
 
-```{r pelican_conf, echo=FALSE}
-#set this to true when ready to publish
-ready_to_publish = FALSE
-
-# hook_plot <- knit_hooks$get('plot')
-# 
-# knit_hooks$set(plot=function(x, options) {
-#     if (!is.null(options$pelican.publish) && options$pelican.publish) {
-#         x <- paste0("{filename}", x)
-#     }
-#     hook_plot(x, options)
-# })
-# opts_chunk$set(pelican.publish = ready_to_publish)
+```{r rbloggers-pelican_conf, echo=FALSE}
 knitr::opts_chunk$set(cache = TRUE)
-knitr::opts_chunk$set(fig.path='./figure/')
+knitr::opts_chunk$set(fig.path='figure/')
 knitr::opts_chunk$set(fig.width =  12.2)
 knitr::opts_chunk$set(fig.height = 6.9)
 knitr::opts_chunk$set(out.width =  "960px")
 knitr::opts_chunk$set(out.height = "540px")
+knitr::opts_chunk$set(fig.retina = NULL)
 knitr::opts_chunk$set(dev = 'Cairo_svg')
 knitr::opts_chunk$set(warning = FALSE)
 ```
@@ -68,7 +57,7 @@ about 160 posts (Revolutions is the only one that regularly posts more than once
 per week).  Nothing much has changed in the last year.  For some arbitrary
 definition of "dead blog", a survival analysis could be done.
 
-```{r rbloggers-periodical, echo = FALSE}
+```{r rbloggers-packages, echo = FALSE}
 library(dplyr)
 library(tidyr)
 library(tm.plugin.mail)
@@ -77,9 +66,9 @@ library(stringr)
 library(lubridate)
 library(ggplot2)
 library(scales)
-# library(ggrepel)
-# library(directlabels)
+```
 
+```{r rbloggers-wrangle, echo = TRUE}
 # TODO: Implement the following manual steps in R
 # 1. Create a label in Gmail for the R-Bloggers digests
 # 2. Export emails with that label from Gmail
@@ -176,7 +165,7 @@ periodical <-
   ungroup
 ```
 
-```{r, echo = FALSE}
+```{r rbloggers-periodical, echo = FALSE}
 periodical %>%
   ggplot(aes(date, n, colour = period, linetype = measure)) +
   geom_line() +
@@ -185,7 +174,7 @@ periodical %>%
   ggtitle("Number of R-Bloggers blogs/posts per week/month")
 ```
 
-## Where the time went
+## What took me so long
 
 This was an easy project, but a few quirks soaked up a lot of time:
 
@@ -269,7 +258,7 @@ blogs %>%
   theme(legend.position = "none")
 ```
 
-```{r, echo = TRUE, eval = FALSE}
+```{r rbloggers-fragments, echo = TRUE, eval = FALSE}
 # NOTE: These are frangments of code.  They do not stand alone.
 
 # Collect the file names
