@@ -17,7 +17,7 @@ knitr::opts_chunk$set(dev = 'Cairo_svg')
 knitr::opts_chunk$set(warning = FALSE)
 ```
 
-This post does three things:
+This post does two things:
 
 * Reproduces my [R-Bloggers post]({filename}./rbloggers.Rmd) on the
   [StatsBlogs](http://www.statsblogs.com/) website, to discover how many
