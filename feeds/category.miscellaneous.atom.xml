@@ -1,5 +1,240 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Crossprod</title><link href="http://nacnudus.github.io/crossprod/" rel="alternate"></link><link href="http://nacnudus.github.io/crossprod/feeds/category.miscellaneous.atom.xml" rel="self"></link><id>http://nacnudus.github.io/crossprod/</id><updated>2016-05-02T00:00:00+12:00</updated><entry><title>How many StatsBloggers are there?</title><link href="http://nacnudus.github.io/crossprod/how-many-statsbloggers-are-there" rel="alternate"></link><updated>2016-05-02T00:00:00+12:00</updated><author><name>Duncan Garmonsway</name></author><id>tag:nacnudus.github.io,2016-05-02:crossprod/how-many-statsbloggers-are-there</id><summary type="html">&lt;p&gt;This post does two&amp;nbsp;things:&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Crossprod</title><link href="http://nacnudus.github.io/crossprod/" rel="alternate"></link><link href="http://nacnudus.github.io/crossprod/feeds/category.miscellaneous.atom.xml" rel="self"></link><id>http://nacnudus.github.io/crossprod/</id><updated>2016-05-11T00:00:00+12:00</updated><entry><title>Simmer vs SimPy: The Bank, Part I</title><link href="http://nacnudus.github.io/crossprod/simmer-vs-simpy-the-bank-part-i" rel="alternate"></link><updated>2016-05-11T00:00:00+12:00</updated><author><name>Duncan Garmonsway</name></author><id>tag:nacnudus.github.io,2016-05-11:crossprod/simmer-vs-simpy-the-bank-part-i</id><summary type="html">&lt;h2 id="simmer-vs-simpy"&gt;Simmer vs&amp;nbsp;SimPy&lt;/h2&gt;
+&lt;p&gt;Which package would be easier for teaching queueing theory?  Python 2.7&amp;#8217;s
+&lt;a href="https://pythonhosted.org/SimPy/Tutorials/TheBank.html"&gt;&lt;code&gt;SimPy&lt;/code&gt;&lt;/a&gt;, designed for
+(as far as I can tell) lecturing, by Tony Vigneau at my alma mater, Vic Uni
+Wellington &lt;span class="caps"&gt;NZ&lt;/span&gt;, or &lt;a href="http://r-simmer.org/"&gt;&lt;code&gt;simmer&lt;/code&gt;&lt;/a&gt;, designed by Bart Smeets and
+Iñaki Ucar to (as far as I can tell) actually&amp;nbsp;use?&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;simmer&lt;/code&gt; package is a relatively new R package for discrete event simulation
+(&lt;span class="caps"&gt;DES&lt;/span&gt;).  It&amp;#8217;s an exciting development, because there isn&amp;#8217;t a lot of open-source
+&lt;span class="caps"&gt;DES&lt;/span&gt; software.  &lt;code&gt;SimPy&lt;/code&gt; seems to be the only serious competitor for teaching
+&lt;span class="caps"&gt;DES&lt;/span&gt; and queueing&amp;nbsp;theory.&lt;/p&gt;
+&lt;p&gt;This post does two&amp;nbsp;things:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Ports the code of the main &lt;code&gt;SimPy&lt;/code&gt; tutorial &amp;#8216;The Bank&amp;#8217; to &lt;code&gt;simmer&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Opines that &lt;code&gt;simmer&lt;/code&gt; would be easier to teach as part of a queueing theory&amp;nbsp;course.&lt;/li&gt;
+&lt;li&gt;Pursues a random red&amp;nbsp;herring.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="why-not-simpy-3"&gt;Why not SimPy&amp;nbsp;3?&lt;/h2&gt;
+&lt;p&gt;I use &lt;code&gt;SimPy&lt;/code&gt; 2 (for Python 2), because it is the last version developed by the
+original author, because it was the version I was taught, only last year, and
+because, in one crucial respect (monitoring), it&amp;#8217;s &lt;a href="https://simpy.readthedocs.io/en/latest/topical_guides/monitoring.html"&gt;much easier to
+use&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id="the-bank"&gt;The&amp;nbsp;Bank&lt;/h2&gt;
+&lt;p&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;The Bank&amp;#8217; is a tutorial that develops &lt;span class="caps"&gt;DES&lt;/span&gt; concepts and techniques by simulating
+the paths of customers at a bank.  The arrivals (customers) queue for a server
+(counter), are served, and&amp;nbsp;exit.&lt;/p&gt;
+&lt;h2 id="complete-example"&gt;Complete&amp;nbsp;example&lt;/h2&gt;
+&lt;p&gt;The actual ported code is available &lt;a href="https://github.com/nacnudus/simmer-bank"&gt;on
+GitHub&lt;/a&gt;, and I only give simple
+examples in this post.  The first example is&amp;nbsp;complete.&lt;/p&gt;
+&lt;p&gt;First, &lt;code&gt;SimPy&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot; bank01: The single non-random Customer &amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;           
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;SimPy.Simulation&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;                           
+
+&lt;span class="c"&gt;## Model components -----------------------------        &lt;/span&gt;
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Customer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Process&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;                                 
+    &lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot; Customer arrives, looks around and leaves &amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;visit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;timeInBank&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;                          
+        &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;now&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s"&gt;&amp;quot; Here I am&amp;quot;&lt;/span&gt;               
+        &lt;span class="k"&gt;yield&lt;/span&gt; &lt;span class="n"&gt;hold&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;timeInBank&lt;/span&gt;                       
+        &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;now&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s"&gt;&amp;quot; I must leave&amp;quot;&lt;/span&gt;            
+
+&lt;span class="c"&gt;## Experiment data ------------------------------&lt;/span&gt;
+
+&lt;span class="n"&gt;maxTime&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mf"&gt;100.0&lt;/span&gt;     &lt;span class="c"&gt;# minutes                            &lt;/span&gt;
+&lt;span class="n"&gt;timeInBank&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mf"&gt;10.0&lt;/span&gt;   &lt;span class="c"&gt;# minutes&lt;/span&gt;
+
+&lt;span class="c"&gt;## Model/Experiment ------------------------------&lt;/span&gt;
+
+&lt;span class="n"&gt;initialize&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;                                             
+&lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Customer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Klaus&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;                               
+&lt;span class="n"&gt;activate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;visit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;timeInBank&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;span class="n"&gt;at&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mf"&gt;5.0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;                   
+&lt;span class="n"&gt;simulate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;until&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;maxTime&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;   
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## 5.0 Klaus  Here I am
+## 15.0 Klaus  I must leave
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Next, &lt;code&gt;simmer&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c1"&gt;# bank01: The single non-random customer&lt;/span&gt;
+&lt;span class="kp"&gt;suppressMessages&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kn"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;simmer&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="c1"&gt;## Experiment data ------------------------------&lt;/span&gt;
+
+maxTime &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="m"&gt;100&lt;/span&gt;     &lt;span class="c1"&gt;# minutes                            &lt;/span&gt;
+timeInBank &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="m"&gt;10&lt;/span&gt;   &lt;span class="c1"&gt;# minutes&lt;/span&gt;
+
+&lt;span class="c1"&gt;## Model components -----------------------------        &lt;/span&gt;
+
+customer &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; 
+  create_trajectory&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Customer&amp;#39;s path&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  timeout&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;timeInBank&lt;span class="p"&gt;})&lt;/span&gt; 
+
+&lt;span class="c1"&gt;## Model/Experiment ------------------------------&lt;/span&gt;
+
+bank &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; simmer&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;bank&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+bank &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; add_generator&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Customer&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; customer&lt;span class="p"&gt;,&lt;/span&gt; at&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;5&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## simmer environment: bank | now: 0 | next: 5
+## { Generator: Customer | monitored: 1 | n_generated: 1 }
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;bank &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; run&lt;span class="p"&gt;(&lt;/span&gt;until &lt;span class="o"&gt;=&lt;/span&gt; maxTime&lt;span class="p"&gt;)&lt;/span&gt; 
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## simmer environment: bank | now: 15 | next: 
+## { Generator: Customer | monitored: 1 | n_generated: 1 }
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;bank &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; get_mon_arrivals
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;##        name start_time end_time activity_time finished replication
+## 1 Customer0          5       15            10     TRUE           1
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Already there are several differences that might make teaching queueing theory
+with &lt;code&gt;simmer&lt;/code&gt; easier than with &lt;code&gt;SimPy&lt;/code&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The difference between &lt;code&gt;from X import Y&lt;/code&gt; and &lt;code&gt;Import X&lt;/code&gt; isn&amp;#8217;t&amp;nbsp;relevant.&lt;/li&gt;
+&lt;li&gt;Whitespace doesn&amp;#8217;t&amp;nbsp;matter.&lt;/li&gt;
+&lt;li&gt;The difference between integer and floating-point types doesn&amp;#8217;t matter&amp;nbsp;here.&lt;/li&gt;
+&lt;li&gt;Arguments don&amp;#8217;t have to be&amp;nbsp;defined.&lt;/li&gt;
+&lt;li&gt;References don&amp;#8217;t have to be&amp;nbsp;passed.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;self&lt;/code&gt; is&amp;nbsp;irrelevant.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;timeout&lt;/code&gt; is more intuitive than &lt;code&gt;yield&lt;/code&gt; (&lt;code&gt;yield&lt;/code&gt; describes how the class
+  behaves in the implementation of the &lt;span class="caps"&gt;DES&lt;/span&gt;, as it yields control back to the
+  clock, whereas &lt;code&gt;timeout&lt;/code&gt; describes what the function does in the mind of the&amp;nbsp;modeller).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;But there is one point that could be tricky, and that soon becomes&amp;nbsp;important:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;timeout&lt;/code&gt; and &lt;code&gt;add_generator&lt;/code&gt; both expect &lt;em&gt;functions&lt;/em&gt;, rather than vectors, to
+  control (inter-)arrival time and timeout duration.  It would be nice to have
+  syntactic sugar to handle vectors.  The reason for the functions is that, when
+  a model is run indefinitely, a function can continue generating new arrival
+  times and timeout durations, whereas a vector will soon be&amp;nbsp;exhausted.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="example-fragments"&gt;Example&amp;nbsp;fragments&lt;/h2&gt;
+&lt;p&gt;Implementing the rest of the examples brought up a few other interesting&amp;nbsp;points.&lt;/p&gt;
+&lt;h3 id="generate-more-than-one-arrival"&gt;Generate more than one&amp;nbsp;arrival&lt;/h3&gt;
+&lt;p&gt;In the &lt;code&gt;SimPy&lt;/code&gt; examples, to generate &lt;code&gt;n &amp;gt; 1&lt;/code&gt; arrivals, the &lt;code&gt;activate&lt;/code&gt; code to
+generate them moves inside the &lt;code&gt;Source&lt;/code&gt; class.  To explain why requires a quite
+a lot of understanding/intuition of object-oriented programming that isn&amp;#8217;t
+relevant to learning about queuing theory.  &lt;code&gt;Simmer&lt;/code&gt; doesn&amp;#8217;t present this&amp;nbsp;difficulty.&lt;/p&gt;
+&lt;h3 id="limit-the-number-of-arrivals"&gt;Limit the number of&amp;nbsp;arrivals&lt;/h3&gt;
+&lt;p&gt;Arrivals with random inter-arrival times would be generated indefinitely by
+&lt;code&gt;bank %&amp;gt;% add_generator("Customer", customer, function() {runif(1)})&lt;/code&gt;.  To limit
+this to &lt;code&gt;n = 10&lt;/code&gt; arrivals, you might try &lt;code&gt;times &amp;lt;- runif(10); bank %&amp;gt;%
+add_generator("Customer", customer, times)&lt;/code&gt;, but it doesn&amp;#8217;t work, because
+&lt;code&gt;add_generator&lt;/code&gt; expects a function that &lt;em&gt;will&lt;/em&gt; supply inter-arrival times, not a
+vector that &lt;em&gt;does&lt;/em&gt; supply&amp;nbsp;them.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Simmer&lt;/code&gt; provides a handy function, &lt;code&gt;at()&lt;/code&gt;, to
+convert a vector to function, so you could do &lt;code&gt;add_generator("Customer", customer,
+at(runif(10)))&lt;/code&gt;, except that this still doesn&amp;#8217;t work.  That&amp;#8217;s because &lt;code&gt;at()&lt;/code&gt;
+is designed to convert &lt;em&gt;arrival&lt;/em&gt; times into &lt;em&gt;inter-arrival&lt;/em&gt; times, but the
+&lt;code&gt;runif&lt;/code&gt; function is being used to provide &lt;em&gt;inter-arrival&lt;/em&gt; times in the first
+place.  The final fix is to do &lt;code&gt;add_generator("Customer", customer, at(c(0,
+cumsum(runif(10)))))&lt;/code&gt;.&lt;/p&gt;
+&lt;h3 id="joining-the-shortest-queue"&gt;Joining the shortest&amp;nbsp;queue&lt;/h3&gt;
+&lt;p&gt;This is a pain in both &lt;code&gt;SimPy&lt;/code&gt; and &lt;code&gt;simmer&lt;/code&gt;.  The &lt;code&gt;SimPy&lt;/code&gt; example creates a
+method to return the length of each queue, and then the following code iterates
+through the results until a queue is&amp;nbsp;chosen:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;# Select the shortest queue&lt;/span&gt;
+&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;range&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Nc&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;                                         
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;Qlength&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="ow"&gt;or&lt;/span&gt; &lt;span class="n"&gt;Qlength&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="nb"&gt;min&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Qlength&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="n"&gt;choice&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;  &lt;span class="c"&gt;# the chosen queue number                &lt;/span&gt;
+        &lt;span class="k"&gt;break&lt;/span&gt;
+
+&lt;span class="c"&gt;# Join the queue&lt;/span&gt;
+&lt;span class="k"&gt;yield&lt;/span&gt; &lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;counters&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;choice&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;In &lt;code&gt;Simmer&lt;/code&gt;, this is done by&amp;nbsp;branching:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;customer &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; 
+  create_trajectory&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Customer&amp;#39;s path&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    branch&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+             &lt;span class="c1"&gt;# Select the shortest queue&lt;/span&gt;
+             &lt;span class="kp"&gt;which.min&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;bank &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; get_server_count&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;counter1&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
+                           bank &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; get_queue_count&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;counter1&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+                         bank &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; get_server_count&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;counter2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
+                           bank &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; get_queue_count&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;counter2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+         &lt;span class="p"&gt;},&lt;/span&gt;
+         merge &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kp"&gt;rep&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+         &lt;span class="c1"&gt;# Join the first queue, if it was chosen&lt;/span&gt;
+         create_trajectory&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;branch1&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+           seize&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;counter1&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+           timeout&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;rexp&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;timeInBank&lt;span class="p"&gt;)})&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+           release&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;counter1&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+         &lt;span class="c1"&gt;# Otherwise join the second queue, if it was chosen&lt;/span&gt;
+         create_trajectory&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;branch2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+           seize&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;counter2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+           timeout&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;rexp&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;timeInBank&lt;span class="p"&gt;)})&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+           release&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;counter2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;I mucked about for a while trying to avoid branching by using attributes to name
+the server at &lt;code&gt;seize&lt;/code&gt; time. I won&amp;#8217;t explain attributes here because they&amp;#8217;re
+covered in the excellent &lt;code&gt;simmer&lt;/code&gt; &lt;a href=""&gt;vignettes&lt;/a&gt;, but basically the following
+code doesn&amp;#8217;t work because attributes are only available to certain arguments,
+which doesn&amp;#8217;t include the &lt;code&gt;resource&lt;/code&gt; argument, only the &lt;code&gt;amount&lt;/code&gt; and perhaps
+&lt;code&gt;priority&lt;/code&gt; and &lt;code&gt;preemptible&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c1"&gt;# This doesn&amp;#39;t work:&lt;/span&gt;
+customer &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; 
+  create_trajectory&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Customer&amp;#39;s path&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    &lt;span class="c1"&gt;# Attributes can be set, to choose the queue&lt;/span&gt;
+    set_attribute&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;counter&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                  &lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+                    &lt;span class="kp"&gt;which.min&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;bank &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; get_server_count&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;counter1&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
+                                  bank &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; get_queue_count&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;counter1&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+                                bank &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; get_server_count&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;counter2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
+                                  bank &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; get_queue_count&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;counter2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)))})&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    &lt;span class="c1"&gt;# But they aren&amp;#39;t available in the `resource` argument of `seize` for naming&lt;/span&gt;
+    &lt;span class="c1"&gt;# the server, so this doesn&amp;#39;t work.&lt;/span&gt;
+    seize&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;attrs&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="kp"&gt;paste0&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;counter&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; attrs&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;counter&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;])})&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    timeout&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;rexp&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;timeInBank&lt;span class="p"&gt;)})&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    release&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;attrs&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="kp"&gt;paste0&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;counter&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; attrs&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;counter&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;])})&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3 id="monitoring"&gt;Monitoring&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;Simmer&lt;/code&gt; has a killer feature: everything is monitored automatically, and
+reported in handy data frames.  This works especially well when doing many&amp;nbsp;replications.&lt;/p&gt;
+&lt;p&gt;But it isn&amp;#8217;t obvious how to do the equivalent of, in Python, injecting &lt;code&gt;print&lt;/code&gt;
+or &lt;code&gt;cat&lt;/code&gt; commands to describe the state of particular arrivals and servers.
+Presumably something could be done in the functions passed to &lt;code&gt;dist&lt;/code&gt; arguments.
+In this sence, &lt;code&gt;simmer&lt;/code&gt; is more declarative; like a story book, where the text
+describes the characters, but the characters don&amp;#8217;t really exist.  &lt;code&gt;Simmer&lt;/code&gt;
+describes arrivals and servers, but they don&amp;#8217;t really exist, and can&amp;#8217;t be
+directly interacted&amp;nbsp;with.&lt;/p&gt;
+&lt;h2 id="random-red-herring"&gt;Random red&amp;nbsp;herring&lt;/h2&gt;
+&lt;p&gt;Python 2.7, R and &lt;span class="caps"&gt;MATLAB&lt;/span&gt; all use the Mersenne-Twister algorithm by default.  But
+none of them matches.  The &lt;code&gt;numpy&lt;/code&gt; Python package &lt;a href="http://www.walkingrandomly.com/?p=5479"&gt;&lt;em&gt;does&lt;/em&gt; match
+&lt;span class="caps"&gt;MATLAB&lt;/span&gt;&lt;/a&gt; (except for seed = 0), but not&amp;nbsp;R.&lt;/p&gt;
+&lt;p&gt;Two potential solutions&amp;nbsp;are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Generate any old random numbers, write them to disk, and read them into both
+  Python and&amp;nbsp;R.&lt;/li&gt;
+&lt;li&gt;Use &lt;code&gt;rpy2&lt;/code&gt; to use R&amp;#8217;s random number generator from within&amp;nbsp;Python.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I used &lt;code&gt;rpy2&lt;/code&gt;, but it wasn&amp;#8217;t long before I encountered a more serious problem.
+When random draws are conducted in more than one part of the code, the
+programmer can&amp;#8217;t control the order of the draws.  That&amp;#8217;s up to &lt;code&gt;SimPy&lt;/code&gt; and
+&lt;code&gt;simmer&lt;/code&gt;.  At that point, I gave&amp;nbsp;up.&lt;/p&gt;</summary><category term="R"></category><category term="Simmer"></category><category term="SimPy"></category></entry><entry><title>How many StatsBloggers are there?</title><link href="http://nacnudus.github.io/crossprod/how-many-statsbloggers-are-there" rel="alternate"></link><updated>2016-05-02T00:00:00+12:00</updated><author><name>Duncan Garmonsway</name></author><id>tag:nacnudus.github.io,2016-05-02:crossprod/how-many-statsbloggers-are-there</id><summary type="html">&lt;p&gt;This post does two&amp;nbsp;things:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Reproduces my &lt;a href="http://nacnudus.github.io/crossprod/how-many-r-bloggers-are-there"&gt;R-Bloggers post&lt;/a&gt; on the
   &lt;a href="http://www.statsblogs.com/"&gt;StatsBlogs&lt;/a&gt; website, to discover how many
