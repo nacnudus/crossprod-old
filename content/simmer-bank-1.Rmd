@@ -206,7 +206,7 @@ I mucked about for a while trying to avoid branching by using attributes to name
 the server at `seize` time. I won't explain attributes here because they're
 covered in the excellent `simmer` [vignettes](), but basically the following
 code doesn't work because attributes are only available to certain arguments,
-which doesn't include the `resource` argument, only the `amount` and perhaps
+the `resource` argument not among them, only `amount` and perhaps
 `priority` and `preemptible`.
 
 ```r
