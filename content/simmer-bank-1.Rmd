@@ -1,0 +1,31 @@
+Title: Simmer vs SimPy: The Bank, Part I
+Date: 2016-05-11
+Author: Duncan Garmonsway
+Summary: Porting a SimPy tutorial to the R package Simmer
+Disqus_identifier: simmer-bank-1
+Tags: R, Simmer, SimPy
+
+```{r simmer-bank-1-pelican_conf, echo=FALSE}
+knitr::opts_chunk$set(cache = TRUE)
+knitr::opts_chunk$set(fig.path='./figure/')
+knitr::opts_chunk$set(fig.width =  12.2)
+knitr::opts_chunk$set(fig.height = 6.9)
+knitr::opts_chunk$set(out.width =  "960px")
+knitr::opts_chunk$set(out.height = "540px")
+knitr::opts_chunk$set(dev = 'Cairo_svg')
+knitr::opts_chunk$set(warning = FALSE)
+```
+
+## Simmer vs SimPy
+
+The `simmer` package is a relatively new R package for discrete event simulation
+(DES).  It is an exciting development, because there isn't a lot of open-source
+DES software.  One popular tool is the Python 2 library `SimPy`, written by a
+professor at my alma mater, Victoria University of Wellington in New Zealand,
+and later redeveloped for Python 3.
+
+This post
+
+* Ports the code of the main `SimPy` tutorial 'The Bank' to `simmer`.
+* Comments on some differences between the libraries.
+
