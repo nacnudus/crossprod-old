@@ -108,7 +108,7 @@
 <li>Illustrates rounding bias with a&nbsp;graph.</li>
 <li>Discovers that JavaScript (in my browser) rounds the other&nbsp;way.</li>
 <li>Encounters floating-point difficulties when emulating&nbsp;JavaScript.</li>
-<li>Calls JavaScript itself via the V8&nbsp;package.</li>
+<li>Calls JavaScript itself via the <code>V8</code> package.</li>
 <li>Explains where all the time&nbsp;goes.</li>
 </ul>
 <h2 id="graph-of-rounding-bias">Graph of rounding&nbsp;bias</h2>
@@ -229,7 +229,7 @@ console.log((7 - 0.35).toFixed(1));
 <h2 id="calling-javascript-v8-engine-via-the-v8-package">Calling JavaScript V8 engine via the V8&nbsp;package</h2>
 <p>At this point, I gave up on emulating JavaScript behaviour in R, and resorted to
 calling JavaScript from R via the
-<a href="https://cran.r-project.org/web/packages/V8/index.html">V8</a> package, which uses
+<a href="https://cran.r-project.org/web/packages/V8/index.html"><code>V8</code></a> package, which uses
 the V8 JavaScript engine, the same that my browser (Chrome)&nbsp;uses.</p>
 <div class="highlight"><pre><span class="kn">library</span><span class="p">(</span>V8<span class="p">)</span>
 </pre></div>
@@ -282,7 +282,7 @@ fundamental language&nbsp;differences:</p>
 drawing random numbers between 0 to 1 (which is unfair on unbiased functions,
 because only 0.5 is represented, not 1.5), and by not doing preliminary rounding
 on the random draws (which meant that 0.5, 1.5, etc., weren&#8217;t represented at&nbsp;all).</p>
-<p>Finally, my initial V8 function used the V8 package&#8217;s own magic for passing
+<p>Finally, my initial <code>V8</code> function used the <code>V8</code> package&#8217;s own magic for passing
 values to the V8 engine, but when it didn&#8217;t work, I suspected that the values
 were being passed as a string, and that R was rounding them as part of the
 conversion.  For&nbsp;example:</p>
@@ -418,7 +418,7 @@ par<span class="p">(</span>mfrow <span class="o">=</span> <span class="kt">c</sp
                     <span>1</span>
 </a></li>
                 <li><a href="http://nacnudus.github.io/crossprod/tags.html#r-ref">R
-                    <span>5</span>
+                    <span>6</span>
 </a></li>
             </ul>
 <h4>Social</h4>

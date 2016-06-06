@@ -92,7 +92,7 @@
             
             <h2 id="simmer-vs-simpy">Simmer vs&nbsp;SimPy</h2>
 <p>Which package would be easier for teaching queueing theory?  Python 2.7&#8217;s
-<a href="https://pythonhosted.org/SimPy/Tutorials/TheBank.html"><code>SimPy</code></a>, designed for
+<a href="https://pythonhosted.org/SimPy/SimPy_Overview.html"><code>SimPy</code></a>, designed for
 (as far as I can tell) lecturing, by Tony Vigneau at my alma mater, Vic Uni
 Wellington <span class="caps">NZ</span>, or <a href="http://r-simmer.org/"><code>simmer</code></a>, designed by Bart Smeets and
 Iñaki Ucar to (as far as I can tell) actually&nbsp;use?</p>
@@ -100,9 +100,9 @@ Iñaki Ucar to (as far as I can tell) actually&nbsp;use?</p>
 (<span class="caps">DES</span>).  It&#8217;s an exciting development, because there isn&#8217;t a lot of open-source
 <span class="caps">DES</span> software.  <code>SimPy</code> seems to be the only serious competitor for teaching
 <span class="caps">DES</span> and queueing&nbsp;theory.</p>
-<p>This post does two&nbsp;things:</p>
+<p>This post does three&nbsp;things:</p>
 <ul>
-<li>Ports the code of the main <code>SimPy</code> tutorial &#8216;The Bank&#8217; to <code>simmer</code>.</li>
+<li>Ports the code of the main <code>SimPy</code> tutorial <a href="https://pythonhosted.org/SimPy/Tutorials/TheBank.html">&#8216;The Bank&#8217;</a> to <code>simmer</code>.</li>
 <li>Opines that <code>simmer</code> would be easier to teach as part of a queueing theory&nbsp;course.</li>
 <li>Pursues a random red&nbsp;herring.</li>
 </ul>
@@ -254,7 +254,7 @@ through the results until a queue is&nbsp;chosen:</p>
 </pre></div>
 
 
-<p>In <code>Simmer</code>, this is done by&nbsp;branching:</p>
+<p>In <code>simmer</code>, this is done by&nbsp;branching:</p>
 <div class="highlight"><pre>customer <span class="o">&lt;-</span> 
   create_trajectory<span class="p">(</span><span class="s">&quot;Customer&#39;s path&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
     branch<span class="p">(</span><span class="kr">function</span><span class="p">()</span> <span class="p">{</span>
@@ -282,7 +282,7 @@ through the results until a queue is&nbsp;chosen:</p>
 the server at <code>seize</code> time. I won&#8217;t explain attributes here because they&#8217;re
 covered in the excellent <code>simmer</code> <a href="">vignettes</a>, but basically the following
 code doesn&#8217;t work because attributes are only available to certain arguments,
-which doesn&#8217;t include the <code>resource</code> argument, only the <code>amount</code> and perhaps
+the <code>resource</code> argument not among them, only <code>amount</code> and perhaps
 <code>priority</code> and <code>preemptible</code>.</p>
 <div class="highlight"><pre><span class="c1"># This doesn&#39;t work:</span>
 customer <span class="o">&lt;-</span> 
@@ -380,6 +380,7 @@ programmer can&#8217;t control the order of the draws.  That&#8217;s up to <code
             <nav>
             <ul class="articles-timeline">
                 <li class="previous-article">« <a href="http://nacnudus.github.io/crossprod/how-many-statsbloggers-are-there" title="Previous: How many StatsBloggers are there?">How many StatsBloggers are there?</a></li>
+                <li class="next-article"><a href="http://nacnudus.github.io/crossprod/simmer-vs-simpy-the-bank-part-ii" title="Next: Simmer vs SimPy: The Bank, Part II">Simmer vs SimPy: The Bank, Part II</a> »</li>
             </ul>
             </nav>
             </aside>
@@ -393,13 +394,13 @@ programmer can&#8217;t control the order of the draws.  That&#8217;s up to <code
             <h4>Tags</h4>
             <ul class="list-of-tags tags-in-article">
                 <li><a href="http://nacnudus.github.io/crossprod/tags.html#r-ref">R
-                    <span>5</span>
+                    <span>6</span>
 </a></li>
                 <li><a href="http://nacnudus.github.io/crossprod/tags.html#simmer-ref">Simmer
-                    <span>1</span>
+                    <span>2</span>
 </a></li>
                 <li><a href="http://nacnudus.github.io/crossprod/tags.html#simpy-ref">SimPy
-                    <span>1</span>
+                    <span>2</span>
 </a></li>
             </ul>
 <h4>Social</h4>

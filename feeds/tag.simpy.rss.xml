@@ -1,7 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Crossprod</title><link>http://nacnudus.github.io/crossprod/</link><description>R, data, and frustration</description><atom:link href="http://nacnudus.github.io/crossprod/feeds/tag.simpy.rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 11 May 2016 00:00:00 +1200</lastBuildDate><item><title>Simmer vs SimPy: The Bank, Part I</title><link>http://nacnudus.github.io/crossprod/simmer-vs-simpy-the-bank-part-i</link><description>&lt;h2 id="simmer-vs-simpy"&gt;Simmer vs&amp;nbsp;SimPy&lt;/h2&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Crossprod</title><link>http://nacnudus.github.io/crossprod/</link><description>R, data, and frustration</description><atom:link href="http://nacnudus.github.io/crossprod/feeds/tag.simpy.rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 06 Jun 2016 00:00:00 +1200</lastBuildDate><item><title>Simmer vs SimPy: The Bank, Part II</title><link>http://nacnudus.github.io/crossprod/simmer-vs-simpy-the-bank-part-ii</link><description>&lt;h2 id="simmer-vs-simpy-rematch"&gt;Simmer vs SimPy&amp;nbsp;(rematch)&lt;/h2&gt;
+&lt;p&gt;In my &lt;a href="{simmer-bank-1.Rmd}"&gt;previous post&lt;/a&gt;, I ported &lt;a href="https://pythonhosted.org/SimPy/Tutorials/TheBank.html"&gt;Part I&lt;/a&gt; of &lt;code&gt;SimPy&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s flagship
+tutorial, &lt;em&gt;The Bank&lt;/em&gt;, to &lt;code&gt;simmer&lt;/code&gt;.  This post does the same for &lt;a href="https://pythonhosted.org/SimPy/Tutorials/TheBank2.html"&gt;Part &lt;span class="caps"&gt;II&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;simmer&lt;/code&gt; package is a relatively new R package for discrete event simulation
+(&lt;span class="caps"&gt;DES&lt;/span&gt;).  It&amp;#8217;s an exciting development, because there isn&amp;#8217;t a lot of open-source
+&lt;span class="caps"&gt;DES&lt;/span&gt; software.  In my last post, I opined that &amp;#8220;&lt;code&gt;SimPy&lt;/code&gt; seems to be the only
+serious competitor for teaching &lt;span class="caps"&gt;DES&lt;/span&gt; and queueing theory&amp;#8221;, but then I learned of
+&lt;a href="https://simjuliajl.readthedocs.io/en/stable/welcome.html"&gt;&lt;code&gt;SimJulia&lt;/code&gt;&lt;/a&gt;, a &lt;span class="caps"&gt;DES&lt;/span&gt;
+package for the Julia language, with an &lt;span class="caps"&gt;API&lt;/span&gt; inspired by &lt;code&gt;SimPy&lt;/code&gt;.  Since the APIs
+are so similar, I haven&amp;#8217;t tried &lt;code&gt;SimJulia&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;This post does two&amp;nbsp;things:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Discusses some difficulties implementing The Bank: Part &lt;span class="caps"&gt;II&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;Suggests some reasons why simulation is&amp;nbsp;hard.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="the-bank"&gt;The&amp;nbsp;Bank&lt;/h2&gt;
+&lt;p&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;The Bank&amp;#8217; is a tutorial that develops &lt;span class="caps"&gt;DES&lt;/span&gt; concepts and techniques by simulating
+the paths of customers at a bank.  The arrivals (customers) queue for a server
+(counter), are served, and&amp;nbsp;exit.&lt;/p&gt;
+&lt;h2 id="complete-code"&gt;Complete&amp;nbsp;code&lt;/h2&gt;
+&lt;p&gt;The actual ported code is available &lt;a href="https://github.com/nacnudus/simmer-bank"&gt;on
+GitHub&lt;/a&gt;, and I only give simple
+examples in this&amp;nbsp;post.&lt;/p&gt;
+&lt;h2 id="priority-and-pre-emption"&gt;Priority and&amp;nbsp;pre-emption&lt;/h2&gt;
+&lt;p&gt;High-priority arrivals (customers) go straight to the front of the queue.  When
+pre-emption is allowed, they can even barge they way onto a busy server,
+interrupting an arrival (customer) that is already being&amp;nbsp;served.&lt;/p&gt;
+&lt;p&gt;Priority and pre-emption has only recently been added to &lt;code&gt;simmer&lt;/code&gt;, and it still
+feels a bit clumsy.  The complications arise because events have to be
+rescheduled, and decisions have to be remade.  For&amp;nbsp;example:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;When a server is serving several arrivals at once, which one should be
+  interrupted by a higher-priority arrival?  &lt;code&gt;Simmer&lt;/code&gt; already implements
+  first-in-first-out (&lt;span class="caps"&gt;FIFO&lt;/span&gt;) and last-in-first-out (&lt;span class="caps"&gt;LIFO&lt;/span&gt;)&amp;nbsp;policies.&lt;/li&gt;
+&lt;li&gt;When an arrival is interrupted while being served, and then resumes service,
+  should they start again (repeating the first period of their service time) or
+  carry on from where they left off (completing their remaining service time).
+  &lt;code&gt;Simmer&lt;/code&gt; already implements these two options, but it&amp;#8217;s reasonable to suppose
+  that resumption of service might come with a time penalty, and it doesn&amp;#8217;t
+  currently seem to be possible to express such a&amp;nbsp;penalty.&lt;/li&gt;
+&lt;li&gt;While an interrupted arrival is waiting to return to the server, where do they
+  wait?  This matters in a finite queue.  Currently, &lt;code&gt;simmer&lt;/code&gt; allows the arrival
+  to wait in the finite queue, even if the queue is already full and rejecting
+  new arrivals.  To change this behaviour, one would have to define a policy for
+  ejecting arrivals from the queue to maintain the constraint on its&amp;nbsp;size.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="balking-and-reneging"&gt;Balking and&amp;nbsp;reneging&lt;/h2&gt;
+&lt;p&gt;Balking is the behaviour of an arrival that, for some reason, never enters a
+queue.  The example in The Bank Tutorial is the case when a finite queue is
+full, so the arrival is rejected.  An alternative might be that the arrival
+decides whether or not to enter the queue according to the number of arrivals
+already in it.  That scenario can already be implemented in &lt;code&gt;simmer&lt;/code&gt; by branching
+based on an enquiry into the state of the&amp;nbsp;queue.&lt;/p&gt;
+&lt;p&gt;Reneging is the behaviour of an arrival already in a queue, who decides to leave
+it.  This isn&amp;#8217;t yet possible in &lt;code&gt;simmer&lt;/code&gt;, but the authors have indulged me in
+several discussions about it, on
+&lt;a href="https://github.com/r-simmer/simmer/issues"&gt;GitHub&lt;/a&gt; and in the &lt;a href="https://groups.google.com/forum/#!forum/simmer-devel"&gt;discussion
+forum&lt;/a&gt;.  The difficulty,
+as I currently see it, is that the &lt;code&gt;seize&lt;/code&gt; function, by handling the whole
+interval between entering the queue and reaching the server, makes the queueing
+period relatively inaccessible.  If one wanted an arrival to renege from one
+queue and branch instead into another queue, there is no way to express that
+inside the &lt;code&gt;seize&lt;/code&gt; function.  If one wanted other customers in the queue to
+reassess their patience, based on customers ahead of them reneging, then there
+is no way to express that idea&amp;nbsp;either.&lt;/p&gt;
+&lt;p&gt;To be fair to the &lt;code&gt;simmer&lt;/code&gt; authors, these ideas weren&amp;#8217;t present in early
+versions of &lt;code&gt;SimPy&lt;/code&gt; either, and were still clumsy when The Bank: Part &lt;span class="caps"&gt;II&lt;/span&gt; was
+written.  It also can&amp;#8217;t be easy to separate the concept of queueing from the
+&lt;code&gt;seize&lt;/code&gt; function, since this is probably the most computationally-expensive
+aspect of modelling, which has, very sensibly, been implemented in&amp;nbsp;C++.&lt;/p&gt;
+&lt;h2 id="interruption"&gt;Interruption&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;SimPy&lt;/code&gt; provides functions for interrupting an arrival that is being served.
+The examples in The Bank Tutorial don&amp;#8217;t convince me that special functions are
+necessary. Why not simply increase their service time?  That&amp;#8217;s certainly how I
+implemented interruptions in &lt;code&gt;simmer&lt;/code&gt;.&lt;/p&gt;
+&lt;h2 id="wait-until"&gt;Wait&amp;nbsp;until&lt;/h2&gt;
+&lt;p&gt;Another relatively new feature of &lt;code&gt;simmer&lt;/code&gt; is the ability to schedule the
+capacity of resources at certain times.  I used schedules to implement the bank
+opening in the morning, and to &amp;#8216;open the door&amp;#8217; once every 30 minutes to let in
+any customers that are queueing&amp;nbsp;outside.&lt;/p&gt;
+&lt;p&gt;The scheduling feature can be periodic, which is wonderful, but it isn&amp;#8217;t
+currently possible to schedule a single change in capacity that then endures
+indefinitely.  See
+&lt;a href="https://github.com/nacnudus/simmer-bank/blob/master/17-waituntil.R"&gt;GitHub&lt;/a&gt; for
+examples.  It also doesn&amp;#8217;t seem to be possible to schedule infinite&amp;nbsp;capacity.&lt;/p&gt;
+&lt;h2 id="monitoring-and-plotting"&gt;Monitoring and&amp;nbsp;plotting&lt;/h2&gt;
+&lt;p&gt;Here is where &lt;code&gt;simmer&lt;/code&gt; continues to excel, providing far simpler and
+more-intuitive monitoring of arrivals, resources and attributes, in handy data
+frames for straightforward plotting with any graphics&amp;nbsp;library.&lt;/p&gt;
+&lt;h2 id="simulation-is-hard"&gt;Simulation is&amp;nbsp;hard&lt;/h2&gt;
+&lt;p&gt;Because human behaviour is hard.  Real-life systems involving humans are
+massively parallel.  Every actor processes his/her own activities onto the
+universal time-line.  As long as computers have very finite numbers of
+processors, simulation libraries will have to find ways to express this
+parallelism in a way that computers can serialise.  When actors in a system
+influence each-other&amp;#8217;s behaviour, the computational difficulties of serialising
+their behaviour begin to meet the boundaries of efficient&amp;nbsp;computation.&lt;/p&gt;
+&lt;p&gt;I must thank the authors of &lt;code&gt;simmer&lt;/code&gt; for their generous attitude towards
+suggestions and discussion, like so many R developers.  I have no doubt that
+this post will soon become obsolete by their&amp;nbsp;efforts.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Duncan Garmonsway</dc:creator><pubDate>Mon, 06 Jun 2016 00:00:00 +1200</pubDate><guid>tag:nacnudus.github.io,2016-06-06:crossprod/simmer-vs-simpy-the-bank-part-ii</guid><category>R</category><category>Simmer</category><category>SimPy</category></item><item><title>Simmer vs SimPy: The Bank, Part I</title><link>http://nacnudus.github.io/crossprod/simmer-vs-simpy-the-bank-part-i</link><description>&lt;h2 id="simmer-vs-simpy"&gt;Simmer vs&amp;nbsp;SimPy&lt;/h2&gt;
 &lt;p&gt;Which package would be easier for teaching queueing theory?  Python 2.7&amp;#8217;s
-&lt;a href="https://pythonhosted.org/SimPy/Tutorials/TheBank.html"&gt;&lt;code&gt;SimPy&lt;/code&gt;&lt;/a&gt;, designed for
+&lt;a href="https://pythonhosted.org/SimPy/SimPy_Overview.html"&gt;&lt;code&gt;SimPy&lt;/code&gt;&lt;/a&gt;, designed for
 (as far as I can tell) lecturing, by Tony Vigneau at my alma mater, Vic Uni
 Wellington &lt;span class="caps"&gt;NZ&lt;/span&gt;, or &lt;a href="http://r-simmer.org/"&gt;&lt;code&gt;simmer&lt;/code&gt;&lt;/a&gt;, designed by Bart Smeets and
 Iñaki Ucar to (as far as I can tell) actually&amp;nbsp;use?&lt;/p&gt;
@@ -9,9 +108,9 @@ Iñaki Ucar to (as far as I can tell) actually&amp;nbsp;use?&lt;/p&gt;
 (&lt;span class="caps"&gt;DES&lt;/span&gt;).  It&amp;#8217;s an exciting development, because there isn&amp;#8217;t a lot of open-source
 &lt;span class="caps"&gt;DES&lt;/span&gt; software.  &lt;code&gt;SimPy&lt;/code&gt; seems to be the only serious competitor for teaching
 &lt;span class="caps"&gt;DES&lt;/span&gt; and queueing&amp;nbsp;theory.&lt;/p&gt;
-&lt;p&gt;This post does two&amp;nbsp;things:&lt;/p&gt;
+&lt;p&gt;This post does three&amp;nbsp;things:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;Ports the code of the main &lt;code&gt;SimPy&lt;/code&gt; tutorial &amp;#8216;The Bank&amp;#8217; to &lt;code&gt;simmer&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Ports the code of the main &lt;code&gt;SimPy&lt;/code&gt; tutorial &lt;a href="https://pythonhosted.org/SimPy/Tutorials/TheBank.html"&gt;&amp;#8216;The Bank&amp;#8217;&lt;/a&gt; to &lt;code&gt;simmer&lt;/code&gt;.&lt;/li&gt;
 &lt;li&gt;Opines that &lt;code&gt;simmer&lt;/code&gt; would be easier to teach as part of a queueing theory&amp;nbsp;course.&lt;/li&gt;
 &lt;li&gt;Pursues a random red&amp;nbsp;herring.&lt;/li&gt;
 &lt;/ul&gt;
@@ -163,7 +262,7 @@ through the results until a queue is&amp;nbsp;chosen:&lt;/p&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;In &lt;code&gt;Simmer&lt;/code&gt;, this is done by&amp;nbsp;branching:&lt;/p&gt;
+&lt;p&gt;In &lt;code&gt;simmer&lt;/code&gt;, this is done by&amp;nbsp;branching:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;customer &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; 
   create_trajectory&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Customer&amp;#39;s path&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
     branch&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
@@ -191,7 +290,7 @@ through the results until a queue is&amp;nbsp;chosen:&lt;/p&gt;
 the server at &lt;code&gt;seize&lt;/code&gt; time. I won&amp;#8217;t explain attributes here because they&amp;#8217;re
 covered in the excellent &lt;code&gt;simmer&lt;/code&gt; &lt;a href=""&gt;vignettes&lt;/a&gt;, but basically the following
 code doesn&amp;#8217;t work because attributes are only available to certain arguments,
-which doesn&amp;#8217;t include the &lt;code&gt;resource&lt;/code&gt; argument, only the &lt;code&gt;amount&lt;/code&gt; and perhaps
+the &lt;code&gt;resource&lt;/code&gt; argument not among them, only &lt;code&gt;amount&lt;/code&gt; and perhaps
 &lt;code&gt;priority&lt;/code&gt; and &lt;code&gt;preemptible&lt;/code&gt;.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c1"&gt;# This doesn&amp;#39;t work:&lt;/span&gt;
 customer &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; 
