@@ -112,6 +112,8 @@ indefinitely.  See
 [GitHub](https://github.com/nacnudus/simmer-bank/blob/master/17-waituntil.R) for
 examples.  It also doesn't seem to be possible to schedule infinite capacity.
 
+**[EDIT]**  I was wrong.  It is possible to do both those things.
+
 ## Monitoring and plotting
 
 Here is where `simmer` continues to excel, providing far simpler and
