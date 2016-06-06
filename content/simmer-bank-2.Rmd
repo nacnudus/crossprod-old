@@ -86,7 +86,7 @@ based on an enquiry into the state of the queue.
 
 Reneging is the behaviour of an arrival already in a queue, who decides to leave
 it.  This isn't yet possible in `Simmer`, but the authors have indulged me in
-several discussions about it, on GitHub and in the discussion forum.  The
+several discussions about it, on [GitHub](https://github.com/r-simmer/simmer/issues) and in the [discussion forum](https://groups.google.com/forum/#!forum/simmer-devel).  The
 difficulty, as I currently see it, is that the `seize` function, by handling the
 whole interval between entering the queue and reaching the server, makes the
 queueing period relatively inaccessible.  If one wanted an arrival to renege from
@@ -117,8 +117,9 @@ any customers that are queueing outside.
 
 The scheduling feature can be periodic, which is wonderful, but it isn't
 currently possible to schedule a single change in capacity that then endures
-indefinitely.  See [GitHub]() for examples.  It also doesn't seem to be possible
-to schedule infinite capacity.
+indefinitely.  See
+[GitHub](https://github.com/nacnudus/simmer-bank/blob/master/17-waituntil.R) for
+examples.  It also doesn't seem to be possible to schedule infinite capacity.
 
 ## Monitoring and plotting
 
