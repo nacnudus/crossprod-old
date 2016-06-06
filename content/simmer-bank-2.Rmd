@@ -56,7 +56,7 @@ High-priority arrivals (customers) go straight to the front of the queue.  When
 pre-emption is allowed, they can even barge they way onto a busy server,
 interrupting an arrival (customer) that is already being served.
 
-Priority and pre-emption has only recently been added to `Simmer`, and it still
+Priority and pre-emption has only recently been added to `simmer`, and it still
 feels a bit clumsy.  The complications arise because events have to be
 rescheduled, and decisions have to be remade.  For example:
 
@@ -85,7 +85,7 @@ already in it.  That scenario can already be implemented in `simmer` by branchin
 based on an enquiry into the state of the queue.
 
 Reneging is the behaviour of an arrival already in a queue, who decides to leave
-it.  This isn't yet possible in `Simmer`, but the authors have indulged me in
+it.  This isn't yet possible in `simmer`, but the authors have indulged me in
 several discussions about it, on GitHub and in the discussion forum.  The
 difficulty, as I currently see it, is that the `seize` function, by handling the
 whole interval between entering the queue and reaching the server, makes the
@@ -95,7 +95,7 @@ inside the `seize` function.  If one wanted other customers in the queue to
 reassess their patience, based on customers ahead of them reneging, then there
 is no way to express that idea either.
 
-To be fair to the `Simmer` authors, these ideas weren't present in early
+To be fair to the `simmer` authors, these ideas weren't present in early
 versions of `SimPy` either, and were still clumsy when The Bank: Part II was
 written.  It also can't be easy to separate the concept of queueing from the
 `seize` function, since this is probably the most computationally-expensive
@@ -106,11 +106,11 @@ aspect of modelling, which has, very sensibly, been implemented in C++.
 `SimPy` provides functions for interrupting an arrival that is being served.
 The examples in The Bank Tutorial don't convince me that special functions are
 necessary. Why not simply increase their service time?  That's certainly how I
-implemented interruptions in `Simmer`.
+implemented interruptions in `simmer`.
 
 ## Wait until
 
-Another relatively new feature of `Simmer` is the ability to schedule the
+Another relatively new feature of `simmer` is the ability to schedule the
 capacity of resources at certain times.  I used schedules to implement the bank
 opening in the morning, and to 'open the door' once every 30 minutes to let in
 any customers that are queueing outside.
@@ -122,7 +122,7 @@ to schedule infinite capacity.
 
 ## Monitoring and plotting
 
-Here is where `Simmer` continues to excel, providing far simpler and
+Here is where `simmer` continues to excel, providing far simpler and
 more-intuitive monitoring of arrivals, resources and attributes, in handy data
 frames for straightforward plotting with any graphics library.
 

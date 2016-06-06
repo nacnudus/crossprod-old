@@ -30,7 +30,7 @@ This post does five things:
 * Illustrates rounding bias with a graph.
 * Discovers that JavaScript (in my browser) rounds the other way.
 * Encounters floating-point difficulties when emulating JavaScript.
-* Calls JavaScript itself via the V8 package.
+* Calls JavaScript itself via the `V8` package.
 * Explains where all the time goes.
 
 ## Graph of rounding bias
@@ -185,7 +185,7 @@ console.log((7 - 0.35).toFixed(1));
 
 At this point, I gave up on emulating JavaScript behaviour in R, and resorted to
 calling JavaScript from R via the
-[V8](https://cran.r-project.org/web/packages/V8/index.html) package, which uses
+[`V8`](https://cran.r-project.org/web/packages/V8/index.html) package, which uses
 the V8 JavaScript engine, the same that my browser (Chrome) uses.
 
 ```{r rounding-loadV8, echo = TRUE}
@@ -231,7 +231,7 @@ because only 0.5 is represented, not 1.5), and by not doing preliminary rounding
 on the random draws (which meant that 0.5, 1.5, etc., weren't represented at
 all).
 
-Finally, my initial V8 function used the V8 package's own magic for passing
+Finally, my initial `V8` function used the `V8` package's own magic for passing
 values to the V8 engine, but when it didn't work, I suspected that the values
 were being passed as a string, and that R was rounding them as part of the
 conversion.  For example:
