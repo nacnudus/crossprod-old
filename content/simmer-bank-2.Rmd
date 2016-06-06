@@ -18,7 +18,7 @@ knitr::opts_chunk$set(warning = FALSE)
 
 ## Simmer vs SimPy (rematch)
 
-In my [previous post]({simmer-bank-1.Rmd}), I ported [Part I](https://pythonhosted.org/SimPy/Tutorials/TheBank.html) of `SimPy`'s flagship
+In my [previous post]({filename}simmer-bank-1.Rmd), I ported [Part I](https://pythonhosted.org/SimPy/Tutorials/TheBank.html) of `SimPy`'s flagship
 tutorial, *The Bank*, to `simmer`.  This post does the same for [Part II](https://pythonhosted.org/SimPy/Tutorials/TheBank2.html).
 
 The `simmer` package is a relatively new R package for discrete event simulation
