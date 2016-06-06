@@ -89,9 +89,9 @@ processors, simulation libraries will have to find ways to express this
 parallelism in a way that computers can serialise.  When actors in a system
 influence each-other&amp;#8217;s behaviour, the computational difficulties of serialising
 their behaviour begin to meet the boundaries of efficient&amp;nbsp;computation.&lt;/p&gt;
-&lt;p&gt;I must thank the authors of &lt;code&gt;simmer&lt;/code&gt; for their generous attitude towards
-suggestions and discussion, like so many R developers.  I have no doubt that
-this post will soon become obsolete by their&amp;nbsp;efforts.&lt;/p&gt;</summary><category term="R"></category><category term="Simmer"></category><category term="SimPy"></category></entry><entry><title>Simmer vs SimPy: The Bank, Part I</title><link href="http://nacnudus.github.io/crossprod/simmer-vs-simpy-the-bank-part-i" rel="alternate"></link><updated>2016-05-11T00:00:00+12:00</updated><author><name>Duncan Garmonsway</name></author><id>tag:nacnudus.github.io,2016-05-11:crossprod/simmer-vs-simpy-the-bank-part-i</id><summary type="html">&lt;h2 id="simmer-vs-simpy"&gt;Simmer vs&amp;nbsp;SimPy&lt;/h2&gt;
+&lt;p&gt;The authors of &lt;code&gt;simmer&lt;/code&gt; have a very generous attitude towards suggestions and
+discussion, like so many R developers.  No doubt that this post will soon become
+obsolete by their&amp;nbsp;efforts.&lt;/p&gt;</summary><category term="R"></category><category term="Simmer"></category><category term="SimPy"></category></entry><entry><title>Simmer vs SimPy: The Bank, Part I</title><link href="http://nacnudus.github.io/crossprod/simmer-vs-simpy-the-bank-part-i" rel="alternate"></link><updated>2016-05-11T00:00:00+12:00</updated><author><name>Duncan Garmonsway</name></author><id>tag:nacnudus.github.io,2016-05-11:crossprod/simmer-vs-simpy-the-bank-part-i</id><summary type="html">&lt;h2 id="simmer-vs-simpy"&gt;Simmer vs&amp;nbsp;SimPy&lt;/h2&gt;
 &lt;p&gt;Which package would be easier for teaching queueing theory?  Python 2.7&amp;#8217;s
 &lt;a href="https://pythonhosted.org/SimPy/SimPy_Overview.html"&gt;&lt;code&gt;SimPy&lt;/code&gt;&lt;/a&gt;, designed for
 (as far as I can tell) lecturing, by Tony Vigneau at my alma mater, Vic Uni
