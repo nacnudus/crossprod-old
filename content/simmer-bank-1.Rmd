@@ -19,7 +19,7 @@ knitr::opts_chunk$set(warning = FALSE)
 ## Simmer vs SimPy
 
 Which package would be easier for teaching queueing theory?  Python 2.7's
-[`SimPy`](https://pythonhosted.org/SimPy/Tutorials/TheBank.html), designed for
+[`SimPy`](https://pythonhosted.org/SimPy/SimPy_Overview.html), designed for
 (as far as I can tell) lecturing, by Tony Vigneau at my alma mater, Vic Uni
 Wellington NZ, or [`simmer`](http://r-simmer.org/), designed by Bart Smeets and
 Iñaki Ucar to (as far as I can tell) actually use?
@@ -29,9 +29,9 @@ The `simmer` package is a relatively new R package for discrete event simulation
 DES software.  `SimPy` seems to be the only serious competitor for teaching
 DES and queueing theory.
 
-This post does two things:
+This post does three things:
 
-* Ports the code of the main `SimPy` tutorial 'The Bank' to `simmer`.
+* Ports the code of the main `SimPy` tutorial ['The Bank'](https://pythonhosted.org/SimPy/Tutorials/TheBank.html) to `simmer`.
 * Opines that `simmer` would be easier to teach as part of a queueing theory
   course.
 * Pursues a random red herring.
