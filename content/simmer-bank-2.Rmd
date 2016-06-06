@@ -18,10 +18,6 @@ knitr::opts_chunk$set(warning = FALSE)
 
 ## Simmer vs SimPy (rematch)
 
-Which package would be easier for teaching queueing theory?  Python 2.7's
-[`SimPy`](https://pythonhosted.org/SimPy/SimPy_Overview.html) or R's
-[`simmer`](http://r-simmer.org/)?  
-
 In my [previous post]({simmer-bank-1.Rmd}), I ported [Part I](https://pythonhosted.org/SimPy/Tutorials/TheBank.html) of `SimPy`'s flagship
 tutorial, *The Bank*, to `simmer`.  This post does the same for [Part II](https://pythonhosted.org/SimPy/Tutorials/TheBank2.html).
 
