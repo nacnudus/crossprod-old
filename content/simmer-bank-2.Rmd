@@ -128,6 +128,6 @@ parallelism in a way that computers can serialise.  When actors in a system
 influence each-other's behaviour, the computational difficulties of serialising
 their behaviour begin to meet the boundaries of efficient computation.
 
-I must thank the authors of `simmer` for their generous attitude towards
-suggestions and discussion, like so many R developers.  I have no doubt that
-this post will soon become obsolete by their efforts.
+The authors of `simmer` have a very generous attitude towards suggestions and
+discussion, like so many R developers.  No doubt that this post will soon become
+obsolete by their efforts.
