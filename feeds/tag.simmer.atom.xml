@@ -77,6 +77,7 @@ currently possible to schedule a single change in capacity that then endures
 indefinitely.  See
 &lt;a href="https://github.com/nacnudus/simmer-bank/blob/master/17-waituntil.R"&gt;GitHub&lt;/a&gt; for
 examples.  It also doesn&amp;#8217;t seem to be possible to schedule infinite&amp;nbsp;capacity.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;[&lt;span class="caps"&gt;EDIT&lt;/span&gt;]&lt;/strong&gt;  I was wrong.  It is possible to do both those&amp;nbsp;things.&lt;/p&gt;
 &lt;h2 id="monitoring-and-plotting"&gt;Monitoring and&amp;nbsp;plotting&lt;/h2&gt;
 &lt;p&gt;Here is where &lt;code&gt;simmer&lt;/code&gt; continues to excel, providing far simpler and
 more-intuitive monitoring of arrivals, resources and attributes, in handy data
