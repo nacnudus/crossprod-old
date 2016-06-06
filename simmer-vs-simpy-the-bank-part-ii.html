@@ -92,18 +92,11 @@
             
             <h2 id="simmer-vs-simpy-rematch">Simmer vs SimPy&nbsp;(rematch)</h2>
 <p>In my <a href="http://nacnudus.github.io/crossprod/simmer-vs-simpy-the-bank-part-i">previous post</a>, I ported <a href="https://pythonhosted.org/SimPy/Tutorials/TheBank.html">Part I</a> of <code>SimPy</code><span class="quo">&#8216;</span>s flagship
-tutorial, <em>The Bank</em>, to <code>simmer</code>.  This post does the same for <a href="https://pythonhosted.org/SimPy/Tutorials/TheBank2.html">Part <span class="caps">II</span></a>.</p>
-<p>The <code>simmer</code> package is a relatively new R package for discrete event simulation
-(<span class="caps">DES</span>).  It&#8217;s an exciting development, because there isn&#8217;t a lot of open-source
-<span class="caps">DES</span> software.  In my last post, I opined that &#8220;<code>SimPy</code> seems to be the only
-serious competitor for teaching <span class="caps">DES</span> and queueing theory&#8221;, but then I learned of
-<a href="https://simjuliajl.readthedocs.io/en/stable/welcome.html"><code>SimJulia</code></a>, a <span class="caps">DES</span>
-package for the Julia language, with an <span class="caps">API</span> inspired by <code>SimPy</code>.  Since the APIs
-are so similar, I haven&#8217;t tried <code>SimJulia</code>.</p>
+tutorial, <em>The Bank</em>, to <code>simmer</code>.  This post does the same for <a href="https://pythonhosted.org/SimPy/Tutorials/TheBank2.html">Part <span class="caps">II</span></a>, which introduces tricky concepts for tricky&nbsp;customers.</p>
 <p>This post does two&nbsp;things:</p>
 <ul>
 <li>Discusses some difficulties implementing The Bank: Part <span class="caps">II</span>.</li>
-<li>Suggests some reasons why simulation is&nbsp;hard.</li>
+<li>Suggests some reasons why simulation is hard (blame&nbsp;humans).</li>
 </ul>
 <h2 id="the-bank">The&nbsp;Bank</h2>
 <p><span class="quo">&#8216;</span>The Bank&#8217; is a tutorial that develops <span class="caps">DES</span> concepts and techniques by simulating

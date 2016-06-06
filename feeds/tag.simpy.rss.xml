@@ -1,18 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Crossprod</title><link>http://nacnudus.github.io/crossprod/</link><description>R, data, and frustration</description><atom:link href="http://nacnudus.github.io/crossprod/feeds/tag.simpy.rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 06 Jun 2016 00:00:00 +1200</lastBuildDate><item><title>Simmer vs SimPy: The Bank, Part II</title><link>http://nacnudus.github.io/crossprod/simmer-vs-simpy-the-bank-part-ii</link><description>&lt;h2 id="simmer-vs-simpy-rematch"&gt;Simmer vs SimPy&amp;nbsp;(rematch)&lt;/h2&gt;
 &lt;p&gt;In my &lt;a href="http://nacnudus.github.io/crossprod/simmer-vs-simpy-the-bank-part-i"&gt;previous post&lt;/a&gt;, I ported &lt;a href="https://pythonhosted.org/SimPy/Tutorials/TheBank.html"&gt;Part I&lt;/a&gt; of &lt;code&gt;SimPy&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s flagship
-tutorial, &lt;em&gt;The Bank&lt;/em&gt;, to &lt;code&gt;simmer&lt;/code&gt;.  This post does the same for &lt;a href="https://pythonhosted.org/SimPy/Tutorials/TheBank2.html"&gt;Part &lt;span class="caps"&gt;II&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;The &lt;code&gt;simmer&lt;/code&gt; package is a relatively new R package for discrete event simulation
-(&lt;span class="caps"&gt;DES&lt;/span&gt;).  It&amp;#8217;s an exciting development, because there isn&amp;#8217;t a lot of open-source
-&lt;span class="caps"&gt;DES&lt;/span&gt; software.  In my last post, I opined that &amp;#8220;&lt;code&gt;SimPy&lt;/code&gt; seems to be the only
-serious competitor for teaching &lt;span class="caps"&gt;DES&lt;/span&gt; and queueing theory&amp;#8221;, but then I learned of
-&lt;a href="https://simjuliajl.readthedocs.io/en/stable/welcome.html"&gt;&lt;code&gt;SimJulia&lt;/code&gt;&lt;/a&gt;, a &lt;span class="caps"&gt;DES&lt;/span&gt;
-package for the Julia language, with an &lt;span class="caps"&gt;API&lt;/span&gt; inspired by &lt;code&gt;SimPy&lt;/code&gt;.  Since the APIs
-are so similar, I haven&amp;#8217;t tried &lt;code&gt;SimJulia&lt;/code&gt;.&lt;/p&gt;
+tutorial, &lt;em&gt;The Bank&lt;/em&gt;, to &lt;code&gt;simmer&lt;/code&gt;.  This post does the same for &lt;a href="https://pythonhosted.org/SimPy/Tutorials/TheBank2.html"&gt;Part &lt;span class="caps"&gt;II&lt;/span&gt;&lt;/a&gt;, which introduces tricky concepts for tricky&amp;nbsp;customers.&lt;/p&gt;
 &lt;p&gt;This post does two&amp;nbsp;things:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Discusses some difficulties implementing The Bank: Part &lt;span class="caps"&gt;II&lt;/span&gt;.&lt;/li&gt;
-&lt;li&gt;Suggests some reasons why simulation is&amp;nbsp;hard.&lt;/li&gt;
+&lt;li&gt;Suggests some reasons why simulation is hard (blame&amp;nbsp;humans).&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h2 id="the-bank"&gt;The&amp;nbsp;Bank&lt;/h2&gt;
 &lt;p&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;The Bank&amp;#8217; is a tutorial that develops &lt;span class="caps"&gt;DES&lt;/span&gt; concepts and techniques by simulating
