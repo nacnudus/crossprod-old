@@ -5,9 +5,9 @@ Summary: Porting a SimPy tutorial to the R package Simmer
 Disqus_identifier: simmer-bank-2
 Tags: R, Simmer, SimPy
 
-```{r simmer-bank-1-pelican_conf, echo=FALSE}
+```{r simmer-bank-2-pelican_conf, echo=FALSE}
 knitr::opts_chunk$set(cache = TRUE)
-knitr::opts_chunk$set(fig.path='./figure/')
+knitr::opts_chunk$set(fig.path='figure/')
 knitr::opts_chunk$set(fig.width =  12.2)
 knitr::opts_chunk$set(fig.height = 6.9)
 knitr::opts_chunk$set(out.width =  "960px")
