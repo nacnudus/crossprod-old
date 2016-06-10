@@ -35,7 +35,7 @@ My analysis focusses on the Financial Times data, because the sample sizes are
 provided, there is a longer time-series, and I didn't notice the BBC's version
 until I'd done most of the work.
 
-```{r brexit-boilerplate, include = FALSE}
+```{r brexit-boilerplate, include = FALSE, cache = FALSE}
 library(magrittr) # for set_colnames
 library(rvest)
 library(readr) # for write_csv, read_csv and parse_number
@@ -45,11 +45,17 @@ library(lubridate)
 library(ggplot2)
 library(scales)
 
+# theme_set(theme_grey() + 
+#           theme(panel.background = element_rect(fill = "#FFF1E0"),
+#                 plot.background = element_rect(fill = "#FFF1E0"),
+#                 legend.background = element_rect(fill = "#FFF1E0"),
+#                 strip.background = element_rect(fill = "#E9DECF"),
+#                 panel.grid = element_blank(),
+#                 legend.key = element_blank(),
+#                 plot.margin = margin(11/2, 22, 
+#                                      11/2, 11/2)))
 theme_set(theme_grey() + 
-          theme(panel.background = element_rect(fill = "#FFF1E0"),
-                plot.background = element_rect(fill = "#FFF1E0"),
-                legend.background = element_rect(fill = "#FFF1E0"),
-                strip.background = element_rect(fill = "#E9DECF"),
+          theme(panel.background = element_blank(),
                 panel.grid = element_blank(),
                 legend.key = element_blank(),
                 plot.margin = margin(11/2, 22, 
@@ -58,6 +64,13 @@ ggplot <- function(...) {
   ggplot2::ggplot(...) + 
   scale_colour_manual(values = c("#DF64A7", "#B9B081"), name = "Majority") +
   scale_fill_manual(values = c("#DF64A7", "#B9B081"), name = "Majority") +
+  scale_shape_manual(name = "Sample size", values = c(1, 19)) +
+  scale_linetype_manual(name = "Sample size", values = c(4, 1))
+}
+ggplot <- function(...) {
+  ggplot2::ggplot(...) + 
+  scale_colour_manual(values = c("darkred", "darkgreen"), name = "Majority") +
+  scale_fill_manual(values = c("darkred", "darkgreen"), name = "Majority") +
   scale_shape_manual(name = "Sample size", values = c(1, 19)) +
   scale_linetype_manual(name = "Sample size", values = c(4, 1))
 }
@@ -140,7 +153,7 @@ master_ft %>%
                    ymax = max_percent, ymin = min_percent,
                    group = interaction(date, pollster),
                    linetype = sample_size), alpha = .5) +
-  geom_point(aes(y = undecided, shape = sample_size), stroke = 0.8) +  
+  geom_point(aes(y = undecided, shape = sample_size), stroke = 0.8, alpha = .5) +
   scale_x_date(date_breaks = "6 month", date_minor_breaks = "1 month",
                limits = c(ymd("2010-07-01"), NA), 
                expand = c(0, 0), labels = date_format("%b %Y")) +
@@ -174,7 +187,7 @@ master_ft %>%
                    ymax = max_percent, ymin = min_percent,
                    group = interaction(date, pollster),
                    linetype = sample_size), alpha = .5) +
-  geom_point(aes(y = undecided, shape = sample_size), stroke = 0.8) +  
+  geom_point(aes(y = undecided, shape = sample_size), stroke = 0.8, alpha = .5) + 
   scale_x_date(date_breaks = "1 month", 
                limits = c(ymd("2015-09-01"), NA), 
                expand = c(0, 0), labels = date_format("%b %Y")) +
@@ -230,8 +243,8 @@ polls.  The next graph makes this more obvious.
 master_ft %>%
   ggplot(aes(majority, fill = majority)) +
   geom_bar() +
-  annotate("text", "leave",  4, label = "Leave") +
-  annotate("text", "remain",  4, label = "Remain") +
+  annotate("text", "leave",  4, label = "Leave", colour = "white") +
+  annotate("text", "remain",  4, label = "Remain", colour = "white") +
   xlab("") +
   ylab("Number of polls") +
   facet_wrap(~sample_size, labeller=labeller(sample_size = c("< 1400" = "Sample size < 1400", "≥ 1400" = "Sample size ≥ 1400"))) +
@@ -337,7 +350,7 @@ Here's the association between indecision and the 'remain' vote.
 ```{r brexit-indecision-by-remain}
 master_ft %>%
   ggplot(aes(undecided, remain)) + 
-  geom_point(aes(colour = majority, shape = sample_size), stroke = 0.8) +  
+  geom_point(aes(colour = majority, shape = sample_size), stroke = 0.8, alpha = .5) + 
   geom_abline(intercept = 0.5, slope = -1/2, linetype = 2) +
   scale_x_continuous(labels = percent) +
   scale_y_continuous(labels = percent) +
@@ -443,7 +456,7 @@ master_ft %>% filter(undecided == 0)
 master_ft %>% 
   filter(pollster == "ORB") %>% 
   ggplot(aes(date, undecided)) + 
-  geom_point(aes(colour = majority, shape = sample_size), stroke = 0.8) +  
+  geom_point(aes(colour = majority, shape = sample_size), stroke = 0.8, alpha = .5) + 
   scale_y_continuous(labels = percent) +
   scale_x_date(date_breaks = "1 month", labels = date_format("%b %Y")) +
   xlab("") +
