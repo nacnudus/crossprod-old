@@ -35,7 +35,9 @@ library(scales)
 
 theme_set(theme_grey() + 
           theme(panel.background = element_blank(),
-                legend.key = element_blank()))
+                legend.key = element_blank(),
+                plot.margin = margin(11/2, 22, 
+                                     11/2, 11/2)))
 
 # If downloading:
 # polls <- 
