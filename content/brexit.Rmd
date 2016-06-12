@@ -18,6 +18,13 @@ knitr::opts_chunk$set(warning = FALSE)
 ```
 
 # Brexit poll of polls
+
+This post does the following:
+
+* Re-works the Financial Times poll-of-polls graph
+* Explores the relationship between sample size, polling method, and voting
+  intention.
+
 ## Data
 
 I scraped the poll data from the [Financial Times poll of
