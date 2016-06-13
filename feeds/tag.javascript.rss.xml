@@ -42,7 +42,7 @@ round_away_from_zero &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kr"&gt
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;&lt;img src="./figure/rounding-bias-1-1.svg" title="plot of chunk rounding-bias-1" alt="plot of chunk rounding-bias-1" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/rounding-bias-1-1.svg" title="plot of chunk rounding-bias-1" alt="plot of chunk rounding-bias-1" width="960px" height="540px" /&gt;&lt;/p&gt;
 &lt;h2 id="javascript-rounding-in-the-chrome-browser"&gt;JavaScript rounding in the Chrome&amp;nbsp;browser&lt;/h2&gt;
 &lt;p&gt;But when I tried to emulated a website&amp;#8217;s behaviour in R, it turned out that
 Chrome was rounding towards odd numbers after the decimal point (anyone know
@@ -79,7 +79,7 @@ round_to_odd &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kr"&gt
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;&lt;img src="./figure/rounding-bias-2-1.svg" title="plot of chunk rounding-bias-2" alt="plot of chunk rounding-bias-2" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/rounding-bias-2-1.svg" title="plot of chunk rounding-bias-2" alt="plot of chunk rounding-bias-2" width="960px" height="540px" /&gt;&lt;/p&gt;
 &lt;p&gt;The graph shows that, like rounding-to-even, rounding-to-odd is unbiased, but a
 snag is that successive rounded operations will never reach zero (see comments
 on &lt;a href="http://programmers.stackexchange.com/a/256269/111311"&gt;this StackExchange

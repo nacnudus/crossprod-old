@@ -1,5 +1,269 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Crossprod</title><link>http://nacnudus.github.io/crossprod/</link><description>R, data, and frustration</description><atom:link href="http://nacnudus.github.io/crossprod/feeds/all.rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 06 Jun 2016 00:00:00 +1200</lastBuildDate><item><title>Simmer vs SimPy: The Bank, Part II</title><link>http://nacnudus.github.io/crossprod/simmer-vs-simpy-the-bank-part-ii</link><description>&lt;h2 id="simmer-vs-simpy-rematch"&gt;Simmer vs SimPy&amp;nbsp;(rematch)&lt;/h2&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Crossprod</title><link>http://nacnudus.github.io/crossprod/</link><description>R, data, and frustration</description><atom:link href="http://nacnudus.github.io/crossprod/feeds/all.rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 07 Jun 2016 00:00:00 +1200</lastBuildDate><item><title>Brexit poll of polls</title><link>http://nacnudus.github.io/crossprod/brexit-poll-of-polls</link><description>&lt;h1 id="brexit-poll-of-polls"&gt;Brexit poll of&amp;nbsp;polls&lt;/h1&gt;
+&lt;p&gt;This post does the&amp;nbsp;following:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Re-works the Financial Times poll-of-polls&amp;nbsp;graph&lt;/li&gt;
+&lt;li&gt;Explores the relationship between sample size, polling method, and voting&amp;nbsp;intention.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="data"&gt;Data&lt;/h2&gt;
+&lt;p&gt;I scraped the poll data from the &lt;a href="https://ig.ft.com/sites/brexit-polling"&gt;Financial Times poll of
+polls&lt;/a&gt;.  The Financial Times made this
+graph of&amp;nbsp;it:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="https://ig.ft.com/sites/brexit-polling" src="figure/brexit-ft-polls.png" /&gt;&lt;/p&gt;
+&lt;p&gt;To check a later inference about sample sizes and online/telephone methods, I
+also scraped polling data from the &lt;a href="http://www.bbc.co.uk/news/uk-politics-eu-referendum-36271589"&gt;&lt;span class="caps"&gt;BBC&lt;/span&gt; poll of
+polls&lt;/a&gt; and used it
+to augment the Financial Times data with the polling&amp;nbsp;method.  &lt;/p&gt;
+&lt;p&gt;My analysis focusses on the Financial Times data, because the sample sizes are
+provided, there is a longer time-series, and I didn&amp;#8217;t notice the &lt;span class="caps"&gt;BBC&lt;/span&gt;&amp;#8217;s version
+until I&amp;#8217;d done most of the&amp;nbsp;work.&lt;/p&gt;
+&lt;h2 id="reworking-the-graph"&gt;Reworking the&amp;nbsp;graph&lt;/h2&gt;
+&lt;p&gt;The Financial Times graph emphasises the poll-of-polls statistic, and the
+difference between online and telephone polls.  In my version, I want to
+emphasise the outcomes (the majority in each poll), the margins of the
+majorities, and the sample sizes.  I also present the full&amp;nbsp;series.&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/brexit-timeseries1-1.svg" title="plot of chunk brexit-timeseries1" alt="plot of chunk brexit-timeseries1" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;p&gt;I would have included the poll-of-polls statistic on my graph, since the
+Financial Times describes their method in a&amp;nbsp;footnote:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The &lt;span class="caps"&gt;FT&lt;/span&gt; poll of polls is calculated by taking the last seven polls from unique
+pollsters up to a given date, removing the two polls with the highest and
+lowest shares for &amp;#8216;remain&amp;#8217;, and calculating an adjusted average of the five
+remaining polls, where the more recent polls are given a higher&amp;nbsp;weight&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Unfortunately, besides omitting the weights, and their tie-breaking policy,
+their statistic has obviously been redesigned since the footnote was written,
+because their current statistic for &amp;#8216;remain&amp;#8217; is higher than the second-highest
+&amp;#8216;remain&amp;#8217; result in the last seven&amp;nbsp;polls.&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s that graph again, but this time beginning in September 2015 like the
+Financial&amp;nbsp;Times.&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/brexit-timeseries2-1.svg" title="plot of chunk brexit-timeseries2" alt="plot of chunk brexit-timeseries2" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;p&gt;Something worth noticing is that the &amp;#8216;leave&amp;#8217; majorities are mostly large
+samples.  Comparing this graph with the one by the Financial Times, sample size
+seems to be a proxy for telephone (small) vs online (large) polling methods.
+Let&amp;#8217;s&amp;nbsp;check.&lt;/p&gt;
+&lt;p&gt;Although the Financial Times graph distinguishes between online/telephone
+methods, that information isn&amp;#8217;t included in the table, despite its obvious
+&lt;a href="https://yougov.co.uk/news/2016/02/23/commentary-what-explains-difference-between-phone-"&gt;importance&lt;/a&gt;:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;There’s a big difference between the online and telephone polls on the &lt;span class="caps"&gt;EU&lt;/span&gt;
+referendum – with online polls showing the sides neck-and neck and telephone
+polls showing about a 15% gap in favour of ‘remain’.&amp;nbsp;Why?&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Fortunately, for most polls in the last six months, data from the &lt;a href="http://www.bbc.co.uk/news/uk-politics-eu-referendum-36271589"&gt;&lt;span class="caps"&gt;BBC&lt;/span&gt;&amp;#8217;s poll of
+polls&lt;/a&gt; can augment
+the Financial Times data with online/telephone information.  As the following
+frequency table shows, in nearly all matched polls, large samples correspond
+with an online method.  So while large samples appear to favour &amp;#8216;leave&amp;#8217;, it may
+simply be that online polls&amp;nbsp;do.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;##         
+##          online phone &amp;lt;NA&amp;gt; Sum
+##   &amp;lt; 1400      8    18   35  61
+##   ≥ 1400     67     0  114 181
+##   &amp;lt;NA&amp;gt;       10     5    0  15
+##   Sum        85    23  149 257
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;However, telephone polls do not necessarily favour either side.  Comparing the
+frequencies of outcomes with first methods and then sample sizes, the
+association between small sample sizes and a &amp;#8216;remain&amp;#8217; outcome appears to be much
+stronger than between &amp;#8216;online&amp;#8217; and &amp;#8216;remain&amp;#8217; or &amp;#8216;phone&amp;#8217; and &amp;#8216;remain&amp;#8217;.  Perhaps
+this is why the financial markets apparently regard telephone polls as more
+reliable, despite the smaller sample&amp;nbsp;sizes.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;##         
+##          leave remain &amp;lt;NA&amp;gt; Sum
+##   online    26     49   10  85
+##   phone      1     17    5  23
+##   &amp;lt;NA&amp;gt;      52     97    0 149
+##   Sum       79    163   15 257
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;##         
+##          leave remain &amp;lt;NA&amp;gt; Sum
+##   &amp;lt; 1400    15     46    0  61
+##   ≥ 1400    64    117    0 181
+##   &amp;lt;NA&amp;gt;       0      0   15  15
+##   Sum       79    163   15 257
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2 id="outcome-by-sample-size-polling-method"&gt;Outcome by sample size / polling&amp;nbsp;method&lt;/h2&gt;
+&lt;p&gt;I already noted that &amp;#8216;leave&amp;#8217; majorities tend to come from large-sample/online
+polls.  The next graph makes this more&amp;nbsp;obvious.&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/brexit-outcome-by-sample-size-1.svg" title="plot of chunk brexit-outcome-by-sample-size" alt="plot of chunk brexit-outcome-by-sample-size" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;h2 id="justification-of-largesmall-threshold"&gt;Justification of large/small&amp;nbsp;threshold&lt;/h2&gt;
+&lt;p&gt;But how did I choose 1400 as the boundary between small and large samples?  It&amp;#8217;s
+because of the following visualisations,  Polls with samples smaller than 1400
+just seem to behave differently. Perhaps small samples don&amp;#8217;t find the &amp;#8216;leave&amp;#8217;
+voters, or perhaps they &lt;em&gt;do&lt;/em&gt; find the &amp;#8216;remain&amp;#8217;&amp;nbsp;ones.&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/brexit-remain-by-sample-size-1.svg" title="plot of chunk brexit-remain-by-sample-size" alt="plot of chunk brexit-remain-by-sample-size" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;p&gt;Smaller samples also don&amp;#8217;t find the undecided people (this is not quite as
+convincing as the graph&amp;nbsp;above).&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/brexit-undecided-by-sample-size-1.svg" title="plot of chunk brexit-undecided-by-sample-size" alt="plot of chunk brexit-undecided-by-sample-size" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;p&gt;Checking this against the method data from the &lt;span class="caps"&gt;BBC&lt;/span&gt;, I&amp;#8217;m arguably on the right
+track.  It would obviously be best to know the method as well as the sample
+size, but since I&amp;#8217;m using the Financial Times data, and since I don&amp;#8217;t have the
+method of so many of those polls (grey points below), I have focussed on sample
+size&amp;nbsp;instead.&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/brexit-method-vs-sample-size-1.svg" title="plot of chunk brexit-method-vs-sample-size" alt="plot of chunk brexit-method-vs-sample-size" width="960px" height="540px" /&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/brexit-method-vs-sample-size-2.svg" title="plot of chunk brexit-method-vs-sample-size" alt="plot of chunk brexit-method-vs-sample-size" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;h2 id="indecision-favours-a-leave-outcome-part-i-graph"&gt;Indecision favours a &amp;#8216;leave&amp;#8217; outcome: Part I &amp;#8212;&amp;nbsp;graph&lt;/h2&gt;
+&lt;p&gt;Here I can use stats, the only stats I&amp;#8217;ve ever been taught (the really
+out-of-date stuff), to explore whether undecided voters will favour the status
+quo.  (What is my status quo, anyway &amp;#8212; that we&amp;#8217;re in Europe now, or that I&amp;#8217;ve
+always wanted to&amp;nbsp;leave?)&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s the association between indecision and the &amp;#8216;remain&amp;#8217;&amp;nbsp;vote.&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/brexit-indecision-by-remain-1.svg" title="plot of chunk brexit-indecision-by-remain" alt="plot of chunk brexit-indecision-by-remain" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;h2 id="intermission-obvious-glitch"&gt;Intermission (obvious&amp;nbsp;glitch)&lt;/h2&gt;
+&lt;p&gt;A few &amp;#8216;remain&amp;#8217; majorities are below the &amp;#8216;win&amp;#8217; threshold in the graph above
+(green points below the dotted line).  That could be because of missing
+&amp;#8220;won&amp;#8217;t vote&amp;#8221; information.  See YouGov&amp;#8217;s
+&lt;a href="https://yougov.co.uk/news/2016/02/23/commentary-what-explains-difference-between-phone-"&gt;explanation&lt;/a&gt;:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Telephone polls ask their respondents “How will you vote in the
+referendum?” People are assumed to have an opinion, and 90% of them give 
+one. By contrast, online polls present people with options: remain, leave,
+won’t vote, don’t know – there is less assumption of an opinion, and 20% or
+more don’t offer&amp;nbsp;one.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;A few polls total much less than 100%, probably for the same reason, but it
+isn&amp;#8217;t a problem in most&amp;nbsp;cases.&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/brexit-totals-1.svg" title="plot of chunk brexit-totals" alt="plot of chunk brexit-totals" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;h2 id="indecision-favours-a-leave-outcome-part-ii-stats"&gt;Indecision favours a &amp;#8216;leave&amp;#8217; outcome: Part &lt;span class="caps"&gt;II&lt;/span&gt; &amp;#8212;&amp;nbsp;stats&lt;/h2&gt;
+&lt;p&gt;We&amp;#8217;ve already seen the non-linearity of sample size vs everything, so I build
+two models, first for large samples, then for small&amp;nbsp;ones.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;## 
+## Call:
+## lm(formula = remain ~ undecided, data = master_ft %&amp;gt;% filter(sample_size == 
+##     &amp;quot;≥ 1400&amp;quot;))
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.152068 -0.015749  0.004864  0.024251  0.100785 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&amp;gt;|t|)    
+## (Intercept)  0.49431    0.01027  48.130  &amp;lt; 2e-16 ***
+## undecided   -0.46932    0.05599  -8.383 1.49e-14 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error: 0.03745 on 179 degrees of freedom
+## Multiple R-squared:  0.2819, Adjusted R-squared:  0.2779 
+## F-statistic: 70.27 on 1 and 179 DF,  p-value: 1.487e-14
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The coefficient of &amp;#8216;undecided&amp;#8217; is nearly -0.5, suggesting that undecided
+large-sample voters about as likely to vote either way (lines almost parallel in
+the graph below).  But as proportion of undecided voters reduces, at what point
+does the &amp;#8216;remain&amp;#8217; outcome start to benefit?  (this analysis will be more
+meaningful for small samples, in just a&amp;nbsp;moment).&lt;/p&gt;
+&lt;p&gt;There are two linear functions: the fitted model, and the threshold of a
+majority (depending on the proportion of voters who are undecided).  Not only
+can we plot these functions (and base R is simplest here), but we can solve
+them for the fulcrum, which turns out to be about 19%.  If the proportion of
+voters who are undecided is below 19%, then outcome is likely to be&amp;nbsp;&amp;#8216;remain&amp;#8217;.&lt;/p&gt;
+&lt;p&gt;I exhibit the R code here, for anyone interested in plotting functions and
+solving&amp;nbsp;them.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;remain &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;coef&lt;span class="p"&gt;(&lt;/span&gt;lm_large&lt;span class="p"&gt;)[&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; x &lt;span class="o"&gt;+&lt;/span&gt; coef&lt;span class="p"&gt;(&lt;/span&gt;lm_large&lt;span class="p"&gt;)[&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]}&lt;/span&gt;
+majority &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; x&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+plot&lt;span class="p"&gt;(&lt;/span&gt;remain&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;0.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; xlab &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;undecided&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; col &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;blue&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+plot&lt;span class="p"&gt;(&lt;/span&gt;majority&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;0.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; col &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;brown&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; add &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/brexit-fulcrum-large-1.svg" title="plot of chunk brexit-fulcrum-large" alt="plot of chunk brexit-fulcrum-large" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;fulcrum &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;remain&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; majority&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;)}&lt;/span&gt;
+uniroot&lt;span class="p"&gt;(&lt;/span&gt;fulcrum&lt;span class="p"&gt;,&lt;/span&gt; interval &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;root
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## [1] 0.1855785
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;master_ft &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; filter&lt;span class="p"&gt;(&lt;/span&gt;sample_size &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;≥ 1400&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; undecided &lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="m"&gt;0.1855785&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; &lt;span class="kp"&gt;nrow&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## [1] 89
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Since &amp;#8220;small&amp;#8221; may be a proxy for &amp;#8220;online&amp;#8221;, let&amp;#8217;s model that,&amp;nbsp;too.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;## 
+## Call:
+## lm(formula = remain ~ undecided, data = master_ft %&amp;gt;% filter(sample_size == 
+##     &amp;quot;&amp;lt; 1400&amp;quot;))
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.147178 -0.028871  0.004515  0.035027  0.178669 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&amp;gt;|t|)    
+## (Intercept)  0.57795    0.01514  38.177  &amp;lt; 2e-16 ***
+## undecided   -0.80511    0.09922  -8.114 3.51e-11 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error: 0.05248 on 59 degrees of freedom
+## Multiple R-squared:  0.5274, Adjusted R-squared:  0.5194 
+## F-statistic: 65.84 on 1 and 59 DF,  p-value: 3.507e-11
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This time, the coefficient of undecided is about -0.8, suggesting that
+undecided small-sample voters are more likely to vote to remain.  The fulrum,
+now much more meaningful than above, given the coefficient, is at about 26%,
+with a caveat that there are only five observations above&amp;nbsp;26%.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;remain &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;coef&lt;span class="p"&gt;(&lt;/span&gt;lm_small&lt;span class="p"&gt;)[&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; x &lt;span class="o"&gt;+&lt;/span&gt; coef&lt;span class="p"&gt;(&lt;/span&gt;lm_small&lt;span class="p"&gt;)[&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]}&lt;/span&gt;
+majority &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; x&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+plot&lt;span class="p"&gt;(&lt;/span&gt;remain&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;0.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; xlab &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;undecided&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; col &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;blue&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+plot&lt;span class="p"&gt;(&lt;/span&gt;majority&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;0.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; col &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;brown&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; add &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/brexit-fulcrum-small-1.svg" title="plot of chunk brexit-fulcrum-small" alt="plot of chunk brexit-fulcrum-small" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;fulcrum &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;remain&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; majority&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;)}&lt;/span&gt;
+uniroot&lt;span class="p"&gt;(&lt;/span&gt;fulcrum&lt;span class="p"&gt;,&lt;/span&gt; interval &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;root
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## [1] 0.2554619
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;master_ft &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; filter&lt;span class="p"&gt;(&lt;/span&gt;sample_size &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&amp;lt; 1400&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; undecided &lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="m"&gt;0.255461&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; &lt;span class="kp"&gt;nrow&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## [1] 5
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2 id="zero-undecided-voters"&gt;Zero undecided&amp;nbsp;voters&lt;/h2&gt;
+&lt;p&gt;Finally, what about the five zero-undecided polls (the five points along the
+bottom of the timeseries)?  It turns out that those polls were all conducted by
+the &lt;span class="caps"&gt;ORB&lt;/span&gt; company, and they&amp;#8217;re also the large-sample polls by &lt;span class="caps"&gt;ORB&lt;/span&gt;.  They aren&amp;#8217;t
+included in the &lt;span class="caps"&gt;BBC&lt;/span&gt; data, so we can&amp;#8217;t tell whether or not they are online polls.
+Make of them what you&amp;nbsp;will.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;## Source: local data frame [5 x 11]
+## 
+##   remain leave undecided       date pollster sample sample_size majority
+##    &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt;     &amp;lt;dbl&amp;gt;     &amp;lt;date&amp;gt;    &amp;lt;chr&amp;gt;  &amp;lt;dbl&amp;gt;       &amp;lt;chr&amp;gt;    &amp;lt;chr&amp;gt;
+## 1   0.50  0.50         0 2016-04-29      ORB   2000      ≥ 1400   remain
+## 2   0.51  0.49         0 2016-03-28      ORB   2002      ≥ 1400   remain
+## 3   0.48  0.52         0 2015-11-19      ORB   2067      ≥ 1400    leave
+## 4   0.53  0.47         0 2015-10-25      ORB   2015      ≥ 1400   remain
+## 5   0.55  0.45         0 2015-09-06      ORB   2044      ≥ 1400   remain
+## Variables not shown: max_percent &amp;lt;dbl&amp;gt;, min_percent &amp;lt;dbl&amp;gt;, method &amp;lt;chr&amp;gt;.
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/brexit-zero-undecided-1.svg" title="plot of chunk brexit-zero-undecided" alt="plot of chunk brexit-zero-undecided" width="960px" height="540px" /&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Duncan Garmonsway</dc:creator><pubDate>Tue, 07 Jun 2016 00:00:00 +1200</pubDate><guid>tag:nacnudus.github.io,2016-06-07:crossprod/brexit-poll-of-polls</guid><category>R</category><category>polls</category><category>Brexit</category></item><item><title>Simmer vs SimPy: The Bank, Part II</title><link>http://nacnudus.github.io/crossprod/simmer-vs-simpy-the-bank-part-ii</link><description>&lt;h2 id="simmer-vs-simpy-rematch"&gt;Simmer vs SimPy&amp;nbsp;(rematch)&lt;/h2&gt;
 &lt;p&gt;In my &lt;a href="http://nacnudus.github.io/crossprod/simmer-vs-simpy-the-bank-part-i"&gt;previous post&lt;/a&gt;, I ported &lt;a href="https://pythonhosted.org/SimPy/Tutorials/TheBank.html"&gt;Part I&lt;/a&gt; of &lt;code&gt;SimPy&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s flagship
 tutorial, &lt;em&gt;The Bank&lt;/em&gt;, to &lt;code&gt;simmer&lt;/code&gt;.  This post does the same for &lt;a href="https://pythonhosted.org/SimPy/Tutorials/TheBank2.html"&gt;Part &lt;span class="caps"&gt;II&lt;/span&gt;&lt;/a&gt;, which introduces tricky concepts for tricky&amp;nbsp;customers.&lt;/p&gt;
 &lt;p&gt;This post does two&amp;nbsp;things:&lt;/p&gt;
@@ -445,7 +709,7 @@ round_away_from_zero &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kr"&gt
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;&lt;img src="./figure/rounding-bias-1-1.svg" title="plot of chunk rounding-bias-1" alt="plot of chunk rounding-bias-1" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/rounding-bias-1-1.svg" title="plot of chunk rounding-bias-1" alt="plot of chunk rounding-bias-1" width="960px" height="540px" /&gt;&lt;/p&gt;
 &lt;h2 id="javascript-rounding-in-the-chrome-browser"&gt;JavaScript rounding in the Chrome&amp;nbsp;browser&lt;/h2&gt;
 &lt;p&gt;But when I tried to emulated a website&amp;#8217;s behaviour in R, it turned out that
 Chrome was rounding towards odd numbers after the decimal point (anyone know
@@ -482,7 +746,7 @@ round_to_odd &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kr"&gt
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;&lt;img src="./figure/rounding-bias-2-1.svg" title="plot of chunk rounding-bias-2" alt="plot of chunk rounding-bias-2" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/rounding-bias-2-1.svg" title="plot of chunk rounding-bias-2" alt="plot of chunk rounding-bias-2" width="960px" height="540px" /&gt;&lt;/p&gt;
 &lt;p&gt;The graph shows that, like rounding-to-even, rounding-to-odd is unbiased, but a
 snag is that successive rounded operations will never reach zero (see comments
 on &lt;a href="http://programmers.stackexchange.com/a/256269/111311"&gt;this StackExchange
