@@ -194,8 +194,8 @@ master_ft %>%
                    ymax = max_percent, ymin = min_percent,
                    group = interaction(date, pollster),
                    linetype = sample_size), alpha = .5) +
-  geom_point(aes(y = undecided, shape = sample_size), stroke = 0.8, alpha = .5) + 
-  scale_x_date(date_breaks = "1 month", 
+  geom_point(aes(y = undecided, shape = sample_size), stroke = 0.8, alpha = .5) +
+  scale_x_date(date_breaks = "1 month", # Deleting this comment breaks 'make devserver'
                limits = c(ymd("2015-09-01"), NA), 
                expand = c(0, 0), labels = date_format("%b %Y")) +
   scale_y_continuous(labels = percent) +
