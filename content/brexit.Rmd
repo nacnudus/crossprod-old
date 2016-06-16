@@ -1,5 +1,5 @@
 Title: Brexit poll of polls
-Date: 2016-06-07
+Date: 2016-06-13
 Author: Duncan Garmonsway
 Summary: Analysis of Brexit polls by visualisation and a linear model
 Disqus_identifier: brexit
