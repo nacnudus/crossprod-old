@@ -1,5 +1,5 @@
 Title: Creating nests without tidyr
-Date: 2016-06-07
+Date: 2016-06-22
 Author: Duncan Garmonsway
 Summary: How to construct nested data frames from scratch, without tidyr.
 Disqus_identifier: nests
