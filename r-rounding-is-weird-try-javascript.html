@@ -237,14 +237,21 @@ the V8 JavaScript engine, the same that my browser (Chrome)&nbsp;uses.</p>
 
 <div class="highlight"><pre><span class="c1"># library(V8)</span>
 ct <span class="o">&lt;-</span> V8<span class="o">::</span>v8<span class="p">()</span>
-roundjs <span class="o">&lt;-</span> <span class="kr">function</span><span class="p">(</span>x<span class="p">,</span> digits<span class="p">)</span> <span class="p">{</span>
+</pre></div>
+
+
+<div class="highlight"><pre>## Error in loadNamespace(name): there is no package called &#39;V8&#39;
+</pre></div>
+
+
+<div class="highlight"><pre>roundjs <span class="o">&lt;-</span> <span class="kr">function</span><span class="p">(</span>x<span class="p">,</span> digits<span class="p">)</span> <span class="p">{</span>
   <span class="kp">sapply</span><span class="p">(</span>x<span class="p">,</span> <span class="kr">function</span><span class="p">(</span>y<span class="p">)</span> <span class="p">{</span>ct<span class="o">$</span><span class="kp">get</span><span class="p">(</span><span class="kp">paste0</span><span class="p">(</span><span class="s">&quot;Number((&quot;</span><span class="p">,</span> <span class="kp">sprintf</span><span class="p">(</span><span class="s">&quot;%.16f&quot;</span><span class="p">,</span> y<span class="p">),</span> <span class="s">&quot;).toFixed(&quot;</span><span class="p">,</span> digits<span class="p">,</span> <span class="s">&quot;))&quot;</span><span class="p">))})</span>
 <span class="p">}</span>
 roundjs<span class="p">(</span><span class="kt">c</span><span class="p">(</span><span class="m">6.65</span><span class="p">,</span> <span class="m">7</span> <span class="o">*</span> <span class="m">0.95</span><span class="p">,</span> <span class="m">7</span> <span class="o">-</span> <span class="m">0.35</span><span class="p">),</span> <span class="m">1</span><span class="p">)</span>
 </pre></div>
 
 
-<div class="highlight"><pre>## [1] 6.7 6.6 6.7
+<div class="highlight"><pre>## Error in FUN(X[[i]], ...): object &#39;ct&#39; not found
 </pre></div>
 
 
@@ -418,7 +425,7 @@ par<span class="p">(</span>mfrow <span class="o">=</span> <span class="kt">c</sp
                     <span>1</span>
 </a></li>
                 <li><a href="http://nacnudus.github.io/crossprod/tags.html#r-ref">R
-                    <span>7</span>
+                    <span>8</span>
 </a></li>
             </ul>
 <h4>Social</h4>

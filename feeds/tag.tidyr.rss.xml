@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Crossprod</title><link>http://nacnudus.github.io/crossprod/</link><description>R, data, and frustration</description><atom:link href="http://nacnudus.github.io/crossprod/feeds/tag.tidyr.rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 22 Jun 2016 00:00:00 +1200</lastBuildDate><item><title>Creating nests without tidyr</title><link>http://nacnudus.github.io/crossprod/creating-nests-without-tidyr</link><description>&lt;p&gt;Unless you begin with an unnested data frame, creating a nested data frame needs
+a little trick.  Here it&amp;nbsp;is.&lt;/p&gt;
+&lt;h1 id="nested-data-frames"&gt;Nested data&amp;nbsp;frames&lt;/h1&gt;
+&lt;p&gt;The &lt;code&gt;tidyr&lt;/code&gt; package has a handy function for &lt;em&gt;nesting&lt;/em&gt; data frames.  Hadley
+Wickham describes it &lt;a href="https://blog.rstudio.org/2016/02/02/tidyr-0-4-0/"&gt;thus&lt;/a&gt;:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;In a grouped data frame, you have one row per observation, and additional
+metadata define the groups. In a nested data frame, you have one row per
+group, and the individual observations are stored in a column that is a list
+of data frames. This is a useful structure when you have lists of other
+objects (like models) with one element per&amp;nbsp;group.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Here&amp;#8217;s a small&amp;nbsp;example:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;dplyr&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="kn"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;tidyr&lt;span class="p"&gt;)&lt;/span&gt;
+
+iris_nested &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; 
+  iris &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
+  group_by&lt;span class="p"&gt;(&lt;/span&gt;Species&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
+  sample_n&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
+  nest
+iris_nested
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## Source: local data frame [3 x 2]
+## 
+##      Species           data
+##       &amp;lt;fctr&amp;gt;         &amp;lt;list&amp;gt;
+## 1     setosa &amp;lt;tbl_df [2,4]&amp;gt;
+## 2 versicolor &amp;lt;tbl_df [2,4]&amp;gt;
+## 3  virginica &amp;lt;tbl_df [2,4]&amp;gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;iris_nested &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; str
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## Classes &amp;#39;tbl_df&amp;#39;, &amp;#39;tbl&amp;#39; and &amp;#39;data.frame&amp;#39;:    3 obs. of  2 variables:
+##  $ Species: Factor w/ 3 levels &amp;quot;setosa&amp;quot;,&amp;quot;versicolor&amp;quot;,..: 1 2 3
+##  $ data   :List of 3
+##   ..$ :Classes &amp;#39;tbl_df&amp;#39;, &amp;#39;tbl&amp;#39; and &amp;#39;data.frame&amp;#39;: 2 obs. of  4 variables:
+##   .. ..$ Sepal.Length: num  5 4.8
+##   .. ..$ Sepal.Width : num  3.3 3.4
+##   .. ..$ Petal.Length: num  1.4 1.6
+##   .. ..$ Petal.Width : num  0.2 0.2
+##   ..$ :Classes &amp;#39;tbl_df&amp;#39;, &amp;#39;tbl&amp;#39; and &amp;#39;data.frame&amp;#39;: 2 obs. of  4 variables:
+##   .. ..$ Sepal.Length: num  5.5 6.1
+##   .. ..$ Sepal.Width : num  2.5 2.8
+##   .. ..$ Petal.Length: num  4 4.7
+##   .. ..$ Petal.Width : num  1.3 1.2
+##   ..$ :Classes &amp;#39;tbl_df&amp;#39;, &amp;#39;tbl&amp;#39; and &amp;#39;data.frame&amp;#39;: 2 obs. of  4 variables:
+##   .. ..$ Sepal.Length: num  6.3 6.7
+##   .. ..$ Sepal.Width : num  2.7 3.1
+##   .. ..$ Petal.Length: num  4.9 5.6
+##   .. ..$ Petal.Width : num  1.8 2.4
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Interestingly, the nested column isn&amp;#8217;t a vector like ordinary columns; it&amp;#8217;s a
+list.  Actually lists are just one kind of vector &amp;#8212; the non-atomic kind
+(composed of parts, i.e vectors and other lists), whereas
+integer/character/etc. vectors are the atomic kind (not composed of parts).
+This is nicely explained in &lt;a href="http://adv-r.had.co.nz/Data-structures.html#vectors"&gt;Advanced
+R&lt;/a&gt; by Hadley&amp;nbsp;Wickham.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kp"&gt;is.atomic&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;vector&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;mode &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;character&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; length &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## [1] TRUE
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kp"&gt;is.atomic&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;vector&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;mode &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;list&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; length &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## [1] FALSE
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h1 id="please-say-its-a-data-frame"&gt;Please say it&amp;#8217;s a data&amp;nbsp;frame&lt;/h1&gt;
+&lt;p&gt;Data frames, which are a list of vectors, handle list-type columns perfectly
+well, but data-frame-construction functions don&amp;#8217;t. So when I tried to create
+one from scratch (rather than by nesting an existing data frame as above), I
+lost a lot of time mucking about with &lt;code&gt;data.frame()&lt;/code&gt; and the&amp;nbsp;like.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kt"&gt;data.frame&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;X1 &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; X2 &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;iris&lt;span class="p"&gt;,&lt;/span&gt; mtcars&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="err"&gt;##&lt;/span&gt; &lt;span class="nb"&gt;Error&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="p"&gt;(...,&lt;/span&gt; &lt;span class="nx"&gt;row&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;names&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;check&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;rows&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;FALSE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;check&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;names&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;arguments&lt;/span&gt; &lt;span class="nx"&gt;imply&lt;/span&gt; &lt;span class="nx"&gt;differing&lt;/span&gt; &lt;span class="nx"&gt;number&lt;/span&gt; &lt;span class="nx"&gt;of&lt;/span&gt; &lt;span class="nx"&gt;rows&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;150&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;32&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kp"&gt;as.data.frame&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;X1 &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; X2 &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;iris&lt;span class="p"&gt;,&lt;/span&gt; mtcars&lt;span class="p"&gt;)))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="err"&gt;##&lt;/span&gt; &lt;span class="nb"&gt;Error&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="p"&gt;(...,&lt;/span&gt; &lt;span class="nx"&gt;row&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;names&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;check&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;rows&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;FALSE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;check&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;names&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;arguments&lt;/span&gt; &lt;span class="nx"&gt;imply&lt;/span&gt; &lt;span class="nx"&gt;differing&lt;/span&gt; &lt;span class="nx"&gt;number&lt;/span&gt; &lt;span class="nx"&gt;of&lt;/span&gt; &lt;span class="nx"&gt;rows&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;150&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;32&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h1 id="its-a-data-frame-because-i-say-so"&gt;It&amp;#8217;s a data frame because I say&amp;nbsp;so&lt;/h1&gt;
+&lt;p&gt;The answer is to simply tell R that the data structure is a data frame by
+setting its class and giving it a &amp;#8220;row.names&amp;#8221;&amp;nbsp;attribute.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;x &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kt"&gt;list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;X1 &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; X2 &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;iris&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; iris&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;4&lt;/span&gt;&lt;span class="p"&gt;]))&lt;/span&gt;
+&lt;span class="kp"&gt;structure&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;,&lt;/span&gt; class &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;tbl_df&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;data.frame&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; row.names &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## Source: local data frame [2 x 2]
+## 
+##      X1                 X2
+##   &amp;lt;int&amp;gt;             &amp;lt;list&amp;gt;
+## 1     1 &amp;lt;data.frame [2,2]&amp;gt;
+## 2     2 &amp;lt;data.frame [3,4]&amp;gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h1 id="invading-the-nest"&gt;Invading the&amp;nbsp;nest&lt;/h1&gt;
+&lt;p&gt;Accessing the nested column by the usual subsetting
+operators, &lt;code&gt;$&lt;/code&gt;, &lt;code&gt;[&lt;/code&gt; and &lt;code&gt;[[&lt;/code&gt;, is a little&amp;nbsp;clumsy.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;x&lt;span class="o"&gt;$&lt;/span&gt;X2 &lt;span class="c1"&gt;# Returns the list of data frames&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## [[1]]
+##   Sepal.Length Sepal.Width
+## 1          5.1         3.5
+## 2          4.9         3.0
+## 
+## [[2]]
+##   Sepal.Length Sepal.Width Petal.Length Petal.Width
+## 3          4.7         3.2          1.3         0.2
+## 4          4.6         3.1          1.5         0.2
+## 5          5.0         3.6          1.4         0.2
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;x&lt;span class="o"&gt;$&lt;/span&gt;X2&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="c1"&gt;# Returns the second data frame, wrapped in a list&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## [[1]]
+##   Sepal.Length Sepal.Width Petal.Length Petal.Width
+## 3          4.7         3.2          1.3         0.2
+## 4          4.6         3.1          1.5         0.2
+## 5          5.0         3.6          1.4         0.2
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;x&lt;span class="o"&gt;$&lt;/span&gt;X2&lt;span class="p"&gt;[[&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;]]&lt;/span&gt; &lt;span class="c1"&gt;# Returns the second data frame -- probably what you want&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;##   Sepal.Length Sepal.Width Petal.Length Petal.Width
+## 3          4.7         3.2          1.3         0.2
+## 4          4.6         3.1          1.5         0.2
+## 5          5.0         3.6          1.4         0.2
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;x&lt;span class="p"&gt;[[&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;X2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]][[&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;]]&lt;/span&gt; &lt;span class="c1"&gt;# Returns the second data frame -- also probably what you want&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;##   Sepal.Length Sepal.Width Petal.Length Petal.Width
+## 3          4.7         3.2          1.3         0.2
+## 4          4.6         3.1          1.5         0.2
+## 5          5.0         3.6          1.4         0.2
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;x&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;X2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="c1"&gt;# Returns the second data frame wrapped in another data frame&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## Error in x[2, &amp;quot;X2&amp;quot;]: incorrect number of dimensions
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;x&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;X2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; drop &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="c1"&gt;# Same -- ignores &amp;quot;drop&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## Error in x[2, &amp;quot;X2&amp;quot;, drop = TRUE]: incorrect number of dimensions
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;x&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;X2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;][&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;X2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;][&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;X2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="c1"&gt;# The `[` goes around in circles&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## Error in x[2, &amp;quot;X2&amp;quot;]: incorrect number of dimensions
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Duncan Garmonsway</dc:creator><pubDate>Wed, 22 Jun 2016 00:00:00 +1200</pubDate><guid>tag:nacnudus.github.io,2016-06-22:crossprod/creating-nests-without-tidyr</guid><category>R</category><category>tidyr</category></item></channel></rss>

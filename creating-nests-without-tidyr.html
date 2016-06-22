@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <meta charset="utf-8"> 
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="author" content="Duncan Garmonsway" />
+        <meta name="copyright" content="Duncan Garmonsway" />
+
+        <meta name="description" content="How to construct nested data frames from scratch, without tidyr.
+" />
+        <meta name="twitter:creator" content="@nacnudus">
+        <meta property="og:type" content="article" />
+        <meta name="twitter:card" content="summary">
+
+<meta name="keywords" content="R, tidyr, Miscellaneous, " />
+
+<meta property="og:title" content="Creating nests without tidyr "/>
+<meta property="og:url" content="http://nacnudus.github.io/crossprod/creating-nests-without-tidyr" />
+<meta property="og:description" content="How to construct nested data frames from scratch, without tidyr." />
+<meta property="og:site_name" content="Crossprod" />
+<meta property="og:article:author" content="Duncan Garmonsway" />
+<meta property="og:article:published_time" content="2016-06-22T00:00:00+12:00" />
+<meta name="twitter:title" content="Creating nests without tidyr ">
+<meta name="twitter:description" content="How to construct nested data frames from scratch, without tidyr.">
+<meta property="og:image" content="http://nacnudus.github.io/crossprod/theme/images/apple-touch-icon-152x152.png" />
+<meta name="twitter:image" content="http://nacnudus.github.io/crossprod/theme/images/apple-touch-icon-152x152.png" >
+
+        <title>Creating nests without tidyr  · Crossprod
+</title>
+        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+        <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.1/css/font-awesome.css" rel="stylesheet">
+<link rel="stylesheet" href="http://nacnudus.github.io/crossprod/theme/css/style.min.css?7aeecf36">
+        <link rel="shortcut icon" href="http://nacnudus.github.io/crossprod/theme/images/favicon.ico" type="image/x-icon" type="image/png" />
+        <link rel="icon" href="http://nacnudus.github.io/crossprod/theme/images/apple-touch-icon-152x152.png" type="image/png" />
+        <link rel="apple-touch-icon" href="http://nacnudus.github.io/crossprod/theme/images/apple-touch-icon.png"  type="image/png" />
+        <link rel="apple-touch-icon" sizes="57x57" href="http://nacnudus.github.io/crossprod/theme/images/apple-touch-icon-57x57.png" type="image/png" />
+        <link rel="apple-touch-icon" sizes="72x72" href="http://nacnudus.github.io/crossprod/theme/images/apple-touch-icon-72x72.png" type="image/png" />
+        <link rel="apple-touch-icon" sizes="76x76" href="http://nacnudus.github.io/crossprod/theme/images/apple-touch-icon-76x76.png" type="image/png" />
+        <link rel="apple-touch-icon" sizes="114x114" href="http://nacnudus.github.io/crossprod/theme/images/apple-touch-icon-114x114.png" type="image/png" />
+        <link rel="apple-touch-icon" sizes="120x120" href="http://nacnudus.github.io/crossprod/theme/images/apple-touch-icon-120x120.png" type="image/png" />
+        <link rel="apple-touch-icon" sizes="144x144" href="http://nacnudus.github.io/crossprod/theme/images/apple-touch-icon-144x144.png" type="image/png" />
+        <link rel="apple-touch-icon" sizes="152x152" href="http://nacnudus.github.io/crossprod/theme/images/apple-touch-icon-152x152.png" type="image/png" />
+        <link href="http://nacnudus.github.io/crossprod/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Crossprod - Full Atom Feed" />
+        <link href="http://nacnudus.github.io/crossprod/feeds/all.rss.xml" type="application/rss+xml" rel="alternate" title="Crossprod - Full RSS Feed" />
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+     })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-45097885-3', 'auto');
+    ga('send', 'pageview');
+</script>
+    </head>
+    <body>
+        <div id="content-sans-footer">
+        <div class="navbar navbar-static-top">
+            <div class="navbar-inner">
+                <div class="container-fluid">
+                    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </a>
+                    <a class="brand" href="http://nacnudus.github.io/crossprod/"><span class=site-name>Crossprod</span></a>
+                    <div class="nav-collapse collapse">
+                        <ul class="nav pull-right top-menu">
+                            <li ><a href="http://nacnudus.github.io/crossprod">Home</a></li>
+                            <li ><a href="http://nacnudus.github.io/crossprod/categories.html">Categories</a></li>
+                            <li ><a href="http://nacnudus.github.io/crossprod/tags.html">Tags</a></li>
+                            <li ><a href="http://nacnudus.github.io/crossprod/archives.html">Archives</a></li>
+                            <li><form class="navbar-search" action="http://nacnudus.github.io/crossprod/search.html" onsubmit="return validateForm(this.elements['q'].value);"> <input type="text" class="search-query" placeholder="Search" name="q" id="tipue_search_input"></form></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span1"></div>
+                <div class="span10">
+<article>
+<div class="row-fluid">
+    <header class="page-header span10 offset2">
+    <h1><a href="http://nacnudus.github.io/crossprod/creating-nests-without-tidyr"> Creating nests without&nbsp;tidyr  </a></h1>
+    </header>
+</div>
+
+<div class="row-fluid">
+        <div class="span8 offset2 article-content">
+
+            
+            <p>Unless you begin with an unnested data frame, creating a nested data frame needs
+a little trick.  Here it&nbsp;is.</p>
+<h1 id="nested-data-frames">Nested data&nbsp;frames</h1>
+<p>The <code>tidyr</code> package has a handy function for <em>nesting</em> data frames.  Hadley
+Wickham describes it <a href="https://blog.rstudio.org/2016/02/02/tidyr-0-4-0/">thus</a>:</p>
+<blockquote>
+<p>In a grouped data frame, you have one row per observation, and additional
+metadata define the groups. In a nested data frame, you have one row per
+group, and the individual observations are stored in a column that is a list
+of data frames. This is a useful structure when you have lists of other
+objects (like models) with one element per&nbsp;group.</p>
+</blockquote>
+<p>Here&#8217;s a small&nbsp;example:</p>
+<div class="highlight"><pre><span class="kn">library</span><span class="p">(</span>dplyr<span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>tidyr<span class="p">)</span>
+
+iris_nested <span class="o">&lt;-</span> 
+  iris <span class="o">%&gt;%</span> 
+  group_by<span class="p">(</span>Species<span class="p">)</span> <span class="o">%&gt;%</span> 
+  sample_n<span class="p">(</span><span class="m">2</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+  nest
+iris_nested
+</pre></div>
+
+
+<div class="highlight"><pre>## Source: local data frame [3 x 2]
+## 
+##      Species           data
+##       &lt;fctr&gt;         &lt;list&gt;
+## 1     setosa &lt;tbl_df [2,4]&gt;
+## 2 versicolor &lt;tbl_df [2,4]&gt;
+## 3  virginica &lt;tbl_df [2,4]&gt;
+</pre></div>
+
+
+<div class="highlight"><pre>iris_nested <span class="o">%&gt;%</span> str
+</pre></div>
+
+
+<div class="highlight"><pre>## Classes &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;:    3 obs. of  2 variables:
+##  $ Species: Factor w/ 3 levels &quot;setosa&quot;,&quot;versicolor&quot;,..: 1 2 3
+##  $ data   :List of 3
+##   ..$ :Classes &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 2 obs. of  4 variables:
+##   .. ..$ Sepal.Length: num  5 4.8
+##   .. ..$ Sepal.Width : num  3.3 3.4
+##   .. ..$ Petal.Length: num  1.4 1.6
+##   .. ..$ Petal.Width : num  0.2 0.2
+##   ..$ :Classes &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 2 obs. of  4 variables:
+##   .. ..$ Sepal.Length: num  5.5 6.1
+##   .. ..$ Sepal.Width : num  2.5 2.8
+##   .. ..$ Petal.Length: num  4 4.7
+##   .. ..$ Petal.Width : num  1.3 1.2
+##   ..$ :Classes &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 2 obs. of  4 variables:
+##   .. ..$ Sepal.Length: num  6.3 6.7
+##   .. ..$ Sepal.Width : num  2.7 3.1
+##   .. ..$ Petal.Length: num  4.9 5.6
+##   .. ..$ Petal.Width : num  1.8 2.4
+</pre></div>
+
+
+<p>Interestingly, the nested column isn&#8217;t a vector like ordinary columns; it&#8217;s a
+list.  Actually lists are just one kind of vector &#8212; the non-atomic kind
+(composed of parts, i.e vectors and other lists), whereas
+integer/character/etc. vectors are the atomic kind (not composed of parts).
+This is nicely explained in <a href="http://adv-r.had.co.nz/Data-structures.html#vectors">Advanced
+R</a> by Hadley&nbsp;Wickham.</p>
+<div class="highlight"><pre><span class="kp">is.atomic</span><span class="p">(</span><span class="kt">vector</span><span class="p">(</span>mode <span class="o">=</span> <span class="s">&quot;character&quot;</span><span class="p">,</span> length <span class="o">=</span> <span class="m">2</span><span class="p">))</span>
+</pre></div>
+
+
+<div class="highlight"><pre>## [1] TRUE
+</pre></div>
+
+
+<div class="highlight"><pre><span class="kp">is.atomic</span><span class="p">(</span><span class="kt">vector</span><span class="p">(</span>mode <span class="o">=</span> <span class="s">&quot;list&quot;</span><span class="p">,</span> length <span class="o">=</span> <span class="m">2</span><span class="p">))</span>
+</pre></div>
+
+
+<div class="highlight"><pre>## [1] FALSE
+</pre></div>
+
+
+<h1 id="please-say-its-a-data-frame">Please say it&#8217;s a data&nbsp;frame</h1>
+<p>Data frames, which are a list of vectors, handle list-type columns perfectly
+well, but data-frame-construction functions don&#8217;t. So when I tried to create
+one from scratch (rather than by nesting an existing data frame as above), I
+lost a lot of time mucking about with <code>data.frame()</code> and the&nbsp;like.</p>
+<div class="highlight"><pre><span class="kt">data.frame</span><span class="p">(</span>X1 <span class="o">=</span> <span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">,</span> X2 <span class="o">=</span> <span class="kt">list</span><span class="p">(</span>iris<span class="p">,</span> mtcars<span class="p">))</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span class="err">##</span> <span class="nb">Error</span> <span class="k">in</span> <span class="p">(</span><span class="kd">function</span> <span class="p">(...,</span> <span class="nx">row</span><span class="p">.</span><span class="nx">names</span> <span class="o">=</span> <span class="nx">NULL</span><span class="p">,</span> <span class="nx">check</span><span class="p">.</span><span class="nx">rows</span> <span class="o">=</span> <span class="nx">FALSE</span><span class="p">,</span> <span class="nx">check</span><span class="p">.</span><span class="nx">names</span> <span class="o">=</span> <span class="nx">TRUE</span><span class="p">,</span> <span class="o">:</span> <span class="nx">arguments</span> <span class="nx">imply</span> <span class="nx">differing</span> <span class="nx">number</span> <span class="nx">of</span> <span class="nx">rows</span><span class="o">:</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">32</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span class="kp">as.data.frame</span><span class="p">(</span><span class="kt">list</span><span class="p">(</span>X1 <span class="o">=</span> <span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">,</span> X2 <span class="o">=</span> <span class="kt">list</span><span class="p">(</span>iris<span class="p">,</span> mtcars<span class="p">)))</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span class="err">##</span> <span class="nb">Error</span> <span class="k">in</span> <span class="p">(</span><span class="kd">function</span> <span class="p">(...,</span> <span class="nx">row</span><span class="p">.</span><span class="nx">names</span> <span class="o">=</span> <span class="nx">NULL</span><span class="p">,</span> <span class="nx">check</span><span class="p">.</span><span class="nx">rows</span> <span class="o">=</span> <span class="nx">FALSE</span><span class="p">,</span> <span class="nx">check</span><span class="p">.</span><span class="nx">names</span> <span class="o">=</span> <span class="nx">TRUE</span><span class="p">,</span> <span class="o">:</span> <span class="nx">arguments</span> <span class="nx">imply</span> <span class="nx">differing</span> <span class="nx">number</span> <span class="nx">of</span> <span class="nx">rows</span><span class="o">:</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">32</span>
+</pre></div>
+
+
+<h1 id="its-a-data-frame-because-i-say-so">It&#8217;s a data frame because I say&nbsp;so</h1>
+<p>The answer is to simply tell R that the data structure is a data frame by
+setting its class and giving it a &#8220;row.names&#8221;&nbsp;attribute.</p>
+<div class="highlight"><pre>x <span class="o">&lt;-</span> <span class="kt">list</span><span class="p">(</span>X1 <span class="o">=</span> <span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">,</span> X2 <span class="o">=</span> <span class="kt">list</span><span class="p">(</span>iris<span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">,</span> <span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">],</span> iris<span class="p">[</span><span class="m">3</span><span class="o">:</span><span class="m">5</span><span class="p">,</span> <span class="m">1</span><span class="o">:</span><span class="m">4</span><span class="p">]))</span>
+<span class="kp">structure</span><span class="p">(</span>x<span class="p">,</span> class <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;tbl_df&quot;</span><span class="p">,</span> <span class="s">&quot;data.frame&quot;</span><span class="p">),</span> row.names <span class="o">=</span> <span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre>## Source: local data frame [2 x 2]
+## 
+##      X1                 X2
+##   &lt;int&gt;             &lt;list&gt;
+## 1     1 &lt;data.frame [2,2]&gt;
+## 2     2 &lt;data.frame [3,4]&gt;
+</pre></div>
+
+
+<h1 id="invading-the-nest">Invading the&nbsp;nest</h1>
+<p>Accessing the nested column by the usual subsetting
+operators, <code>$</code>, <code>[</code> and <code>[[</code>, is a little&nbsp;clumsy.</p>
+<div class="highlight"><pre>x<span class="o">$</span>X2 <span class="c1"># Returns the list of data frames</span>
+</pre></div>
+
+
+<div class="highlight"><pre>## [[1]]
+##   Sepal.Length Sepal.Width
+## 1          5.1         3.5
+## 2          4.9         3.0
+## 
+## [[2]]
+##   Sepal.Length Sepal.Width Petal.Length Petal.Width
+## 3          4.7         3.2          1.3         0.2
+## 4          4.6         3.1          1.5         0.2
+## 5          5.0         3.6          1.4         0.2
+</pre></div>
+
+
+<div class="highlight"><pre>x<span class="o">$</span>X2<span class="p">[</span><span class="m">2</span><span class="p">]</span> <span class="c1"># Returns the second data frame, wrapped in a list</span>
+</pre></div>
+
+
+<div class="highlight"><pre>## [[1]]
+##   Sepal.Length Sepal.Width Petal.Length Petal.Width
+## 3          4.7         3.2          1.3         0.2
+## 4          4.6         3.1          1.5         0.2
+## 5          5.0         3.6          1.4         0.2
+</pre></div>
+
+
+<div class="highlight"><pre>x<span class="o">$</span>X2<span class="p">[[</span><span class="m">2</span><span class="p">]]</span> <span class="c1"># Returns the second data frame -- probably what you want</span>
+</pre></div>
+
+
+<div class="highlight"><pre>##   Sepal.Length Sepal.Width Petal.Length Petal.Width
+## 3          4.7         3.2          1.3         0.2
+## 4          4.6         3.1          1.5         0.2
+## 5          5.0         3.6          1.4         0.2
+</pre></div>
+
+
+<div class="highlight"><pre>x<span class="p">[[</span><span class="s">&quot;X2&quot;</span><span class="p">]][[</span><span class="m">2</span><span class="p">]]</span> <span class="c1"># Returns the second data frame -- also probably what you want</span>
+</pre></div>
+
+
+<div class="highlight"><pre>##   Sepal.Length Sepal.Width Petal.Length Petal.Width
+## 3          4.7         3.2          1.3         0.2
+## 4          4.6         3.1          1.5         0.2
+## 5          5.0         3.6          1.4         0.2
+</pre></div>
+
+
+<div class="highlight"><pre>x<span class="p">[</span><span class="m">2</span><span class="p">,</span> <span class="s">&quot;X2&quot;</span><span class="p">]</span> <span class="c1"># Returns the second data frame wrapped in another data frame</span>
+</pre></div>
+
+
+<div class="highlight"><pre>## Error in x[2, &quot;X2&quot;]: incorrect number of dimensions
+</pre></div>
+
+
+<div class="highlight"><pre>x<span class="p">[</span><span class="m">2</span><span class="p">,</span> <span class="s">&quot;X2&quot;</span><span class="p">,</span> drop <span class="o">=</span> <span class="kc">TRUE</span><span class="p">]</span> <span class="c1"># Same -- ignores &quot;drop&quot;</span>
+</pre></div>
+
+
+<div class="highlight"><pre>## Error in x[2, &quot;X2&quot;, drop = TRUE]: incorrect number of dimensions
+</pre></div>
+
+
+<div class="highlight"><pre>x<span class="p">[</span><span class="m">2</span><span class="p">,</span> <span class="s">&quot;X2&quot;</span><span class="p">][</span><span class="m">1</span><span class="p">,</span> <span class="s">&quot;X2&quot;</span><span class="p">][</span><span class="m">1</span><span class="p">,</span> <span class="s">&quot;X2&quot;</span><span class="p">]</span> <span class="c1"># The `[` goes around in circles</span>
+</pre></div>
+
+
+<div class="highlight"><pre>## Error in x[2, &quot;X2&quot;]: incorrect number of dimensions
+</pre></div>
+            <section>
+    <p id="post-share-links">
+    Like this post? Share on:
+    <a href="http://twitter.com/home?status=Creating%20nests%20without%C2%A0tidyr%20http%3A//nacnudus.github.io/crossprod/creating-nests-without-tidyr" target="_blank" title="Share on Twitter">Twitter</a>
+    ❄
+    <a href="http://www.facebook.com/sharer/sharer.php?u=http%3A//nacnudus.github.io/crossprod/creating-nests-without-tidyr" target="_blank" title="Share on Facebook">Facebook</a>
+    ❄
+    <a href="https://plus.google.com/share?url=http%3A//nacnudus.github.io/crossprod/creating-nests-without-tidyr" target="_blank" title="Share on Google Plus">Google+</a>
+    ❄
+    <a href="mailto:?subject=Creating%20nests%20without%C2%A0tidyr&amp;body=http%3A//nacnudus.github.io/crossprod/creating-nests-without-tidyr" target="_blank" title="Share via Email">Email</a>
+    </p>
+</section>
+
+            <section>
+<p id="comment-message">Please comment below </p>
+<div class="accordion" id="accordion2">
+    <div class="accordion-group">
+        <div class="accordion-heading">
+            <a class="accordion-toggle disqus-comment-count" data-toggle="collapse" data-parent="#accordion2"
+                    data-disqus-identifier="nests"
+                href="http://nacnudus.github.io/crossprod/creating-nests-without-tidyr#disqus_thread">
+                Comments
+            </a>
+        </div>
+        <div id="disqus_thread" class="accordion-body collapse">
+            <div class="accordion-inner">
+                <div class="comments">
+                    <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'crossprod';
+        var disqus_identifier = 'nests';
+    var disqus_url = 'http://nacnudus.github.io/crossprod/creating-nests-without-tidyr';
+
+    (function() {
+         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+         dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+
+            <hr/>
+            <aside>
+            <nav>
+            <ul class="articles-timeline">
+                <li class="previous-article">« <a href="http://nacnudus.github.io/crossprod/brexit-poll-of-polls" title="Previous: Brexit poll of polls">Brexit poll of polls</a></li>
+            </ul>
+            </nav>
+            </aside>
+        </div>
+        <section>
+        <div class="span2" style="float:right;font-size:0.9em;">
+            <h4>Published</h4>
+            <time pubdate="pubdate" datetime="2016-06-22T00:00:00+12:00">Jun 22, 2016</time>
+            <h4>Category</h4>
+            <a class="category-link" href="http://nacnudus.github.io/crossprod/categories.html#miscellaneous-ref">Miscellaneous</a>
+            <h4>Tags</h4>
+            <ul class="list-of-tags tags-in-article">
+                <li><a href="http://nacnudus.github.io/crossprod/tags.html#r-ref">R
+                    <span>8</span>
+</a></li>
+                <li><a href="http://nacnudus.github.io/crossprod/tags.html#tidyr-ref">tidyr
+                    <span>1</span>
+</a></li>
+            </ul>
+<h4>Social</h4>
+    <a href="https://github.com/nacnudus" title="My Github Profile" class="sidebar-social-links" target="_blank">
+    <i class="fa fa-github sidebar-social-links"></i></a>
+    <a href="https://twitter.com/nacnudus" title="My Twitter Profile" class="sidebar-social-links" target="_blank">
+    <i class="fa fa-twitter sidebar-social-links"></i></a>
+    <a href="https://nz.linkedin.com/in/duncangarmonsway" title="My LinkedIn Profile" class="sidebar-social-links" target="_blank">
+    <i class="fa fa-linkedin sidebar-social-links"></i></a>
+        </div>
+        </section>
+</div>
+</article>
+                </div>
+                <div class="span1"></div>
+            </div>
+        </div>
+        <div id="push"></div>
+    </div>
+<footer>
+<div id="footer">
+    <ul class="footer-content">
+        <li class="elegant-subtitle"><span class="site-name">Crossprod</span> - R, data, and frustration</li>
+        <li class="elegant-power">Powered by <a href="http://getpelican.com/" title="Pelican Home Page">Pelican</a>. Theme: <a href="http://oncrashreboot.com/pelican-elegant" title="Theme Elegant Home Page">Elegant</a> by <a href="http://oncrashreboot.com" title="Talha Mansoor Home Page">Talha Mansoor</a></li>
+    </ul>
+</div>
+</footer>            <script src="http://code.jquery.com/jquery.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+        <script>
+            function validateForm(query)
+            {
+                return (query.length > 0);
+            }
+        </script>
+
+            <script type="text/javascript">
+var disqus_shortname = 'crossprod';
+(function () {
+    var s = document.createElement('script'); s.async = true;
+    s.type = 'text/javascript';
+    s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+    (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+}());
+</script>
+<script  language="javascript" type="text/javascript">
+function uncollapse() {
+    if (window.location.hash.match(/^#comment-\d+$/)) {
+        $('#disqus_thread').collapse('show');
+    }
+}
+</script>
+<script type="text/javascript" language="JavaScript">
+uncollapse();
+window.onhashchange=function(){
+    if (window.location.hash.match(/^#comment-\d+$/))
+        window.location.reload(true);
+}
+</script>
+<script>
+$('#disqus_thread').on('shown', function () {
+    var link = document.getElementsByClassName('accordion-toggle');
+    var old_innerHTML = link[0].innerHTML;
+    $(link[0]).fadeOut(500, function() {
+        $(this).text('Click here to hide comments').fadeIn(500);
+    });
+    $('#disqus_thread').on('hidden', function () {
+        $(link[0]).fadeOut(500, function() {
+            $(this).text(old_innerHTML).fadeIn(500);
+        });
+    })
+})
+</script>
+
+
+    </body>
+    <!-- Theme: Elegant built for Pelican
+    License : http://oncrashreboot.com/pelican-elegant -->
+</html>
