@@ -1,5 +1,5 @@
 Title: Hacking the Data Science Radar with Data Science
-Date: 2016-06-22
+Date: 2016-06-27
 Author: Duncan Garmonsway
 Summary: Get a perfect score in the Mango Solution Data Science Radar
 Disqus_identifier: brexit
@@ -18,8 +18,6 @@ knitr::opts_chunk$set(dev = 'Cairo_svg')
 knitr::opts_chunk$set(warning = FALSE)
 ```
 
-# Hacking the Data Science Radar with Data Science
-
 This post reverse-engineers the Mango Solutions [Data Science
 Radar](https://www.mango-solutions.com/radar/) using
 
@@ -30,7 +28,7 @@ Radar](https://www.mango-solutions.com/radar/) using
 * Technology (embedded V8 javascript)
 * Communication (blog)
 
-Why hack?  Because getting at the innards would also reveal
+Why hack?  Because getting at the innards also reveals
 
 * What a good score is in each category
 * Which statements are most important
@@ -38,7 +36,7 @@ Why hack?  Because getting at the innards would also reveal
 * Whether you should strongly agree with the statement "On average, I spend at
   least 25% of my time manipulating data into analysis-ready formats"
 
-### The radar
+## The radar
 
 Based on Likert-style responses to 24 provocative statements, the Data
 Science Radar visualises your skills along six axes, the "core attributes of a
@@ -59,7 +57,7 @@ library(directlabels)
 library(ggrepel)
 ```
 
-### First attempt: Multivariate multiple regression
+## First attempt: Multivariate multiple regression
 
 How can we score better?  Hacking the url would be
 [cheating](https://www.mango-solutions.com/radar/?fs=true&r=7.0,7.0,7.0,7.0,7.0,7.0),
@@ -97,7 +95,7 @@ lm1
 Hopeless!  At least one of the assumptions must be wrong, but which one?  This
 time, let's use our brains instead of stats, and do a visualisation.  
 
-### Visualisation: Brain not brawn
+## Visualisation: Brain not brawn
 
 Since patterns are hard to find among random responses, I answered 24 more
 surveys systematically, answering "Strongly disagree" to one statement, and
@@ -165,7 +163,7 @@ This is much clearer.
 * Even the statement weighting system varies between questions (the range of
   trough depths varies between groups).
 
-### Penalties
+## Penalties
 
 Crucially, it's now obvious from the parallel movements between 0 and 1, 4 and
 5, and 8 and 9, that attributes are penalized by their rank.  When statement 1
@@ -212,7 +210,7 @@ final step, "Strongly agree", there's a jump.  That's because 'Communicator' is
 now ranked (abitrarily) in first place, so no penalty is applied, and it gets
 the full 7 points.  At the same time, the other attributes are bumped down.
 
-### Hunt the function
+## Hunt the function
 
 We need to remove these penalties before we can investigate the
 statement/response weightings, but we don't yet know what exactly the penalty
@@ -291,7 +289,7 @@ between penalties is constant by design, and the difference between *these*
 penalties alternates between 0.1 and 0.0, I *strongly* suspect a factor of 0.5
 and a rounding system that alternates between odds and evens.
 
-### Modelling success
+## Modelling success
 
 But we can nail this down with a linear model, using the two sets of data where
 we already know the pre-penalty scores, i.e. the best- and worst-possible
@@ -322,7 +320,7 @@ That'll do!  The coefficient on the pre-penalty score is 1, as in our
 model, and the coefficient on the pre-penalty--rank interaction is -0.05, a nice
 round number such as a model-builder might choose (and the right sign).
 
-### Weighting game
+## Weighting game
 
 We're on the home straight.  Now that we understand the penalty system, we can
 go beneath its obfuscations and sort out the statement weights.  Here, I invert
@@ -379,7 +377,7 @@ And don't forget to re-write the model to account for the weights.
 $$\text{score}_{\text{attribute}} = \sum_{i = 1}^{4} \text{answer}_i \times
 \text{weight}_i$$ where $\text{weight}_i$ is taken from above.
 
-### Implementation and simulation
+## Implementation and simulation
 
 At last, we can implement the whole thing in R, run it on thousands of random
 answer-sets, and explore the distributions.  Well, almost -- it turns out that R
@@ -497,7 +495,7 @@ results %>%
   theme(legend.position = "none")
 ```
 
-### The whole point
+## The whole point
 
 It turns out that interpreting individual radars should be done more thoughtfully
 than one might have expected, because
