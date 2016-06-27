@@ -21,7 +21,7 @@ knitr::opts_chunk$set(warning = FALSE)
 This post reverse-engineers the Mango Solutions [Data Science
 Radar](https://www.mango-solutions.com/radar/) using
 
-* Programming (R),
+* Programming (R)
 * Visualisation (ggplot2) 
 * Data wrangling (dpylr/tidyr/etc.)
 * Modelling (lm)
@@ -40,7 +40,7 @@ Why hack?  Because getting at the innards also reveals
 
 Based on Likert-style responses to 24 provocative statements, the Data
 Science Radar visualises your skills along six axes, the "core attributes of a
-contemporary 'Data Scientist." It looks like this.
+contemporary 'Data Scientist'." It looks like this.
 
 ![Mango Solutions Data Science Radar](figure/radar.png)
 
@@ -193,7 +193,6 @@ penaltygraph <-
   select(-1:-24) %>%
   mutate(agreement = n():1 - 1) %>% # "Strongly disagree" == 0
   gather(type, score, -agreement) %>%
-  mutate(type = tolower(type)) %>%
   ggplot(aes(agreement, score)) +
   geom_line(aes(colour = type)) +
   scale_x_continuous(breaks = 0:6) +
@@ -225,7 +224,7 @@ the size of the penalty.
 sort(7 - unlist(perfect_data[1, -1:-24]))       # absolute penalty
 ```
 
-So penalties can be as large as 1.8.  That would be problem for poor-ranking
+So penalties can be as large as 1.8.  That would be a problem for poor-ranking
 pre-penalty scores below 1.8, which would be pushed below zero.  To guarantee
 positive final scores, the penalty function must scale with the pre-penalty
 score, i.e. the pre-penalty score must be a coefficient in the function.  That
@@ -371,7 +370,7 @@ systematic_prepenalty %>%
 ```
 
 Being nice fractions, the three systems make perfect sense (allowing yet again for minor
-rounding): ($\frac{1}{5}$, $\frac{1}{5}$, $\frac{1}{5}$, $\frac{2}{5}$), ($\frac{7}{30}$, $\frac{7}{30}$, $\frac{7}{30}$, $\frac{9}{30}$), and ($\frac{2}{10}$, $\frac{2}{10}$, $\frac{3}{10}$, $\frac{3}{10}$).
+rounding): $(\frac{1}{5}$, $\frac{1}{5}$, $\frac{1}{5}$, $\frac{2}{5})$, $(\frac{7}{30}$, $\frac{7}{30}$, $\frac{7}{30}$, $\frac{9}{30})$, and $(\frac{2}{10}$, $\frac{2}{10}$, $\frac{3}{10}$, $\frac{3}{10})$.
 
 And don't forget to re-write the model to account for the weights.
 
