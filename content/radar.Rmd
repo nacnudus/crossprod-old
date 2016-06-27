@@ -61,7 +61,7 @@ library(ggrepel)
 
 How can we score better?  Hacking the url would be
 [cheating](https://www.mango-solutions.com/radar/?fs=true&r=7.0,7.0,7.0,7.0,7.0,7.0),
-so instead, let's use science: hypothesise -> text -> improve.  Here are some
+so instead, let's use science: hypothesise -> test -> improve.  Here are some
 initial guesses.
 
 * Each of the 24 statements relates to exactly one attribute, i.e. four
@@ -184,7 +184,7 @@ between survey response and pre-penalty scores.
 
 Here's the penalty function in action.  I answered every statement 'correctly',
 except for statement 1, which I answered at every level from "Strongly disagree"
-to "Strongly agree".  Note the change of x-axis variable.
+to "Strongly agree".  Note the change of axis variables.
 
 ```{r radar-diff}
 penalty <-  "./data/radar-penalties.csv" %>% read_csv
@@ -200,6 +200,7 @@ penaltygraph <-
   scale_y_continuous(breaks = 0:7, limits = c(0, 7)) +
   expand_limits(x = c(1, 7)) +
   xlab("agreement with first statement") +
+  ylab("score of 'Communicator'") +
   theme(panel.grid.minor = element_blank())
 penaltygraph %>% direct.label(method = "last.polygons")
 ```
@@ -238,7 +239,7 @@ where $0 \leq \text{factor} < 1/5$ (for positivity).
 Or:
 
 $$\text{final score} = \text{factor} \times \frac{\text{pre-penalty}}{\text{rank}}$$
-where $0 \leq \text{factor} < 1$ (to ensure a penalty when $\text{rank} = 1$.
+where $0 \leq \text{factor} < 1$ (to ensure a penalty when $\text{rank} = 1$).
 
 There is a telling difference between these functions.  The first is a straight
 line, essentially $y = mx + c$, so that, given equal pre-penalty scores, the
@@ -490,6 +491,7 @@ results %>%
   coord_fixed() +
   scale_x_continuous(breaks = 0:7, limits = c(0, 7)) +
   scale_y_continuous(breaks = 0:7, limits = c(0, 7)) +
+  coord_fixed() +
   xlab("Post-penalty score") +
   ylab("Pre-penalty score") +
   theme(legend.position = "none")
@@ -500,7 +502,7 @@ results %>%
 It turns out that interpreting individual radars should be done more thoughtfully
 than one might have expected, because
 
-* 5.2 > 7.0 for unicorns with perfect answers.
+* 5.2 = 7.0 for data-wrangling unicorns with perfect answers.
 * Scores aren't directly comparable between people, unless they're at the
   extremes where the penalties exaggerate less.
 * The correct answer to the statement "On average, I spend at least 25% of my
