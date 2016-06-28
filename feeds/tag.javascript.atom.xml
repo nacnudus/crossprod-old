@@ -146,21 +146,14 @@ the V8 JavaScript engine, the same that my browser (Chrome)&amp;nbsp;uses.&lt;/p
 
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c1"&gt;# library(V8)&lt;/span&gt;
 ct &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; V8&lt;span class="o"&gt;::&lt;/span&gt;v8&lt;span class="p"&gt;()&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;## Error in loadNamespace(name): there is no package called &amp;#39;V8&amp;#39;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;roundjs &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;,&lt;/span&gt; digits&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+roundjs &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;,&lt;/span&gt; digits&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
   &lt;span class="kp"&gt;sapply&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;y&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;ct&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="kp"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;paste0&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Number((&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kp"&gt;sprintf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;%.16f&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; y&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;).toFixed(&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; digits&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;))&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))})&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 roundjs&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;6.65&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;7&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="m"&gt;0.95&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;7&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="m"&gt;0.35&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;div class="highlight"&gt;&lt;pre&gt;## Error in FUN(X[[i]], ...): object &amp;#39;ct&amp;#39; not found
+&lt;div class="highlight"&gt;&lt;pre&gt;## [1] 6.7 6.6 6.7
 &lt;/pre&gt;&lt;/div&gt;
 
 
