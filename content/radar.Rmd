@@ -3,7 +3,7 @@ Date: 2016-06-28
 Author: Duncan Garmonsway
 Summary: Get a perfect score in the Mango Solution Data Science Radar
 Disqus_identifier: brexit
-Tags: R, polls, Brexit
+Tags: R, JavaScript, V8
 
 ```{r brexit-pelican-conf, echo=FALSE}
 options(width=91)
