@@ -3,7 +3,7 @@ Date: 2016-04-25
 Author: Duncan Garmonsway
 Summary: Reproducing browser rounding in R
 Disqus_identifier: rbloggers
-Tags: R, JavaScript
+Tags: R, JavaScript, V8
 
 ```{r rounding-pelican_conf, echo=FALSE}
 knitr::opts_chunk$set(cache = TRUE)
