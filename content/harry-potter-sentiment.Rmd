@@ -1,5 +1,5 @@
 Title: <i>Harry Potter</i> and the N-Grams of Sentiment
-Date: 2016-07-12
+Date: 2016-07-13
 Author: Duncan Garmonsway
 Summary: *Harry Potter* cliches and story arcs by n-grams and sentiment analysis
 Disqus_identifier: harry-potter-sentiment
