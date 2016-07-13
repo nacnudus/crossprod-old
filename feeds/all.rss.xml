@@ -1,5 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Crossprod</title><link>http://nacnudus.github.io/crossprod/</link><description>R, data, and frustration</description><atom:link href="http://nacnudus.github.io/crossprod/feeds/all.rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 28 Jun 2016 00:00:00 +1200</lastBuildDate><item><title>Hacking the Data Science Radar with Data Science</title><link>http://nacnudus.github.io/crossprod/hacking-the-data-science-radar-with-data-science</link><description>&lt;p&gt;This post reverse-engineers the Mango Solutions &lt;a href="https://www.mango-solutions.com/radar/"&gt;Data Science
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Crossprod</title><link>http://nacnudus.github.io/crossprod/</link><description>R, data, and frustration</description><atom:link href="http://nacnudus.github.io/crossprod/feeds/all.rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 12 Jul 2016 00:00:00 +1200</lastBuildDate><item><title>Harry Potter and the N-Grams of Sentiment</title><link>http://nacnudus.github.io/crossprod/harry-potter-and-the-n-grams-of-sentiment</link><description>&lt;p&gt;This post applies &lt;a href="http://juliasilge.com/blog/"&gt;Julia Silge&lt;/a&gt;&amp;#8216;s amazing story-arc
+&lt;a href="http://juliasilge.com/blog/Life-Changing-Magic/"&gt;sentiment&lt;/a&gt;
+&lt;a href="http://juliasilge.com/blog/Life-Changing-Magic/"&gt;analyses&lt;/a&gt; to the &lt;em&gt;Harry
+Potter&lt;/em&gt;&amp;nbsp;books.&lt;/p&gt;
+&lt;p&gt;It also busts the myth that &amp;#8220;turned on his heel&amp;#8221; is the series&amp;#8217; most common&amp;nbsp;phrase.&lt;/p&gt;
+&lt;p&gt;Here is a related &lt;a href="https://duncan-garmonsway.shinyapps.io/harry-potter"&gt;shiny
+app&lt;/a&gt; to explore the ideas&amp;nbsp;futher.&lt;/p&gt;
+&lt;h2 id="super-easy-text-munging"&gt;Super-easy&amp;nbsp;text-munging&lt;/h2&gt;
+&lt;p&gt;Casual text-munging is no longer a pain, thanks to a couple of new packages,
+&lt;a href="https://github.com/juliasilge/tidytext"&gt;tidytext&lt;/a&gt; and
+&lt;a href="https://github.com/lmullen/tokenizers"&gt;tokenizers&lt;/a&gt;, and a not-so-new one,
+&lt;a href="https://github.com/gagolews/stringi"&gt;stringi&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;When I last analysed Harry Potter a few years ago, the
+&lt;a href="https://cran.r-project.org/web/packages/tm/index.html"&gt;tm&lt;/a&gt; package, though
+powerful, was frustrating, partly due to its unusual data format, which was
+tricky to traverse.  But these new packages operate on ordinary data frames,
+using nesting to great&amp;nbsp;effect.&lt;/p&gt;
+&lt;p&gt;The outcome is that n-grams can be created incredibly quickly, easily avoiding
+sentence boundaries.  The code is as simple as&amp;nbsp;this:&lt;/p&gt;
+&lt;h2 id="most-common-phrases-in-harry-potter"&gt;Most-common phrases in &lt;em&gt;Harry&amp;nbsp;Potter&lt;/em&gt;&lt;/h2&gt;
+&lt;p&gt;Did you hear that the most common phrase in &lt;em&gt;Harry Potter&lt;/em&gt; is &amp;#8220;turned on his
+heel&amp;#8221;?  I can finally bust that myth.  It does appear quite often &amp;#8212; 12 times at
+most, if you include &amp;#8216;turning&amp;#8217; and &amp;#8216;her&amp;#8217;, but the most-common four-word phrase,
+by &lt;em&gt;miles&lt;/em&gt;, is &amp;#8220;Harry, Ron and Hermione&amp;#8221;.  Big&amp;nbsp;surprise.&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-sentiment-fourgrams-1.svg" title="plot of chunk harry-potter-sentiment-fourgrams" alt="plot of chunk harry-potter-sentiment-fourgrams" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;p&gt;A few of these are predictable nouns (Defence Against the Dark Arts, the
+Ministry of Magic, the Room of Requirement).  He Who Must Not Be Named makes it
+into the top 40.  There are a bunch of phrases that describe where things are
+(at the end of, etc.).  But the most intriguing phrase is &amp;#8220;said Hermione in a&amp;#8221;
+&amp;#8212; why is Hermione singled out by that&amp;nbsp;construction?&lt;/p&gt;
+&lt;p&gt;There&amp;#8217;s a &lt;a href="https://duncan-garmonsway.shinyapps.io/harry-potter/#n-grams"&gt;shiny
+app&lt;/a&gt; to explore
+lots more n-grams, from 2-grams to&amp;nbsp;10-grams.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.slate.com/articles/arts/culturebox/2013/11/hunger_games_catching_fire_a_textual_analysis_of_suzanne_collins_novels.html?wpisrc=burger_bar"&gt;Slate&lt;/a&gt;
+did a similar analysis, though they looked at the most-common &lt;em&gt;sentences&lt;/em&gt;,
+comparing &lt;em&gt;Harry Potter&lt;/em&gt; with &lt;em&gt;The Hunger Games&lt;/em&gt; and the &lt;em&gt;Twilight&lt;/em&gt;&amp;nbsp;series.&lt;/p&gt;
+&lt;p&gt;They seem to have edited their list somewhat, since &amp;#8220;He waited&amp;#8221; appears only
+three times, and &amp;#8220;Something he didn&amp;#8217;t have last time&amp;#8221; only twice, while I find
+that &amp;#8220;Harry nodded&amp;#8221; tops my list (of complete sentences) with 14 occurences,
+one more than Slate&amp;#8217;s top sentence, &amp;#8220;Nothing&amp;nbsp;happened.&amp;#8221;&lt;/p&gt;
+&lt;p&gt;Here are my top 30, many of which are not complete&amp;nbsp;sentences.&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-sentiment-sentences-1.svg" title="plot of chunk harry-potter-sentiment-sentences" alt="plot of chunk harry-potter-sentiment-sentences" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;p&gt;Part of the difficulty is that written English speech isn&amp;#8217;t unambiguously
+punctuated.  This has bugged me since primary school.  See what happens&amp;nbsp;here.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;tokenize_sentences&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&amp;#39;Are you going?&amp;#39; Harry asked.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                     &lt;span class="s"&gt;&amp;quot;Ron asked, &amp;#39;Are you going?&amp;#39; Harry shrugged.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                     &lt;span class="s"&gt;&amp;quot;&amp;#39;You should go,&amp;#39; Harry said&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                     &lt;span class="s"&gt;&amp;quot;&amp;#39;Go now.&amp;#39; Harry went.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## [[1]]
+## [1] &amp;quot;&amp;#39;Are you going?&amp;#39;&amp;quot; &amp;quot;Harry asked.&amp;quot;    
+## 
+## [[2]]
+## [1] &amp;quot;Ron asked, &amp;#39;Are you going?&amp;#39;&amp;quot; &amp;quot;Harry shrugged.&amp;quot;            
+## 
+## [[3]]
+## [1] &amp;quot;&amp;#39;You should go,&amp;#39; Harry said&amp;quot;
+## 
+## [[4]]
+## [1] &amp;quot;&amp;#39;Go now.&amp;#39;&amp;quot;   &amp;quot;Harry went.&amp;quot;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Were I king, I&amp;#8217;d decree the following unambiguous&amp;nbsp;style.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;tokenize_sentences&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Ron asked, &amp;#39;Are you going?&amp;#39;. Harry shrugged.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                     &lt;span class="s"&gt;&amp;quot;&amp;#39;You should go.&amp;#39;, Harry said&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## [[1]]
+## [1] &amp;quot;Ron asked, &amp;#39;Are you going?&amp;#39;.&amp;quot; &amp;quot;Harry shrugged.&amp;quot;             
+## 
+## [[2]]
+## [1] &amp;quot;&amp;#39;You should go.&amp;#39;, Harry said&amp;quot;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2 id="most-important-characters"&gt;Most-important&amp;nbsp;characters&lt;/h2&gt;
+&lt;p&gt;If importance is proportional to mentions of first names, then Hermione and Ron
+are not as equal as you might&amp;nbsp;expect.&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-sentiment-characters-1.svg" title="plot of chunk harry-potter-sentiment-characters" alt="plot of chunk harry-potter-sentiment-characters" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;h2 id="sentiment-driven-story-arcs"&gt;Sentiment-driven story&amp;nbsp;arcs&lt;/h2&gt;
+&lt;p&gt;Ever since I read &lt;a href="http://juliasilge.com/blog/"&gt;Julia Silge&lt;/a&gt;&amp;#8216;s amazing story-arc
+&lt;a href="http://juliasilge.com/blog/Life-Changing-Magic/"&gt;sentiment&lt;/a&gt;
+&lt;a href="http://juliasilge.com/blog/Life-Changing-Magic/"&gt;analyses&lt;/a&gt;, I wanted to apply
+the method to the &lt;em&gt;Harry Potter&lt;/em&gt;&amp;nbsp;books.&lt;/p&gt;
+&lt;p&gt;There&amp;#8217;s a &lt;a href="https://duncan-garmonsway.shinyapps.io/harry-potter/#sentiment"&gt;shiny
+app&lt;/a&gt; to explore
+this interactively, but here is a still for the&amp;nbsp;blog.&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-sentiment-arcarea-1.svg" title="plot of chunk harry-potter-sentiment-arcarea" alt="plot of chunk harry-potter-sentiment-arcarea" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;p&gt;If there&amp;#8217;s anything to interpret here, then it&amp;#8217;s that the first three books
+play the game &amp;#8220;fortunately, unfortunately&amp;#8221;, while the later books are a little
+different, especially &lt;em&gt;Order of the Phoenix&lt;/em&gt;, which is the grumpy&amp;nbsp;one.&lt;/p&gt;
+&lt;p&gt;Perhaps the Fourier transform is too sensitive to a magic number that I call the
+&amp;#8216;wiggliness&amp;#8217; parameter.  To see how sensitive, I calculated the arcs for
+&amp;#8216;wiggliness&amp;#8217; values from 3 to 10, and described the range of the arcs with a
+ribbon &amp;#8212; a little like the standard-error-ribbon on a &lt;code&gt;geom_smooth&lt;/code&gt;.  I think
+the ribbons show a more reliable story arc, and reveal that narrow wobbles, of
+the order of a chapter or so, are probably&amp;nbsp;misleading.&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-sentiment-ribbon-1.svg" title="plot of chunk harry-potter-sentiment-ribbon" alt="plot of chunk harry-potter-sentiment-ribbon" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;p&gt;And to see where &amp;#8216;wiggliness = 3&amp;#8217; arc lies in the range, I superimpose it as a&amp;nbsp;line.&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-sentiment-ribbon-arcline-1.svg" title="plot of chunk harry-potter-sentiment-ribbon-arcline" alt="plot of chunk harry-potter-sentiment-ribbon-arcline" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;p&gt;The code is, as always, on &lt;a href="https://github.com/nacnudus/crossprod"&gt;GitHub&lt;/a&gt;, but
+you need to supply your own copies of the&amp;nbsp;books.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Duncan Garmonsway</dc:creator><pubDate>Tue, 12 Jul 2016 00:00:00 +1200</pubDate><guid>tag:nacnudus.github.io,2016-07-12:crossprod/harry-potter-and-the-n-grams-of-sentiment</guid><category>R</category><category>text</category><category>Harry Potter</category></item><item><title>Hacking the Data Science Radar with Data Science</title><link>http://nacnudus.github.io/crossprod/hacking-the-data-science-radar-with-data-science</link><description>&lt;p&gt;This post reverse-engineers the Mango Solutions &lt;a href="https://www.mango-solutions.com/radar/"&gt;Data Science
 Radar&lt;/a&gt;&amp;nbsp;using&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Programming&amp;nbsp;(R)&lt;/li&gt;
@@ -267,36 +372,19 @@ go beneath its obfuscations and sort out the statement weights.  Here, I invert
 the penalty function, and apply it to an earlier set of answers that you&amp;#8217;ll
 recognise in the&amp;nbsp;graph.&lt;/p&gt;
 &lt;div class="math"&gt;$$\text{pre-penalty} = \frac{\text{final score}}{1 - (\text{factor} \times \text{rank})}$$&lt;/div&gt;
-&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/radar-penalty-inverse-1.svg" title="plot of chunk radar-penalty-inverse" alt="plot of chunk radar-penalty-inverse" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="err"&gt;##&lt;/span&gt; &lt;span class="nb"&gt;Error&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="nx"&gt;select&lt;/span&gt;&lt;span class="p"&gt;(.,&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;starts_with&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;q&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;attempt&lt;/span&gt; &lt;span class="nx"&gt;to&lt;/span&gt; &lt;span class="nx"&gt;apply&lt;/span&gt; &lt;span class="nx"&gt;non&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="kd"&gt;function&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;## Error in eval(expr, envir, enclos): object &amp;#39;systematic_prepenalty&amp;#39; not found
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;It does the soul good to see the pre-penalty attribute scores restored (bar&amp;nbsp;rounding).&lt;/p&gt;
 &lt;p&gt;The weight of each statement equals the amount of damage that it can do to the
 relevant attribute&amp;#8217;s score, divided by the total damage done by the other
 relevant&amp;nbsp;statements.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;##             type Score damage weight
-## 1   Communicator  5.73   1.27   0.20
-## 2   Communicator  5.73   1.27   0.20
-## 3   Communicator  5.73   1.27   0.20
-## 4   Communicator  4.53   2.47   0.39
-## 5  Data Wrangler  5.47   1.53   0.23
-## 6  Data Wrangler  5.47   1.53   0.23
-## 7  Data Wrangler  5.47   1.53   0.23
-## 8  Data Wrangler  5.07   1.93   0.30
-## 9       Modeller  5.73   1.27   0.20
-## 10      Modeller  5.73   1.27   0.20
-## 11      Modeller  5.73   1.27   0.20
-## 12      Modeller  4.53   2.47   0.39
-## 13    Programmer  5.73   1.27   0.21
-## 14    Programmer  5.73   1.27   0.21
-## 15    Programmer  5.20   1.80   0.29
-## 16    Programmer  5.20   1.80   0.29
-## 17  Technologist  5.73   1.27   0.21
-## 18  Technologist  5.20   1.80   0.29
-## 19  Technologist  5.20   1.80   0.29
-## 20  Technologist  5.73   1.27   0.21
-## 21    Visualiser  5.73   1.27   0.21
-## 22    Visualiser  5.20   1.80   0.29
-## 23    Visualiser  5.73   1.27   0.21
-## 24    Visualiser  5.20   1.80   0.29
+&lt;div class="highlight"&gt;&lt;pre&gt;## Error in eval(expr, envir, enclos): object &amp;#39;systematic_prepenalty&amp;#39; not found
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -324,7 +412,10 @@ roundjs &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kr"&gt;func
 &lt;p&gt;The effect of the penalty can be prettily illustrated by a scatterplot of the
 scores of two attributes.  Ties are separated, parting the cloud, slightly above
 the line &lt;span class="math"&gt;\(y = x\)&lt;/span&gt;.&lt;/p&gt;
-&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/radar-penalty-gap-1.svg" title="plot of chunk radar-penalty-gap" alt="plot of chunk radar-penalty-gap" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="err"&gt;##&lt;/span&gt; &lt;span class="nb"&gt;Error&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="nx"&gt;select&lt;/span&gt;&lt;span class="p"&gt;(.,&lt;/span&gt; &lt;span class="nx"&gt;set&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;attribute&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;score&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;attempt&lt;/span&gt; &lt;span class="nx"&gt;to&lt;/span&gt; &lt;span class="nx"&gt;apply&lt;/span&gt; &lt;span class="nx"&gt;non&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="kd"&gt;function&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;We can also de-penalise the scores to see the effect of the penalty on the
 distribution.  Pre-penalty scores are distributed as you&amp;#8217;d expect, despite
 slightly uneven weights.  Post-penalty scores are skewed to the right, but not
@@ -419,7 +510,7 @@ than one might have expected,&amp;nbsp;because&lt;/p&gt;
         "}";
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
-&lt;/script&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Duncan Garmonsway</dc:creator><pubDate>Tue, 28 Jun 2016 00:00:00 +1200</pubDate><guid>tag:nacnudus.github.io,2016-06-28:crossprod/hacking-the-data-science-radar-with-data-science</guid><category>R</category><category>polls</category><category>Brexit</category></item><item><title>Creating nests without tidyr</title><link>http://nacnudus.github.io/crossprod/creating-nests-without-tidyr</link><description>&lt;p&gt;Unless you begin with an unnested data frame, creating a nested data frame needs
+&lt;/script&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Duncan Garmonsway</dc:creator><pubDate>Tue, 28 Jun 2016 00:00:00 +1200</pubDate><guid>tag:nacnudus.github.io,2016-06-28:crossprod/hacking-the-data-science-radar-with-data-science</guid><category>R</category><category>JavaScript</category><category>V8</category></item><item><title>Creating nests without tidyr</title><link>http://nacnudus.github.io/crossprod/creating-nests-without-tidyr</link><description>&lt;p&gt;Unless you begin with an unnested data frame, creating a nested data frame needs
 a little trick.  Here it&amp;nbsp;is.&lt;/p&gt;
 &lt;h1 id="nested-data-frames"&gt;Nested data&amp;nbsp;frames&lt;/h1&gt;
 &lt;p&gt;The &lt;code&gt;tidyr&lt;/code&gt; package has a handy function for &lt;em&gt;nesting&lt;/em&gt; data frames.  Hadley
@@ -1553,7 +1644,7 @@ par&lt;span class="p"&gt;(&lt;/span&gt;mfrow &lt;span class="o"&gt;=&lt;/span&gt
   hist&lt;span class="p"&gt;(&lt;/span&gt;bias_to_even&lt;span class="p"&gt;,&lt;/span&gt; xlim &lt;span class="o"&gt;=&lt;/span&gt; limits&lt;span class="p"&gt;,&lt;/span&gt; col &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;lightgreen&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
   hist&lt;span class="p"&gt;(&lt;/span&gt;bias_away_from_zero&lt;span class="p"&gt;,&lt;/span&gt; xlim &lt;span class="o"&gt;=&lt;/span&gt; limits&lt;span class="p"&gt;,&lt;/span&gt; col &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;lightblue&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
   hist&lt;span class="p"&gt;(&lt;/span&gt;bias_to_odd&lt;span class="p"&gt;,&lt;/span&gt; xlim &lt;span class="o"&gt;=&lt;/span&gt; limits&lt;span class="p"&gt;,&lt;/span&gt; col &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;pink&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Duncan Garmonsway</dc:creator><pubDate>Mon, 25 Apr 2016 00:00:00 +1200</pubDate><guid>tag:nacnudus.github.io,2016-04-25:crossprod/r-rounding-is-weird-try-javascript</guid><category>R</category><category>JavaScript</category></item><item><title>How many R-Bloggers are there?</title><link>http://nacnudus.github.io/crossprod/how-many-r-bloggers-are-there</link><description>&lt;p&gt;This post does three&amp;nbsp;things:&lt;/p&gt;
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Duncan Garmonsway</dc:creator><pubDate>Mon, 25 Apr 2016 00:00:00 +1200</pubDate><guid>tag:nacnudus.github.io,2016-04-25:crossprod/r-rounding-is-weird-try-javascript</guid><category>R</category><category>JavaScript</category><category>V8</category></item><item><title>How many R-Bloggers are there?</title><link>http://nacnudus.github.io/crossprod/how-many-r-bloggers-are-there</link><description>&lt;p&gt;This post does three&amp;nbsp;things:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Finds out how many R-related blogs there are &lt;em&gt;really&lt;/em&gt; (not a well-defined&amp;nbsp;question).&lt;/li&gt;
 &lt;li&gt;Shows that I can use semi-structured non-csv data (job interview&amp;nbsp;weakness).&lt;/li&gt;

@@ -13,7 +13,7 @@
         <meta property="og:type" content="article" />
         <meta name="twitter:card" content="summary">
 
-<meta name="keywords" content="R, polls, Brexit, Miscellaneous, " />
+<meta name="keywords" content="R, JavaScript, V8, Miscellaneous, " />
 
 <meta property="og:title" content="Hacking the Data Science Radar with Data Science "/>
 <meta property="og:url" content="http://nacnudus.github.io/crossprod/hacking-the-data-science-radar-with-data-science" />
@@ -358,36 +358,19 @@ go beneath its obfuscations and sort out the statement weights.  Here, I invert
 the penalty function, and apply it to an earlier set of answers that you&#8217;ll
 recognise in the&nbsp;graph.</p>
 <div class="math">$$\text{pre-penalty} = \frac{\text{final score}}{1 - (\text{factor} \times \text{rank})}$$</div>
-<p><img src="http://nacnudus.github.io/crossprod/figure/radar-penalty-inverse-1.svg" title="plot of chunk radar-penalty-inverse" alt="plot of chunk radar-penalty-inverse" width="960px" height="540px" /></p>
+<div class="highlight"><pre><span class="err">##</span> <span class="nb">Error</span> <span class="k">in</span> <span class="nx">select</span><span class="p">(.,</span> <span class="o">-</span><span class="p">(</span><span class="nx">starts_with</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">)))</span><span class="o">:</span> <span class="nx">attempt</span> <span class="nx">to</span> <span class="nx">apply</span> <span class="nx">non</span><span class="o">-</span><span class="kd">function</span>
+</pre></div>
+
+
+<div class="highlight"><pre>## Error in eval(expr, envir, enclos): object &#39;systematic_prepenalty&#39; not found
+</pre></div>
+
+
 <p>It does the soul good to see the pre-penalty attribute scores restored (bar&nbsp;rounding).</p>
 <p>The weight of each statement equals the amount of damage that it can do to the
 relevant attribute&#8217;s score, divided by the total damage done by the other
 relevant&nbsp;statements.</p>
-<div class="highlight"><pre>##             type Score damage weight
-## 1   Communicator  5.73   1.27   0.20
-## 2   Communicator  5.73   1.27   0.20
-## 3   Communicator  5.73   1.27   0.20
-## 4   Communicator  4.53   2.47   0.39
-## 5  Data Wrangler  5.47   1.53   0.23
-## 6  Data Wrangler  5.47   1.53   0.23
-## 7  Data Wrangler  5.47   1.53   0.23
-## 8  Data Wrangler  5.07   1.93   0.30
-## 9       Modeller  5.73   1.27   0.20
-## 10      Modeller  5.73   1.27   0.20
-## 11      Modeller  5.73   1.27   0.20
-## 12      Modeller  4.53   2.47   0.39
-## 13    Programmer  5.73   1.27   0.21
-## 14    Programmer  5.73   1.27   0.21
-## 15    Programmer  5.20   1.80   0.29
-## 16    Programmer  5.20   1.80   0.29
-## 17  Technologist  5.73   1.27   0.21
-## 18  Technologist  5.20   1.80   0.29
-## 19  Technologist  5.20   1.80   0.29
-## 20  Technologist  5.73   1.27   0.21
-## 21    Visualiser  5.73   1.27   0.21
-## 22    Visualiser  5.20   1.80   0.29
-## 23    Visualiser  5.73   1.27   0.21
-## 24    Visualiser  5.20   1.80   0.29
+<div class="highlight"><pre>## Error in eval(expr, envir, enclos): object &#39;systematic_prepenalty&#39; not found
 </pre></div>
 
 
@@ -415,7 +398,10 @@ roundjs <span class="o">&lt;-</span> <span class="kr">function</span><span class
 <p>The effect of the penalty can be prettily illustrated by a scatterplot of the
 scores of two attributes.  Ties are separated, parting the cloud, slightly above
 the line <span class="math">\(y = x\)</span>.</p>
-<p><img src="http://nacnudus.github.io/crossprod/figure/radar-penalty-gap-1.svg" title="plot of chunk radar-penalty-gap" alt="plot of chunk radar-penalty-gap" width="960px" height="540px" /></p>
+<div class="highlight"><pre><span class="err">##</span> <span class="nb">Error</span> <span class="k">in</span> <span class="nx">select</span><span class="p">(.,</span> <span class="nx">set</span><span class="p">,</span> <span class="nx">attribute</span><span class="p">,</span> <span class="nx">score</span><span class="p">)</span><span class="o">:</span> <span class="nx">attempt</span> <span class="nx">to</span> <span class="nx">apply</span> <span class="nx">non</span><span class="o">-</span><span class="kd">function</span>
+</pre></div>
+
+
 <p>We can also de-penalise the scores to see the effect of the penalty on the
 distribution.  Pre-penalty scores are distributed as you&#8217;d expect, despite
 slightly uneven weights.  Post-penalty scores are skewed to the right, but not
@@ -565,6 +551,7 @@ than one might have expected,&nbsp;because</p>
             <nav>
             <ul class="articles-timeline">
                 <li class="previous-article">« <a href="http://nacnudus.github.io/crossprod/creating-nests-without-tidyr" title="Previous: Creating nests without tidyr">Creating nests without tidyr</a></li>
+                <li class="next-article"><a href="http://nacnudus.github.io/crossprod/harry-potter-and-the-n-grams-of-sentiment" title="Next: Harry Potter and the N-Grams of Sentiment">Harry Potter and the N-Grams of Sentiment</a> »</li>
             </ul>
             </nav>
             </aside>
@@ -577,14 +564,14 @@ than one might have expected,&nbsp;because</p>
             <a class="category-link" href="http://nacnudus.github.io/crossprod/categories.html#miscellaneous-ref">Miscellaneous</a>
             <h4>Tags</h4>
             <ul class="list-of-tags tags-in-article">
-                <li><a href="http://nacnudus.github.io/crossprod/tags.html#brexit-ref">Brexit
-                    <span>2</span>
-</a></li>
-                <li><a href="http://nacnudus.github.io/crossprod/tags.html#polls-ref">polls
+                <li><a href="http://nacnudus.github.io/crossprod/tags.html#javascript-ref">JavaScript
                     <span>2</span>
 </a></li>
                 <li><a href="http://nacnudus.github.io/crossprod/tags.html#r-ref">R
-                    <span>9</span>
+                    <span>10</span>
+</a></li>
+                <li><a href="http://nacnudus.github.io/crossprod/tags.html#v8-ref">V8
+                    <span>2</span>
 </a></li>
             </ul>
 <h4>Social</h4>
