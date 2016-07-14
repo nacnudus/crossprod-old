@@ -26,7 +26,8 @@ By [**Duncan Garmonsway**](http://nacnudus.github.io/crossprod/).
 This tab is based on Julia Silge's
 [blog](http://juliasilge.com/blog/If-I-Loved-NLP-Less/)
 [posts](http://juliasilge.com/blog/Life-Changing-Magic/) about Jane Austen's
-novels.  Here, it is applied to the Harry Potter series.
+novels.  Here, it is applied to the Harry Potter series.  Read more
+[here](http://nacnudus.github.io/crossprod/harry-potter-and-the-n-grams-of-sentiment).
 
 The **arcs** describe the **sentiment** (positive or negative) of passages in the
 novels.  Sentiment is calculated for discrete chunks of words, and is smoothed
@@ -152,6 +153,9 @@ Sidebar {.sidebar data-width=275}
 By [**Duncan Garmonsway**](http://nacnudus.github.io/crossprod/).
 
 Explore the most-common phrases in Harry Potter.
+
+Read more about this project
+[here](http://nacnudus.github.io/crossprod/harry-potter-and-the-n-grams-of-sentiment).
 
 On small screens, adjust the number of n-grams to be displayed, and the size of
 the text.

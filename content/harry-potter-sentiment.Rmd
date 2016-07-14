@@ -57,7 +57,7 @@ using nesting to great effect.
 The outcome is that n-grams can be created incredibly quickly, easily avoiding
 sentence boundaries.  The code is as simple as this:
 
-```{r harry-potter-sentiment-ngramming, eval = FALSE}
+```{r harry-potter-sentiment-ngramming, eval = FALSE, echo = TRUE}
 books %>% # One row per paragraph. Two columns: title and text
   # First, break into sentences so that ngrams don't cross sentence boundaries
   group_by(title) %>%
