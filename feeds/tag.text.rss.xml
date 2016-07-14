@@ -18,6 +18,18 @@ tricky to traverse.  But these new packages operate on ordinary data frames,
 using nesting to great&amp;nbsp;effect.&lt;/p&gt;
 &lt;p&gt;The outcome is that n-grams can be created incredibly quickly, easily avoiding
 sentence boundaries.  The code is as simple as&amp;nbsp;this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;books &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; &lt;span class="c1"&gt;# One row per paragraph. Two columns: title and text&lt;/span&gt;
+  &lt;span class="c1"&gt;# First, break into sentences so that ngrams don&amp;#39;t cross sentence boundaries&lt;/span&gt;
+  group_by&lt;span class="p"&gt;(&lt;/span&gt;title&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  summarise&lt;span class="p"&gt;(&lt;/span&gt;sentence &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;unlist&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;map&lt;span class="p"&gt;(&lt;/span&gt;text&lt;span class="p"&gt;,&lt;/span&gt; tokenize_sentences&lt;span class="p"&gt;))))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  unnest &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="c1"&gt;# Then create 4-grams&lt;/span&gt;
+  group_by&lt;span class="p"&gt;(&lt;/span&gt;title&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  summarise&lt;span class="p"&gt;(&lt;/span&gt;fourgram &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;unlist&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;tokenize_ngrams&lt;span class="p"&gt;(&lt;/span&gt;sentence&lt;span class="p"&gt;,&lt;/span&gt; n &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;4&lt;/span&gt;&lt;span class="p"&gt;))))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  unnest
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;h2 id="most-common-phrases-in-harry-potter"&gt;Most-common phrases in &lt;em&gt;Harry&amp;nbsp;Potter&lt;/em&gt;&lt;/h2&gt;
 &lt;p&gt;Did you hear that the most common phrase in &lt;em&gt;Harry Potter&lt;/em&gt; is &amp;#8220;turned on his
 heel&amp;#8221;?  I can finally bust that myth.  It does appear quite often &amp;#8212; 12 times at

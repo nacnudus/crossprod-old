@@ -109,6 +109,18 @@ tricky to traverse.  But these new packages operate on ordinary data frames,
 using nesting to great&nbsp;effect.</p>
 <p>The outcome is that n-grams can be created incredibly quickly, easily avoiding
 sentence boundaries.  The code is as simple as&nbsp;this:</p>
+<div class="highlight"><pre>books <span class="o">%&gt;%</span> <span class="c1"># One row per paragraph. Two columns: title and text</span>
+  <span class="c1"># First, break into sentences so that ngrams don&#39;t cross sentence boundaries</span>
+  group_by<span class="p">(</span>title<span class="p">)</span> <span class="o">%&gt;%</span>
+  summarise<span class="p">(</span>sentence <span class="o">=</span> <span class="kt">list</span><span class="p">(</span><span class="kp">unlist</span><span class="p">(</span>map<span class="p">(</span>text<span class="p">,</span> tokenize_sentences<span class="p">))))</span> <span class="o">%&gt;%</span>
+  unnest <span class="o">%&gt;%</span>
+  <span class="c1"># Then create 4-grams</span>
+  group_by<span class="p">(</span>title<span class="p">)</span> <span class="o">%&gt;%</span>
+  summarise<span class="p">(</span>fourgram <span class="o">=</span> <span class="kt">list</span><span class="p">(</span><span class="kp">unlist</span><span class="p">(</span>tokenize_ngrams<span class="p">(</span>sentence<span class="p">,</span> n <span class="o">=</span> <span class="m">4</span><span class="p">))))</span> <span class="o">%&gt;%</span>
+  unnest
+</pre></div>
+
+
 <h2 id="most-common-phrases-in-harry-potter">Most-common phrases in <em>Harry&nbsp;Potter</em></h2>
 <p>Did you hear that the most common phrase in <em>Harry Potter</em> is &#8220;turned on his
 heel&#8221;?  I can finally bust that myth.  It does appear quite often &#8212; 12 times at
