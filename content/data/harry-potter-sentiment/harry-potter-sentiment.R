@@ -84,15 +84,26 @@ sentences <-
   unnest 
 
 saveRDS(sentences, "./sentences.Rds")
+sentences <- readRDS("./sentences.Rds")
 
 # # Plot
-# sentences <- readRDS("./sentences.Rds")
 
-# sentences <- 
-#   sentences %>%
-#   count(sentence) %>%
-#   arrange(desc(n)) %>%
-#   mutate(rank = min_rank(-n))
+sentences <- 
+  sentences %>%
+  count(sentence) %>%
+  arrange(desc(n)) %>%
+  mutate(rank = min_rank(-n))
+
+sentences %>%
+  filter(n >= 2) %>%
+  filter(stri_trim(sentence) != "*") %>%
+  select(-rank) %>%
+  mutate(words = stri_count_words(sentence)) %>%
+  group_by(words) %>%
+  arrange(desc(n)) %>%
+  slice(1:80) %>%
+  ungroup %>%
+  saveRDS("./dashboard/sentences80.Rds")
 
 # # Slate's list is somewhat edited.  Speech has been ignored -- fair enough --
 # # but "He waited." appears only three times, and "Something he didn't have last
@@ -370,4 +381,4 @@ arcarea <-
 # main + ribbon + arcline + hline
 # ggsave("sentiment-ribbon-arcline.png")
 
-# rmarkdown::run("./dashboard.Rmd")
+# rmarkdown::run("./dashboard/dashboard.Rmd")
