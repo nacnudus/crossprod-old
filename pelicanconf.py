@@ -62,6 +62,7 @@ LANDING_PAGE_ABOUT = {'title': 'Crossprod', 'details': '<p>My name is Duncan '
                       '<a href="https://twitter.com/nacnudus" title="Twitter">Twitter</a>, '
                       '<a href="https://stackoverflow.com/users/937932/nacnudus" title="StackOverflow">StackOverflow</a>, '
                       'and <a href="https://uk.linkedin.com/in/duncangarmonsway" title="LinkedIn">LinkedIn</a>.</p> '
+                      '<p>Subscribe with <a href="https://nacnudus.github.io/crossprod/feeds/all.rss.xml" title="RSS">RSS</a>.'
                       '<p>Two excellent blog-aggregators that I read are '
                       '<a href="http://www.r-bloggers.com/" title="R-Bloggers">R-Bloggers</a> '
                       'and <a href="http://www.statsblogs.com/" title="StatsBlogs">StatsBlogs</a>.</p>'}
@@ -69,7 +70,7 @@ LANDING_PAGE_ABOUT = {'title': 'Crossprod', 'details': '<p>My name is Duncan '
 # Labels
 SOCIAL_PROFILE_LABEL = u'Social'
 RELATED_POSTS_LABEL = 'Keep Reading'
-SHARE_POST_INTRO = 'Like this post? Share on:'
+SHARE_POST_INTRO = 'Like this post? Subscribe with <a href="https://nacnudus.github.io/crossprod/feeds/all.rss.xml" title="RSS">RSS</a>. Share on:'
 COMMENTS_INTRO = u'Please comment below'
 
 # -----------------------------------------------------------------------------#
@@ -99,7 +100,7 @@ TWITTER_USERNAME = 'nacnudus'
 SOCIAL = (('Github', 'https://github.com/nacnudus'),
           ('Twitter', 'https://twitter.com/nacnudus'),
           ('LinkedIn', 'https://nz.linkedin.com/in/duncangarmonsway'),
-          # ('RSS', 'http://oncrashreboot.com/feeds/all.atom.xml'),
+          ('RSS', 'https://nacnudus.github.io/crossprod/feeds/all.rss.xml'),
           )
 
 # Search engine optimisation
