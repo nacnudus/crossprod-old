@@ -13,6 +13,7 @@ library(tokenizers)
 
 ngrams_all <- readRDS("./ngrams80.Rds")
 arcs <- readRDS("./arcs.Rds")
+sentences_all <- readRDS("./sentences80.Rds")
 ```
 
 Sentiment
@@ -175,7 +176,7 @@ sliderInput("ngrams",
             max = 80,
             value = 40)
 
-sliderInput("textsize",
+sliderInput("textsizengrams",
             label = "Text size:",
             min = 1,
             max = 10,
@@ -193,7 +194,7 @@ ngrams <- reactive(
     filter(words == input$words)
  )
 
-maxcount <- reactive(
+maxcount_ngrams <- reactive(
   max(ngrams()$n)
   )
    
@@ -204,8 +205,8 @@ renderPlot({
     mutate(ngram = factor(ngram, levels = ngram)) %>%
     ggplot(aes(ngram, n)) +
     coord_flip() +
-    geom_text(aes(label = ngram), hjust = 0, size = input$textsize) + 
-    scale_y_continuous(limits = c(0, maxcount() * 1.25), expand = c(0, 0)) +
+    geom_text(aes(label = ngram), hjust = 0, size = input$textsizengrams) + 
+    scale_y_continuous(limits = c(0, maxcount_ngrams() * 1.25), expand = c(0, 0)) +
     xlab("") +
     theme_minimal() +
     ylab("Occurrences (left-justified)") +
@@ -213,5 +214,90 @@ renderPlot({
           axis.ticks.y = element_blank(),
           panel.grid = element_blank()) +
     ggtitle(paste0("Top ", input$ngrams, " Harry Potter ", input$words, "-Grams"))
+})
+```
+
+Sentences
+=======================================================================
+
+Sidebar {.sidebar data-width=275}
+-----------------------------------------------------------------------
+
+By [**Duncan Garmonsway**](http://nacnudus.github.io/crossprod/).
+
+Explore the most-common sentences in Harry Potter.
+
+Read more about this project
+[here](http://nacnudus.github.io/crossprod/harry-potter-and-the-n-grams-of-sentiment).
+
+On small screens, adjust the number of sentences to be displayed, and the size
+of the text.
+
+`r br()`
+
+```{r}
+sliderInput("minwords",
+            label = "Minimum number of words in the sentence:",
+            min = 1,
+            max = max(sentences_all$words),
+            value = 1,
+            step = 1)
+
+sliderInput("maxwords",
+            label = "Maximum number of words in the sentence:",
+            min = 1,
+            max = max(sentences_all$words),
+            value = max(sentences_all$words),
+            step = 1)
+
+sliderInput("sentences",
+            label = "Number of sentences to plot:",
+            min = 20,
+            max = 80,
+            value = 40)
+
+sliderInput("textsizesentences",
+            label = "Text size:",
+            min = 1,
+            max = 10,
+            value = 5)
+```
+
+Column 
+-----------------------------------------------------------------------
+
+###
+
+```{r}
+sentences <- reactive(
+  sentences_all %>%
+    filter(words >= input$minwords, words <= input$maxwords) %>%
+    arrange(desc(n)) %>%
+    slice(1:input$sentences)
+ )
+
+maxcount_sentences <- reactive(
+  max(sentences()$n)
+  )
+   
+renderPlot({
+  if (nrow(sentences())) {
+    sentences() %>%
+      slice(1:input$sentences) %>% 
+      arrange(n) %>%
+      mutate(sentence = factor(sentence, levels = sentence)) %>%
+      ggplot(aes(sentence, n)) +
+      coord_flip() +
+      geom_text(aes(label = sentence), hjust = 0, size = input$textsizesentences) + 
+      scale_y_continuous(limits = c(0, maxcount_sentences() * 1.25), expand = c(0, 0)) +
+      xlab("") +
+      theme_minimal() +
+      ylab("Occurrences (left-justified)") +
+      theme(axis.text.y = element_blank(),
+            axis.ticks.y = element_blank(),
+            panel.grid = element_blank()) +
+      ggtitle(paste0("Top ", input$sentences, " Harry Potter sentences\nbetween ", 
+                     input$minwords, " and ", input$maxwords, " words long."))
+  }
 })
 ```
