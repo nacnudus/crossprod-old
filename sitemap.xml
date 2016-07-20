@@ -5,29 +5,36 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://nacnudus.github.io/crossprod/</loc>
-<lastmod>2016-07-20T17:07:40-00:00</lastmod>
+<lastmod>2016-07-20T18:19:44-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://nacnudus.github.io/crossprod/archives.html</loc>
-<lastmod>2016-07-20T17:07:40-00:00</lastmod>
+<lastmod>2016-07-20T18:19:44-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://nacnudus.github.io/crossprod/tags.html</loc>
-<lastmod>2016-07-20T17:07:40-00:00</lastmod>
+<lastmod>2016-07-20T18:19:44-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://nacnudus.github.io/crossprod/categories.html</loc>
-<lastmod>2016-07-20T17:07:40-00:00</lastmod>
+<lastmod>2016-07-20T18:19:44-00:00</lastmod>
 <changefreq>daily</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
+<loc>http://nacnudus.github.io/crossprod/more-harry-potter-story-arcs-they-get-darker</loc>
+<lastmod>2016-07-20T00:00:00+12:00</lastmod>
+<changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 

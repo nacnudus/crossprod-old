@@ -1,5 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Crossprod</title><link href="http://nacnudus.github.io/crossprod/" rel="alternate"></link><link href="http://nacnudus.github.io/crossprod/feeds/all.atom.xml" rel="self"></link><id>http://nacnudus.github.io/crossprod/</id><updated>2016-07-13T00:00:00+12:00</updated><entry><title>Harry Potter and the N-Grams of Sentiment</title><link href="http://nacnudus.github.io/crossprod/harry-potter-and-the-n-grams-of-sentiment" rel="alternate"></link><updated>2016-07-13T00:00:00+12:00</updated><author><name>Duncan Garmonsway</name></author><id>tag:nacnudus.github.io,2016-07-13:crossprod/harry-potter-and-the-n-grams-of-sentiment</id><summary type="html">&lt;p&gt;This post applies &lt;a href="http://juliasilge.com/blog/"&gt;Julia Silge&lt;/a&gt;&amp;#8216;s amazing story-arc
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Crossprod</title><link href="http://nacnudus.github.io/crossprod/" rel="alternate"></link><link href="http://nacnudus.github.io/crossprod/feeds/all.atom.xml" rel="self"></link><id>http://nacnudus.github.io/crossprod/</id><updated>2016-07-20T00:00:00+12:00</updated><entry><title>More Harry Potter story arcs (they get darker)</title><link href="http://nacnudus.github.io/crossprod/more-harry-potter-story-arcs-they-get-darker" rel="alternate"></link><updated>2016-07-20T00:00:00+12:00</updated><author><name>Duncan Garmonsway</name></author><id>tag:nacnudus.github.io,2016-07-20:crossprod/more-harry-potter-story-arcs-they-get-darker</id><summary type="html">&lt;p&gt;In my &lt;a href="http://nacnudus.github.io/crossprod/harry-potter-and-the-n-grams-of-sentiment"&gt;previous post&lt;/a&gt;, I applied &lt;a href="http://juliasilge.com/blog/"&gt;Julia
+Silge&lt;/a&gt;&amp;#8216;s story-arc
+&lt;a href="http://juliasilge.com/blog/Life-Changing-Magic/"&gt;sentiment&lt;/a&gt;
+&lt;a href="http://juliasilge.com/blog/Life-Changing-Magic/"&gt;analysis&lt;/a&gt; method to the &lt;em&gt;Harry
+Potter&lt;/em&gt; books. Twitter&amp;#8217;s response was a tweet about some very similar and
+fascinating research, on &lt;a href="https://arxiv.org/abs/1606.07772"&gt;arXiv&lt;/a&gt;.  Here&amp;#8217;s
+their beautiful&amp;nbsp;graph.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="*Harry Potter and the Deathly Hallows* sentiment arc, from Reagan et al.
+https://arxiv.org/pdf/1606.07772v2.pdf" src="./figure/harry-potter-arcs-wizards.jpg" /&gt;.&lt;/p&gt;
+&lt;p&gt;This post reproduces their method, using&amp;nbsp;R.&lt;/p&gt;
+&lt;h3 id="method"&gt;Method&lt;/h3&gt;
+&lt;p&gt;Reagan et al.&amp;#8217;s method differs in two ways. They use the sentiment dictionary
+LabMT, a product of their own research group,
+&lt;a href="http://hedonometer.org/index.html"&gt;Hedonometer&lt;/a&gt;, which is available in R in the
+&lt;a href="https://github.com/trinker/qdapDictionaries"&gt;qdapDictionaries&lt;/a&gt; package.  Then
+they smooth the scores by averaging inside a moving window.  The moving-window
+method produces curves that make a lot more&amp;nbsp;sense.&lt;/p&gt;
+&lt;p&gt;You can see their curves for all the Harry Potter books on their interactive
+&lt;a href="http://hedonometer.org/books/v1/?book=Harry%20Potter%20and%20the%20Sorcerer%27s%20Stone"&gt;website&lt;/a&gt;,
+which I highly&amp;nbsp;recommend.&lt;/p&gt;
+&lt;p&gt;But I wanted to reproduce the method in R, for fun.  The main snag was handling
+the moving window, which is one of the few under-developed parts of R munging at
+the moment.  There&amp;#8217;s &lt;a href="https://github.com/kevinushey/RcppRoll"&gt;RcppRoll&lt;/a&gt;, which
+implements a few obvious functions but no-longer allows custom functions, and
+&lt;a href="https://cran.r-project.org/web/packages/zoo/index.html"&gt;zoo&lt;/a&gt;, which does allow
+custom functions, but seems to want the input to be a timeseries &amp;#8212; fair enough,
+it is a timeseries&amp;nbsp;library.&lt;/p&gt;
+&lt;p&gt;So I did something hacky with base R and
+&lt;a href="https://github.com/hadley/purrr"&gt;purrr&lt;/a&gt;.  Starting with two vectors, one for
+the first and the other for the last row number of each window.  Putting those
+into a list, I then &lt;strong&gt;transpose&lt;/strong&gt;d them, which you really have to see to
+understand what it&amp;#8217;s doing &amp;#8212; basically it paired up each entry of each vector
+into a vectors of length 2, each one an element of one overall list.  Then I
+could use &lt;strong&gt;lapply&lt;/strong&gt; to iterate over each pair, generating a sequence of
+rownumbers from the first to the last, and finally &lt;strong&gt;bind_rows&lt;/strong&gt; combined them
+into a large dataframe of all rows in all windows.  I recommend running the code
+below to see how this works.  Obviously the method doesn&amp;#8217;t scale too well, since
+it loads all the windows into memory at&amp;nbsp;once.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c1"&gt;# Set up the moving-window-average parameters&lt;/span&gt;
+N &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;nrow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;book&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# Number of words in the book&lt;/span&gt;
+k &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="m"&gt;10000&lt;/span&gt; &lt;span class="c1"&gt;# Number of words in each sample&lt;/span&gt;
+l &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="m"&gt;200&lt;/span&gt; &lt;span class="c1"&gt;# Number of points in the time series&lt;/span&gt;
+overlap &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;floor&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;N &lt;span class="o"&gt;-&lt;/span&gt; k&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;l &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="c1"&gt;# Number of words by which the window slides&lt;/span&gt;
+overlap &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;floor&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;N &lt;span class="o"&gt;-&lt;/span&gt; k &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;l&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# Function in the paper -- I think it&amp;#39;s wrong, but it makes little difference.&lt;/span&gt;
+
+&lt;span class="c1"&gt;# first and last words of each chunk&lt;/span&gt;
+uppers &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;seq&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;k&lt;span class="p"&gt;,&lt;/span&gt; by &lt;span class="o"&gt;=&lt;/span&gt; overlap&lt;span class="p"&gt;,&lt;/span&gt; length.out &lt;span class="o"&gt;=&lt;/span&gt; l&lt;span class="p"&gt;),&lt;/span&gt; N&lt;span class="p"&gt;)&lt;/span&gt;
+lowers &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;seq&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; by &lt;span class="o"&gt;=&lt;/span&gt; overlap&lt;span class="p"&gt;,&lt;/span&gt; length.out &lt;span class="o"&gt;=&lt;/span&gt; l&lt;span class="p"&gt;),&lt;/span&gt; N &lt;span class="o"&gt;-&lt;/span&gt; k&lt;span class="p"&gt;)&lt;/span&gt; 
+
+arc &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; 
+  &lt;span class="kt"&gt;list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;lowers&lt;span class="p"&gt;,&lt;/span&gt; uppers&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
+  transpose &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
+  at_depth&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kp"&gt;unlist&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="kp"&gt;lapply&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;slice&lt;span class="p"&gt;(&lt;/span&gt;book&lt;span class="p"&gt;,&lt;/span&gt; x&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;x&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; mutate&lt;span class="p"&gt;(&lt;/span&gt;length &lt;span class="o"&gt;=&lt;/span&gt; n&lt;span class="p"&gt;())})&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  bind_rows&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;.i&lt;/span&gt;d &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;window&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  etc.
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;One thing on my graphs that Hedonometer doesn&amp;#8217;t provide is the chapter titles,
+so you can be reminded what is going on at each turn in the&amp;nbsp;plot.&lt;/p&gt;
+&lt;p&gt;Enjoy the plots below, otherwise that&amp;#8217;s it for this post.  The code is, as
+always, on &lt;a href="https://github.com/nacnudus/crossprod"&gt;GitHub&lt;/a&gt;, but you need to
+supply your own copies of the&amp;nbsp;books.&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-arcs-2-1.svg" title="plot of chunk harry-potter-arcs-2" alt="plot of chunk harry-potter-arcs-2" width="960px" height="540px" /&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-arcs-2-2.svg" title="plot of chunk harry-potter-arcs-2" alt="plot of chunk harry-potter-arcs-2" width="960px" height="540px" /&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-arcs-2-3.svg" title="plot of chunk harry-potter-arcs-2" alt="plot of chunk harry-potter-arcs-2" width="960px" height="540px" /&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-arcs-2-4.svg" title="plot of chunk harry-potter-arcs-2" alt="plot of chunk harry-potter-arcs-2" width="960px" height="540px" /&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-arcs-2-5.svg" title="plot of chunk harry-potter-arcs-2" alt="plot of chunk harry-potter-arcs-2" width="960px" height="540px" /&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-arcs-2-6.svg" title="plot of chunk harry-potter-arcs-2" alt="plot of chunk harry-potter-arcs-2" width="960px" height="540px" /&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-arcs-2-7.svg" title="plot of chunk harry-potter-arcs-2" alt="plot of chunk harry-potter-arcs-2" width="960px" height="540px" /&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;## Source: local data frame [0 x 1]
+## Groups: title [0]
+## 
+## # ... with 1 variables: title &amp;lt;chr&amp;gt;
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="R"></category><category term="text"></category><category term="Harry Potter"></category></entry><entry><title>Harry Potter and the N-Grams of Sentiment</title><link href="http://nacnudus.github.io/crossprod/harry-potter-and-the-n-grams-of-sentiment" rel="alternate"></link><updated>2016-07-13T00:00:00+12:00</updated><author><name>Duncan Garmonsway</name></author><id>tag:nacnudus.github.io,2016-07-13:crossprod/harry-potter-and-the-n-grams-of-sentiment</id><summary type="html">&lt;p&gt;This post applies &lt;a href="http://juliasilge.com/blog/"&gt;Julia Silge&lt;/a&gt;&amp;#8216;s amazing story-arc
 &lt;a href="http://juliasilge.com/blog/Life-Changing-Magic/"&gt;sentiment&lt;/a&gt;
 &lt;a href="http://juliasilge.com/blog/Life-Changing-Magic/"&gt;analyses&lt;/a&gt; to the &lt;em&gt;Harry
 Potter&lt;/em&gt;&amp;nbsp;books.&lt;/p&gt;
