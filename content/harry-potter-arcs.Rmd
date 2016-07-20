@@ -104,7 +104,7 @@ Enjoy the plots below, otherwise that's it for this post.  The code is, as
 always, on [GitHub](https://github.com/nacnudus/crossprod), but you need to
 supply your own copies of the books.
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
 # Titles as factor in series order
 titles <- c("1. Philosopher's Stone", 
             "2. Chamber of Secrets",
