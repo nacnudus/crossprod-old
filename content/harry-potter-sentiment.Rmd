@@ -278,7 +278,7 @@ the order of a chapter or so, are probably misleading.
 main_ribbon
 ```
 
-And to see where 'wiggliness = 3' arc lies in the range, I superimpose it as a line.
+And to see where the 'wiggliness = 3' arc lies in the range, I superimpose it as a line.
 
 ```{r harry-potter-sentiment-ribbon-arcline, echo = FALSE}
 main_ribbon_arcline
