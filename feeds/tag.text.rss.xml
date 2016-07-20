@@ -113,7 +113,7 @@ ribbon &amp;#8212; a little like the standard-error-ribbon on a &lt;code&gt;geom
 the ribbons show a more reliable story arc, and reveal that narrow wobbles, of
 the order of a chapter or so, are probably&amp;nbsp;misleading.&lt;/p&gt;
 &lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-sentiment-ribbon-1.svg" title="plot of chunk harry-potter-sentiment-ribbon" alt="plot of chunk harry-potter-sentiment-ribbon" width="960px" height="540px" /&gt;&lt;/p&gt;
-&lt;p&gt;And to see where &amp;#8216;wiggliness = 3&amp;#8217; arc lies in the range, I superimpose it as a&amp;nbsp;line.&lt;/p&gt;
+&lt;p&gt;And to see where the &amp;#8216;wiggliness = 3&amp;#8217; arc lies in the range, I superimpose it as a&amp;nbsp;line.&lt;/p&gt;
 &lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-sentiment-ribbon-arcline-1.svg" title="plot of chunk harry-potter-sentiment-ribbon-arcline" alt="plot of chunk harry-potter-sentiment-ribbon-arcline" width="960px" height="540px" /&gt;&lt;/p&gt;
 &lt;p&gt;The code is, as always, on &lt;a href="https://github.com/nacnudus/crossprod"&gt;GitHub&lt;/a&gt;, but
 you need to supply your own copies of the&amp;nbsp;books.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Duncan Garmonsway</dc:creator><pubDate>Wed, 13 Jul 2016 00:00:00 +1200</pubDate><guid>tag:nacnudus.github.io,2016-07-13:crossprod/harry-potter-and-the-n-grams-of-sentiment</guid><category>R</category><category>text</category><category>Harry Potter</category></item></channel></rss>
