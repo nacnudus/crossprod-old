@@ -1,597 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Crossprod</title><link>http://nacnudus.github.io/crossprod/</link><description>R, data, and frustration</description><atom:link href="http://nacnudus.github.io/crossprod/feeds/all.rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 20 Jul 2016 00:00:00 +1200</lastBuildDate><item><title>More Harry Potter story arcs (they get darker)</title><link>http://nacnudus.github.io/crossprod/more-harry-potter-story-arcs-they-get-darker</link><description>&lt;p&gt;In my &lt;a href="http://nacnudus.github.io/crossprod/harry-potter-and-the-n-grams-of-sentiment"&gt;previous post&lt;/a&gt;, I applied &lt;a href="http://juliasilge.com/blog/"&gt;Julia
-Silge&lt;/a&gt;&amp;#8216;s story-arc
-&lt;a href="http://juliasilge.com/blog/Life-Changing-Magic/"&gt;sentiment&lt;/a&gt;
-&lt;a href="http://juliasilge.com/blog/Life-Changing-Magic/"&gt;analysis&lt;/a&gt; method to the &lt;em&gt;Harry
-Potter&lt;/em&gt; books. Twitter&amp;#8217;s response was a tweet about some very similar and
-fascinating research, on &lt;a href="https://arxiv.org/abs/1606.07772"&gt;arXiv&lt;/a&gt;.  Here&amp;#8217;s
-their beautiful&amp;nbsp;graph.&lt;/p&gt;
-&lt;p&gt;&lt;img alt="*Harry Potter and the Deathly Hallows* sentiment arc, from Reagan et al.
-https://arxiv.org/pdf/1606.07772v2.pdf" src="./figure/harry-potter-arcs-wizards.jpg" /&gt;.&lt;/p&gt;
-&lt;p&gt;This post reproduces their method, using&amp;nbsp;R.&lt;/p&gt;
-&lt;h3 id="method"&gt;Method&lt;/h3&gt;
-&lt;p&gt;Reagan et al.&amp;#8217;s method differs in two ways. They use the sentiment dictionary
-LabMT, a product of their own research group,
-&lt;a href="http://hedonometer.org/index.html"&gt;Hedonometer&lt;/a&gt;, which is available in R in the
-&lt;a href="https://github.com/trinker/qdapDictionaries"&gt;qdapDictionaries&lt;/a&gt; package.  Then
-they smooth the scores by averaging inside a moving window.  The moving-window
-method produces curves that make a lot more&amp;nbsp;sense.&lt;/p&gt;
-&lt;p&gt;You can see their curves for all the Harry Potter books on their interactive
-&lt;a href="http://hedonometer.org/books/v1/?book=Harry%20Potter%20and%20the%20Sorcerer%27s%20Stone"&gt;website&lt;/a&gt;,
-which I highly&amp;nbsp;recommend.&lt;/p&gt;
-&lt;p&gt;But I wanted to reproduce the method in R, for fun.  The main snag was handling
-the moving window, which is one of the few under-developed parts of R munging at
-the moment.  There&amp;#8217;s &lt;a href="https://github.com/kevinushey/RcppRoll"&gt;RcppRoll&lt;/a&gt;, which
-implements a few obvious functions but no-longer allows custom functions, and
-&lt;a href="https://cran.r-project.org/web/packages/zoo/index.html"&gt;zoo&lt;/a&gt;, which does allow
-custom functions, but seems to want the input to be a timeseries &amp;#8212; fair enough,
-it is a timeseries&amp;nbsp;library.&lt;/p&gt;
-&lt;p&gt;So I did something hacky with base R and
-&lt;a href="https://github.com/hadley/purrr"&gt;purrr&lt;/a&gt;.  Starting with two vectors, one for
-the first and the other for the last row number of each window.  Putting those
-into a list, I then &lt;strong&gt;transpose&lt;/strong&gt;d them, which you really have to see to
-understand what it&amp;#8217;s doing &amp;#8212; basically it paired up each entry of each vector
-into a vectors of length 2, each one an element of one overall list.  Then I
-could use &lt;strong&gt;lapply&lt;/strong&gt; to iterate over each pair, generating a sequence of
-rownumbers from the first to the last, and finally &lt;strong&gt;bind_rows&lt;/strong&gt; combined them
-into a large dataframe of all rows in all windows.  I recommend running the code
-below to see how this works.  Obviously the method doesn&amp;#8217;t scale too well, since
-it loads all the windows into memory at&amp;nbsp;once.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c1"&gt;# Set up the moving-window-average parameters&lt;/span&gt;
-N &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;nrow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;book&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# Number of words in the book&lt;/span&gt;
-k &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="m"&gt;10000&lt;/span&gt; &lt;span class="c1"&gt;# Number of words in each sample&lt;/span&gt;
-l &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="m"&gt;200&lt;/span&gt; &lt;span class="c1"&gt;# Number of points in the time series&lt;/span&gt;
-overlap &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;floor&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;N &lt;span class="o"&gt;-&lt;/span&gt; k&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;l &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="c1"&gt;# Number of words by which the window slides&lt;/span&gt;
-overlap &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;floor&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;N &lt;span class="o"&gt;-&lt;/span&gt; k &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;l&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# Function in the paper -- I think it&amp;#39;s wrong, but it makes little difference.&lt;/span&gt;
-
-&lt;span class="c1"&gt;# first and last words of each chunk&lt;/span&gt;
-uppers &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;seq&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;k&lt;span class="p"&gt;,&lt;/span&gt; by &lt;span class="o"&gt;=&lt;/span&gt; overlap&lt;span class="p"&gt;,&lt;/span&gt; length.out &lt;span class="o"&gt;=&lt;/span&gt; l&lt;span class="p"&gt;),&lt;/span&gt; N&lt;span class="p"&gt;)&lt;/span&gt;
-lowers &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;seq&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; by &lt;span class="o"&gt;=&lt;/span&gt; overlap&lt;span class="p"&gt;,&lt;/span&gt; length.out &lt;span class="o"&gt;=&lt;/span&gt; l&lt;span class="p"&gt;),&lt;/span&gt; N &lt;span class="o"&gt;-&lt;/span&gt; k&lt;span class="p"&gt;)&lt;/span&gt; 
-
-arc &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; 
-  &lt;span class="kt"&gt;list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;lowers&lt;span class="p"&gt;,&lt;/span&gt; uppers&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
-  transpose &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
-  at_depth&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kp"&gt;unlist&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  &lt;span class="kp"&gt;lapply&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;slice&lt;span class="p"&gt;(&lt;/span&gt;book&lt;span class="p"&gt;,&lt;/span&gt; x&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;x&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; mutate&lt;span class="p"&gt;(&lt;/span&gt;length &lt;span class="o"&gt;=&lt;/span&gt; n&lt;span class="p"&gt;())})&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  bind_rows&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;.i&lt;/span&gt;d &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;window&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  etc.
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;One thing on my graphs that Hedonometer doesn&amp;#8217;t provide is the chapter titles,
-so you can be reminded what is going on at each turn in the&amp;nbsp;plot.&lt;/p&gt;
-&lt;p&gt;Enjoy the plots below, otherwise that&amp;#8217;s it for this post.  The code is, as
-always, on &lt;a href="https://github.com/nacnudus/crossprod"&gt;GitHub&lt;/a&gt;, but you need to
-supply your own copies of the&amp;nbsp;books.&lt;/p&gt;
-&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-arcs-2-1.svg" title="plot of chunk harry-potter-arcs-2" alt="plot of chunk harry-potter-arcs-2" width="960px" height="540px" /&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-arcs-2-2.svg" title="plot of chunk harry-potter-arcs-2" alt="plot of chunk harry-potter-arcs-2" width="960px" height="540px" /&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-arcs-2-3.svg" title="plot of chunk harry-potter-arcs-2" alt="plot of chunk harry-potter-arcs-2" width="960px" height="540px" /&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-arcs-2-4.svg" title="plot of chunk harry-potter-arcs-2" alt="plot of chunk harry-potter-arcs-2" width="960px" height="540px" /&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-arcs-2-5.svg" title="plot of chunk harry-potter-arcs-2" alt="plot of chunk harry-potter-arcs-2" width="960px" height="540px" /&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-arcs-2-6.svg" title="plot of chunk harry-potter-arcs-2" alt="plot of chunk harry-potter-arcs-2" width="960px" height="540px" /&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-arcs-2-7.svg" title="plot of chunk harry-potter-arcs-2" alt="plot of chunk harry-potter-arcs-2" width="960px" height="540px" /&gt;&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;## Source: local data frame [0 x 1]
-## Groups: title [0]
-## 
-## # ... with 1 variables: title &amp;lt;chr&amp;gt;
-&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Duncan Garmonsway</dc:creator><pubDate>Wed, 20 Jul 2016 00:00:00 +1200</pubDate><guid>tag:nacnudus.github.io,2016-07-20:crossprod/more-harry-potter-story-arcs-they-get-darker</guid><category>R</category><category>text</category><category>Harry Potter</category></item><item><title>Harry Potter and the N-Grams of Sentiment</title><link>http://nacnudus.github.io/crossprod/harry-potter-and-the-n-grams-of-sentiment</link><description>&lt;p&gt;This post applies &lt;a href="http://juliasilge.com/blog/"&gt;Julia Silge&lt;/a&gt;&amp;#8216;s amazing story-arc
-&lt;a href="http://juliasilge.com/blog/Life-Changing-Magic/"&gt;sentiment&lt;/a&gt;
-&lt;a href="http://juliasilge.com/blog/Life-Changing-Magic/"&gt;analyses&lt;/a&gt; to the &lt;em&gt;Harry
-Potter&lt;/em&gt;&amp;nbsp;books.&lt;/p&gt;
-&lt;p&gt;It also busts the myth that &amp;#8220;turned on his heel&amp;#8221; is the series&amp;#8217; most common&amp;nbsp;phrase.&lt;/p&gt;
-&lt;p&gt;Here is a related &lt;a href="https://duncan-garmonsway.shinyapps.io/harry-potter"&gt;shiny
-app&lt;/a&gt; to explore the ideas&amp;nbsp;futher.&lt;/p&gt;
-&lt;h2 id="super-easy-text-munging"&gt;Super-easy&amp;nbsp;text-munging&lt;/h2&gt;
-&lt;p&gt;Casual text-munging is no longer a pain, thanks to a couple of new packages,
-&lt;a href="https://github.com/juliasilge/tidytext"&gt;tidytext&lt;/a&gt; and
-&lt;a href="https://github.com/lmullen/tokenizers"&gt;tokenizers&lt;/a&gt;, and a not-so-new one,
-&lt;a href="https://github.com/gagolews/stringi"&gt;stringi&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;When I last analysed Harry Potter a few years ago, the
-&lt;a href="https://cran.r-project.org/web/packages/tm/index.html"&gt;tm&lt;/a&gt; package, though
-powerful, was frustrating, partly due to its unusual data format, which was
-tricky to traverse.  But these new packages operate on ordinary data frames,
-using nesting to great&amp;nbsp;effect.&lt;/p&gt;
-&lt;p&gt;The outcome is that n-grams can be created incredibly quickly, easily avoiding
-sentence boundaries.  The code is as simple as&amp;nbsp;this:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;books &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; &lt;span class="c1"&gt;# One row per paragraph. Two columns: title and text&lt;/span&gt;
-  &lt;span class="c1"&gt;# First, break into sentences so that ngrams don&amp;#39;t cross sentence boundaries&lt;/span&gt;
-  group_by&lt;span class="p"&gt;(&lt;/span&gt;title&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  summarise&lt;span class="p"&gt;(&lt;/span&gt;sentence &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;unlist&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;map&lt;span class="p"&gt;(&lt;/span&gt;text&lt;span class="p"&gt;,&lt;/span&gt; tokenize_sentences&lt;span class="p"&gt;))))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  unnest &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  &lt;span class="c1"&gt;# Then create 4-grams&lt;/span&gt;
-  group_by&lt;span class="p"&gt;(&lt;/span&gt;title&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  summarise&lt;span class="p"&gt;(&lt;/span&gt;fourgram &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;unlist&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;tokenize_ngrams&lt;span class="p"&gt;(&lt;/span&gt;sentence&lt;span class="p"&gt;,&lt;/span&gt; n &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;4&lt;/span&gt;&lt;span class="p"&gt;))))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  unnest
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;h2 id="most-common-phrases-in-harry-potter"&gt;Most-common phrases in &lt;em&gt;Harry&amp;nbsp;Potter&lt;/em&gt;&lt;/h2&gt;
-&lt;p&gt;Did you hear that the most common phrase in &lt;em&gt;Harry Potter&lt;/em&gt; is &amp;#8220;turned on his
-heel&amp;#8221;?  I can finally bust that myth.  It does appear quite often &amp;#8212; 12 times at
-most, if you include &amp;#8216;turning&amp;#8217; and &amp;#8216;her&amp;#8217;, but the most-common four-word phrase,
-by &lt;em&gt;miles&lt;/em&gt;, is &amp;#8220;Harry, Ron and Hermione&amp;#8221;.  Big&amp;nbsp;surprise.&lt;/p&gt;
-&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-sentiment-fourgrams-1.svg" title="plot of chunk harry-potter-sentiment-fourgrams" alt="plot of chunk harry-potter-sentiment-fourgrams" width="960px" height="540px" /&gt;&lt;/p&gt;
-&lt;p&gt;A few of these are predictable nouns (Defence Against the Dark Arts, the
-Ministry of Magic, the Room of Requirement).  He Who Must Not Be Named makes it
-into the top 40.  There are a bunch of phrases that describe where things are
-(at the end of, etc.).  But the most intriguing phrase is &amp;#8220;said Hermione in a&amp;#8221;
-&amp;#8212; why is Hermione singled out by that&amp;nbsp;construction?&lt;/p&gt;
-&lt;p&gt;There&amp;#8217;s a &lt;a href="https://duncan-garmonsway.shinyapps.io/harry-potter/#n-grams"&gt;shiny
-app&lt;/a&gt; to explore
-lots more n-grams, from 2-grams to&amp;nbsp;10-grams.&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://www.slate.com/articles/arts/culturebox/2013/11/hunger_games_catching_fire_a_textual_analysis_of_suzanne_collins_novels.html?wpisrc=burger_bar"&gt;Slate&lt;/a&gt;
-did a similar analysis, though they looked at the most-common &lt;em&gt;sentences&lt;/em&gt;,
-comparing &lt;em&gt;Harry Potter&lt;/em&gt; with &lt;em&gt;The Hunger Games&lt;/em&gt; and the &lt;em&gt;Twilight&lt;/em&gt;&amp;nbsp;series.&lt;/p&gt;
-&lt;p&gt;They seem to have edited their list somewhat, since &amp;#8220;He waited&amp;#8221; appears only
-three times, and &amp;#8220;Something he didn&amp;#8217;t have last time&amp;#8221; only twice, while I find
-that &amp;#8220;Harry nodded&amp;#8221; tops my list (of complete sentences) with 14 occurences,
-one more than Slate&amp;#8217;s top sentence, &amp;#8220;Nothing&amp;nbsp;happened.&amp;#8221;&lt;/p&gt;
-&lt;p&gt;Here are my top 30, many of which are not complete&amp;nbsp;sentences.&lt;/p&gt;
-&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-sentiment-sentences-1.svg" title="plot of chunk harry-potter-sentiment-sentences" alt="plot of chunk harry-potter-sentiment-sentences" width="960px" height="540px" /&gt;&lt;/p&gt;
-&lt;p&gt;Part of the difficulty is that written English speech isn&amp;#8217;t unambiguously
-punctuated.  This has bugged me since primary school.  See what happens&amp;nbsp;here.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;tokenize_sentences&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&amp;#39;Are you going?&amp;#39; Harry asked.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-                     &lt;span class="s"&gt;&amp;quot;Ron asked, &amp;#39;Are you going?&amp;#39; Harry shrugged.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-                     &lt;span class="s"&gt;&amp;quot;&amp;#39;You should go,&amp;#39; Harry said&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-                     &lt;span class="s"&gt;&amp;quot;&amp;#39;Go now.&amp;#39; Harry went.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;## [[1]]
-## [1] &amp;quot;&amp;#39;Are you going?&amp;#39;&amp;quot; &amp;quot;Harry asked.&amp;quot;    
-## 
-## [[2]]
-## [1] &amp;quot;Ron asked, &amp;#39;Are you going?&amp;#39;&amp;quot; &amp;quot;Harry shrugged.&amp;quot;            
-## 
-## [[3]]
-## [1] &amp;quot;&amp;#39;You should go,&amp;#39; Harry said&amp;quot;
-## 
-## [[4]]
-## [1] &amp;quot;&amp;#39;Go now.&amp;#39;&amp;quot;   &amp;quot;Harry went.&amp;quot;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;Were I king, I&amp;#8217;d decree the following unambiguous&amp;nbsp;style.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;tokenize_sentences&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Ron asked, &amp;#39;Are you going?&amp;#39;. Harry shrugged.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-                     &lt;span class="s"&gt;&amp;quot;&amp;#39;You should go.&amp;#39;, Harry said&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;## [[1]]
-## [1] &amp;quot;Ron asked, &amp;#39;Are you going?&amp;#39;.&amp;quot; &amp;quot;Harry shrugged.&amp;quot;             
-## 
-## [[2]]
-## [1] &amp;quot;&amp;#39;You should go.&amp;#39;, Harry said&amp;quot;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;h2 id="most-important-characters"&gt;Most-important&amp;nbsp;characters&lt;/h2&gt;
-&lt;p&gt;If importance is proportional to mentions of first names, then Hermione and Ron
-are not as equal as you might&amp;nbsp;expect.&lt;/p&gt;
-&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-sentiment-characters-1.svg" title="plot of chunk harry-potter-sentiment-characters" alt="plot of chunk harry-potter-sentiment-characters" width="960px" height="540px" /&gt;&lt;/p&gt;
-&lt;h2 id="sentiment-driven-story-arcs"&gt;Sentiment-driven story&amp;nbsp;arcs&lt;/h2&gt;
-&lt;p&gt;Ever since I read &lt;a href="http://juliasilge.com/blog/"&gt;Julia Silge&lt;/a&gt;&amp;#8216;s amazing story-arc
-&lt;a href="http://juliasilge.com/blog/Life-Changing-Magic/"&gt;sentiment&lt;/a&gt;
-&lt;a href="http://juliasilge.com/blog/Life-Changing-Magic/"&gt;analyses&lt;/a&gt;, I wanted to apply
-the method to the &lt;em&gt;Harry Potter&lt;/em&gt;&amp;nbsp;books.&lt;/p&gt;
-&lt;p&gt;There&amp;#8217;s a &lt;a href="https://duncan-garmonsway.shinyapps.io/harry-potter/#sentiment"&gt;shiny
-app&lt;/a&gt; to explore
-this interactively, but here is a still for the&amp;nbsp;blog.&lt;/p&gt;
-&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-sentiment-arcarea-1.svg" title="plot of chunk harry-potter-sentiment-arcarea" alt="plot of chunk harry-potter-sentiment-arcarea" width="960px" height="540px" /&gt;&lt;/p&gt;
-&lt;p&gt;If there&amp;#8217;s anything to interpret here, then it&amp;#8217;s that the first three books
-play the game &amp;#8220;fortunately, unfortunately&amp;#8221;, while the later books are a little
-different, especially &lt;em&gt;Order of the Phoenix&lt;/em&gt;, which is the grumpy&amp;nbsp;one.&lt;/p&gt;
-&lt;p&gt;Perhaps the Fourier transform is too sensitive to a magic number that I call the
-&amp;#8216;wiggliness&amp;#8217; parameter.  To see how sensitive, I calculated the arcs for
-&amp;#8216;wiggliness&amp;#8217; values from 3 to 10, and described the range of the arcs with a
-ribbon &amp;#8212; a little like the standard-error-ribbon on a &lt;code&gt;geom_smooth&lt;/code&gt;.  I think
-the ribbons show a more reliable story arc, and reveal that narrow wobbles, of
-the order of a chapter or so, are probably&amp;nbsp;misleading.&lt;/p&gt;
-&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-sentiment-ribbon-1.svg" title="plot of chunk harry-potter-sentiment-ribbon" alt="plot of chunk harry-potter-sentiment-ribbon" width="960px" height="540px" /&gt;&lt;/p&gt;
-&lt;p&gt;And to see where the &amp;#8216;wiggliness = 3&amp;#8217; arc lies in the range, I superimpose it as a&amp;nbsp;line.&lt;/p&gt;
-&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/harry-potter-sentiment-ribbon-arcline-1.svg" title="plot of chunk harry-potter-sentiment-ribbon-arcline" alt="plot of chunk harry-potter-sentiment-ribbon-arcline" width="960px" height="540px" /&gt;&lt;/p&gt;
-&lt;p&gt;The code is, as always, on &lt;a href="https://github.com/nacnudus/crossprod"&gt;GitHub&lt;/a&gt;, but
-you need to supply your own copies of the&amp;nbsp;books.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Duncan Garmonsway</dc:creator><pubDate>Wed, 13 Jul 2016 00:00:00 +1200</pubDate><guid>tag:nacnudus.github.io,2016-07-13:crossprod/harry-potter-and-the-n-grams-of-sentiment</guid><category>R</category><category>text</category><category>Harry Potter</category></item><item><title>Hacking the Data Science Radar with Data Science</title><link>http://nacnudus.github.io/crossprod/hacking-the-data-science-radar-with-data-science</link><description>&lt;p&gt;This post reverse-engineers the Mango Solutions &lt;a href="https://www.mango-solutions.com/radar/"&gt;Data Science
-Radar&lt;/a&gt;&amp;nbsp;using&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Programming&amp;nbsp;(R)&lt;/li&gt;
-&lt;li&gt;Visualisation&amp;nbsp;(ggplot2) &lt;/li&gt;
-&lt;li&gt;Data wrangling&amp;nbsp;(dpylr/tidyr/etc.)&lt;/li&gt;
-&lt;li&gt;Modelling&amp;nbsp;(lm)&lt;/li&gt;
-&lt;li&gt;Technology (embedded V8&amp;nbsp;javascript)&lt;/li&gt;
-&lt;li&gt;Communication&amp;nbsp;(blog)&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Why hack?  Because getting at the innards also&amp;nbsp;reveals&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;What a good score is in each&amp;nbsp;category&lt;/li&gt;
-&lt;li&gt;Which statements are most&amp;nbsp;important&lt;/li&gt;
-&lt;li&gt;Whether scores are comparable across&amp;nbsp;people&lt;/li&gt;
-&lt;li&gt;Whether you should strongly agree with the statement &amp;#8220;On average, I spend at
-  least 25% of my time manipulating data into analysis-ready&amp;nbsp;formats&amp;#8221;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id="the-radar"&gt;The&amp;nbsp;radar&lt;/h2&gt;
-&lt;p&gt;Based on Likert-style responses to 24 provocative statements, the Data
-Science Radar visualises your skills along six axes, the &amp;#8220;core attributes of a
-contemporary &amp;#8216;Data Scientist&amp;#8217;.&amp;#8221; It looks like&amp;nbsp;this.&lt;/p&gt;
-&lt;p&gt;&lt;img alt="Mango Solutions Data Science Radar" src="figure/radar.png" /&gt;&lt;/p&gt;
-&lt;h2 id="first-attempt-multivariate-multiple-regression"&gt;First attempt: Multivariate multiple&amp;nbsp;regression&lt;/h2&gt;
-&lt;p&gt;How can we score better?  Hacking the url would be
-&lt;a href="https://www.mango-solutions.com/radar/?fs=true&amp;amp;r=7.0,7.0,7.0,7.0,7.0,7.0"&gt;cheating&lt;/a&gt;,
-so instead, let&amp;#8217;s use science: hypothesise -&amp;gt; test -&amp;gt; improve.  Here are some
-initial&amp;nbsp;guesses.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Each of the 24 statements relates to exactly one attribute, i.e. four
-  statements per&amp;nbsp;attribute.&lt;/li&gt;
-&lt;li&gt;The Likert values (strongly agree, agree, somewhat agree, etc.) are coded from
-  1 to 7 (since there are seven points on each&amp;nbsp;axis).&lt;/li&gt;
-&lt;li&gt;There is a linear relationship between the coded agreement with the
-  statements, and the&amp;nbsp;attributes.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;So something&amp;nbsp;like
-&lt;/p&gt;
-&lt;div class="math"&gt;$$\text{score}_{\text{attribute}} = \frac{1}{4} \sum_{i = 1}^{4} \text{answer}_i$$&lt;/div&gt;
-&lt;p&gt;
-where &lt;span class="math"&gt;\(\text{answer}_i = 1, 2, \cdots, 7\)&lt;/span&gt; by encoding &amp;#8220;Strongly disagree&amp;#8221; as
-1, up to &amp;#8220;Strongly agree&amp;#8221; as 7, including only four relevant answers per
-attribute.  The best-possible set of answers would score 7 on every axis, and
-the worst set would score&amp;nbsp;1.&lt;/p&gt;
-&lt;p&gt;If the hypotheses are correct, then all we need to do to prove them is to record
-24 sets of random answers, the resulting scores, and fit a multivariate
-linear model.  We&amp;#8217;d expect each score (outcome variable) to have four non-zero
-coefficients (out of the 24 input variables).  Let&amp;#8217;s try&amp;nbsp;it.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c1"&gt;# The first two aren&amp;#39;t random, but they&amp;#39;re still linearly independent of the&lt;/span&gt;
-&lt;span class="c1"&gt;# others, which is what matters.&lt;/span&gt;
-random_data &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; read_csv&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;./data/radar-random.csv&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-lm1 &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; lm&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;cbind&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;Communicator&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="sb"&gt;`Data Wrangler`&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; Modeller&lt;span class="p"&gt;,&lt;/span&gt; 
-                Programmer&lt;span class="p"&gt;,&lt;/span&gt; Technologist&lt;span class="p"&gt;,&lt;/span&gt; Visualiser&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;~&lt;/span&gt; &lt;span class="m"&gt;.&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; data &lt;span class="o"&gt;=&lt;/span&gt; random_data&lt;span class="p"&gt;)&lt;/span&gt;
-lm1
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;## 
-## Call:
-## lm(formula = cbind(Communicator, `Data Wrangler`, Modeller, Programmer, 
-##     Technologist, Visualiser) ~ ., data = random_data)
-## 
-## Coefficients:
-##              Communicator  Data Wrangler  Modeller    Programmer  Technologist  Visualiser
-## (Intercept)   2.060e+00     2.422e+00      3.247e+00   6.658e-01  -1.331e+00     1.456e+00
-## q01           1.997e-01    -2.507e-02      2.602e-01  -1.103e-01  -5.866e-02    -7.103e-02
-## q02          -2.571e-01     2.729e-02     -4.514e-01   2.090e-01   1.554e-01     1.281e-01
-## q03           3.087e-01     1.744e-02     -3.471e-01  -1.303e-03   5.611e-02     1.978e-01
-## q04           4.356e-01     8.534e-04     -8.676e-03  -2.346e-02  -7.130e-02    -4.193e-02
-## q05          -2.524e-01     2.267e-01      8.732e-01  -1.559e-01  -1.907e-01    -3.885e-01
-## q06          -1.948e-01     1.545e-01      7.016e-01  -7.626e-02  -1.271e-01    -3.897e-01
-## q07          -7.925e-03     2.075e-01      4.423e-01  -1.089e-01  -2.015e-01    -2.247e-01
-## q08           8.902e-02    -4.810e-01     -1.246e-02   8.111e-02  -5.556e-02    -4.572e-02
-## q09           1.901e-01     5.174e-02     -5.260e-01  -9.428e-02   5.506e-02     2.620e-01
-## q10           9.750e-02    -1.248e-02     -2.365e-01   3.181e-02   1.557e-01     3.267e-01
-## q11          -2.099e-01    -5.220e-02      2.943e-01   2.032e-01   6.801e-02    -1.775e-01
-## q12          -1.000e-01     1.813e-15      7.000e-01  -1.333e-01   9.653e-16    -1.000e-01
-## q13           5.164e-02     2.647e-02     -3.386e-01   2.881e-01  -4.010e-03     1.428e-01
-## q14           1.211e-01    -8.162e-02     -3.835e-02  -2.508e-01  -4.963e-02     7.972e-02
-## q15           4.971e-03     5.740e-02     -2.581e-01   3.729e-01   7.939e-02     1.018e-01
-## q16           2.450e-01    -6.448e-02      6.447e-02   1.757e-01  -2.060e-01     7.158e-03
-## q17          -2.310e-01     8.405e-02     -3.947e-02   1.424e-01   3.434e-01    -8.871e-02
-## q18           4.003e-02    -4.045e-02      2.264e-02  -9.453e-02   2.958e-01    -2.477e-02
-## q19           5.952e-02     5.815e-02     -6.029e-01   6.573e-02   5.393e-01     2.828e-01
-## q20          -8.766e-02     2.262e-01     -6.807e-01   1.403e-01   5.257e-01     3.440e-01
-## q21           1.903e-01    -3.190e-02     -6.312e-01   1.331e-01   5.689e-02     4.847e-01
-## q22          -1.334e-01     5.980e-02      1.251e-01   8.396e-02   7.175e-02    -4.788e-01
-## q23          -5.700e-02    -1.563e-01      5.947e-01  -1.535e-01  -1.894e-01    -6.388e-02
-## q24          -1.419e-01     4.202e-02      2.188e-01   2.128e-02  -4.087e-02     2.361e-01
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;Hopeless!  At least one of the assumptions must be wrong, but which one?  This
-time, let&amp;#8217;s use our brains instead of stats, and do a&amp;nbsp;visualisation.  &lt;/p&gt;
-&lt;h2 id="visualisation-brain-not-brawn"&gt;Visualisation: Brain not&amp;nbsp;brawn&lt;/h2&gt;
-&lt;p&gt;Since patterns are hard to find among random responses, I answered 24 more
-surveys systematically, answering &amp;#8220;Strongly disagree&amp;#8221; to one statement, and
-&amp;#8220;Strongly agree&amp;#8221; to all the others, until all 24 statements had been strongly
-disagreed with. One time, I answered one with &amp;#8220;Strongly agree&amp;#8221; to every
-statement, plotting the resulting scores at 0 on the&amp;nbsp;x-axis.&lt;/p&gt;
-&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/radar-systematic-1.svg" title="plot of chunk radar-systematic" alt="plot of chunk radar-systematic" width="960px" height="540px" /&gt;&lt;/p&gt;
-&lt;p&gt;Let&amp;#8217;s break this&amp;nbsp;down.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;The maximum score appears to be 7, which &amp;#8216;Technologist&amp;#8217; got most of the time.
-  If you&amp;#8217;re a technologist, you should agree with&amp;nbsp;everything.&lt;/li&gt;
-&lt;li&gt;Disagreement with any of the statements drastically affects the score of
-  exactly one attribute, with minor effects on some/all of the&amp;nbsp;others.&lt;/li&gt;
-&lt;li&gt;Sometimes disagreement affects attributes for the better (e.g. 2 improves
-  &amp;#8216;Communicator&amp;#8217;).  Sometimes it&amp;#8217;s really damaging (e.g. 17&amp;#8212;20 ruins&amp;nbsp;&amp;#8216;Technologist&amp;#8217;).&lt;/li&gt;
-&lt;li&gt;There are no ties between attributes.  This is a massive&amp;nbsp;clue.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;It&amp;#8217;s now easy from this graph to work out the perfect survey responses.  For
-example, we could max-out &amp;#8216;Communicator&amp;#8217; by agreeing with statements 1, 3, and
-4, but disagreeing with statement 2 &amp;#8212; which caused a peak in the previous&amp;nbsp;graph.&lt;/p&gt;
-&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/radar-perfect-1.svg" title="plot of chunk radar-perfect" alt="plot of chunk radar-perfect" width="960px" height="540px" /&gt;&lt;/p&gt;
-&lt;p&gt;This is much&amp;nbsp;clearer.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Each attribute relates to four&amp;nbsp;statements.&lt;/li&gt;
-&lt;li&gt;Not only that, but related statements are grouped together (okay, that&amp;#8217;s
-  guessable from just doing the&amp;nbsp;survey).&lt;/li&gt;
-&lt;li&gt;Not every statement is equally weighted (the trough depths vary within&amp;nbsp;groups).&lt;/li&gt;
-&lt;li&gt;Even the statement weighting system varies between questions (the range of
-  trough depths varies between&amp;nbsp;groups).&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id="penalties"&gt;Penalties&lt;/h2&gt;
-&lt;p&gt;Crucially, it&amp;#8217;s now obvious from the parallel movements between 0 and 1, 4 and
-5, and 8 and 9, that attributes are penalized by their rank.  When statement 1
-is strongly disagreed with, &amp;#8216;Communicator&amp;#8217; has the bottom score, and the others
-are spread between 7 and five.  But when statement 1 is strongly agreed with
-(position 0 on the x-axis), &amp;#8216;Communicator&amp;#8217; takes the lead with a score of 7, and
-the scores of all the others are bumped down a step.  This strongly suggests
-that the scores are penalised by some function of the&amp;nbsp;rank.&lt;/p&gt;
-&lt;p&gt;Think of it this way: if they&amp;#8217;re all equal-first-place, then rank them
-arbitrarily (zero-based rank, 0 to 5), and then penalise them by, say,
-subtracting their rank from their score.  So say &amp;#8216;Communicator&amp;#8217; is arbitrarily
-ranked zero-th among equals (i.e. first place), then &amp;#8216;Communicator&amp;#8217; still scores
-7, But &amp;#8216;Modeller&amp;#8217;, ranked 1 (second place), loses 1 point, and &amp;#8216;Programmer&amp;#8217;,
-ranked 2 (third place) loses 2 points.  This penalisation process guarantees
-against any ties, but it also obfuscates any straightforward relationship
-between survey response and pre-penalty&amp;nbsp;scores.&lt;/p&gt;
-&lt;p&gt;Here&amp;#8217;s the penalty function in action.  I answered every statement &amp;#8216;correctly&amp;#8217;,
-except for statement 1, which I answered at every level from &amp;#8220;Strongly disagree&amp;#8221;
-to &amp;#8220;Strongly agree&amp;#8221;.  Note the change of axis&amp;nbsp;variables.&lt;/p&gt;
-&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/radar-diff-1.svg" title="plot of chunk radar-diff" alt="plot of chunk radar-diff" width="960px" height="540px" /&gt;&lt;/p&gt;
-&lt;p&gt;As my answers go from &amp;#8220;Strongly disagree&amp;#8221; up to &amp;#8220;Agree&amp;#8221; (0 to 6 on the x-axis),
-the score of &amp;#8216;Communicator&amp;#8217; gradually increases, as we&amp;#8217;d expect.  But in the
-final step, &amp;#8220;Strongly agree&amp;#8221;, there&amp;#8217;s a jump.  That&amp;#8217;s because &amp;#8216;Communicator&amp;#8217; is
-now ranked (abitrarily) in first place, so no penalty is applied, and it gets
-the full 7 points.  At the same time, the other attributes are bumped&amp;nbsp;down.&lt;/p&gt;
-&lt;h2 id="hunt-the-function"&gt;Hunt the&amp;nbsp;function&lt;/h2&gt;
-&lt;p&gt;We need to remove these penalties before we can investigate the
-statement/response weightings, but we don&amp;#8217;t yet know what exactly the penalty
-function is, besides being some function of the rank.  Using the perfect
-answers, though (at 6 on the x-axis above), we can get clues to narrow down the
-options.  Since we know that the original pre-penalty score of every attribute
-ought to have been 7, then by subtracting their final scores from 7, we reveal
-the size of the&amp;nbsp;penalty.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kp"&gt;sort&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;7&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="kp"&gt;unlist&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;perfect_data&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;-1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;-24&lt;/span&gt;&lt;span class="p"&gt;]))&lt;/span&gt;       &lt;span class="c1"&gt;# absolute penalty&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;##  Communicator      Modeller    Programmer  Technologist    Visualiser Data Wrangler 
-##           0.0           0.4           0.7           1.0           1.4           1.8
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;So penalties can be as large as 1.8.  That would be a problem for poor-ranking
-pre-penalty scores below 1.8, which would be pushed below zero.  To guarantee
-positive final scores, the penalty function must scale with the pre-penalty
-score, i.e. the pre-penalty score must be a coefficient in the function.  That
-restricts us to a couple of basic designs for each attribute&amp;#8217;s&amp;nbsp;score.&lt;/p&gt;
-&lt;p&gt;Either:&lt;/p&gt;
-&lt;div class="math"&gt;$$\text{final score} = \text{pre-penalty} - (\text{pre-penalty} \times \text{factor} \times \text{rank})$$&lt;/div&gt;
-&lt;p&gt;
-where &lt;span class="math"&gt;\(0 \leq \text{factor} &amp;lt; 1/5\)&lt;/span&gt; (for&amp;nbsp;positivity).&lt;/p&gt;
-&lt;p&gt;Or:&lt;/p&gt;
-&lt;div class="math"&gt;$$\text{final score} = \text{factor} \times \frac{\text{pre-penalty}}{\text{rank}}$$&lt;/div&gt;
-&lt;p&gt;
-where &lt;span class="math"&gt;\(0 \leq \text{factor} &amp;lt; 1\)&lt;/span&gt; (to ensure a penalty when &lt;span class="math"&gt;\(\text{rank} = 1\)&lt;/span&gt;).&lt;/p&gt;
-&lt;p&gt;There is a telling difference between these functions.  The first is a straight
-line, essentially &lt;span class="math"&gt;\(y = mx + c\)&lt;/span&gt;, so that, given equal pre-penalty scores, the
-differences between final scores are equal.  The second is a curve, essentially
-&lt;span class="math"&gt;\(y = m/x\)&lt;/span&gt;, so that, even given equal pre-penalty scores, the gap between
-poorly-ranked scores is wider than between the top&amp;nbsp;scores.&lt;/p&gt;
-&lt;p&gt;Since we have a handy set of equal pre-penalty scores, we can eliminate one of
-the functions by seeing whether the difference in penalties between ranks is, in
-fact,&amp;nbsp;constant.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kp"&gt;diff&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;sort&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;7&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="kp"&gt;unlist&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;perfect_data&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;-1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;-24&lt;/span&gt;&lt;span class="p"&gt;])))&lt;/span&gt; &lt;span class="c1"&gt;# difference in penalties between ranks&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;##      Modeller    Programmer  Technologist    Visualiser Data Wrangler 
-##           0.4           0.3           0.3           0.4           0.4
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;It&amp;#8217;s constant enough for me, so I choose the first&amp;nbsp;model.&lt;/p&gt;
-&lt;p&gt;We can also check that penalties do, indeed, scale with the pre-penalty scores,
-by producing a set of &lt;a href="https://www.mango-solutions.com/radar/?fs=true&amp;amp;r=1.0,0.9,0.9,0.8,0.8,0.7"&gt;worst-possible
-answers&lt;/a&gt;.
-Pay attention: these are the scores to&amp;nbsp;beat.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;## Source: local data frame [6 x 2]
-## 
-##       attribute score
-##           &amp;lt;chr&amp;gt; &amp;lt;dbl&amp;gt;
-## 1  Communicator   1.0
-## 2      Modeller   0.9
-## 3    Programmer   0.9
-## 4  Technologist   0.8
-## 5    Visualiser   0.8
-## 6 Data Wrangler   0.7
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;&lt;img alt="Mango Solutions Data Science Radar: worst score" src="figure/radar-worst.png" /&gt;&lt;/p&gt;
-&lt;p&gt;Not only does this prove the scaling of penalties by pre-penalty score, but it
-also justifies the coding of &amp;#8216;agreement&amp;#8217; between 1 and 7, rather than, say, 0
-and 6, since we now have a clear minimum pre-penalty score of 1, as well as a
-maximum of 7 from the set of perfect&amp;nbsp;answers.&lt;/p&gt;
-&lt;p&gt;If you look carefully, this set of worst-possible scores also hints at the value
-of the penalty factor.  Since the pre-penalty score is 1, and the difference
-between penalties is constant by design, and the difference between &lt;em&gt;these&lt;/em&gt;
-penalties alternates between 0.1 and 0.0, I &lt;em&gt;strongly&lt;/em&gt; suspect a factor of 0.5
-and a rounding system that alternates between odds and&amp;nbsp;evens.&lt;/p&gt;
-&lt;h2 id="modelling-success"&gt;Modelling&amp;nbsp;success&lt;/h2&gt;
-&lt;p&gt;But we can nail this down with a linear model, using the two sets of data where
-we already know the pre-penalty scores, i.e. the best- and worst-possible
-scores, as well as the ranks, so we can estimate the penalty&amp;nbsp;factor.  &lt;/p&gt;
-&lt;p&gt;A reminder of the&amp;nbsp;model:&lt;/p&gt;
-&lt;div class="math"&gt;$$\text{final score} = \text{pre-penalty} - (\text{pre-penalty} \times \text{factor} \times \text{rank})$$&lt;/div&gt;
-&lt;p&gt;
-where &lt;span class="math"&gt;\(0 \leq \text{factor} &amp;lt; 1/5\)&lt;/span&gt; (for&amp;nbsp;positivity).&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;worst&lt;span class="o"&gt;$&lt;/span&gt;rank &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;5&lt;/span&gt;
-worst&lt;span class="o"&gt;$&lt;/span&gt;prepenalty &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;
-best &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; 
-  frame_data&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;~&lt;/span&gt;attribute&lt;span class="p"&gt;,&lt;/span&gt;     &lt;span class="o"&gt;~&lt;/span&gt;&lt;span class="kp"&gt;rank&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;~&lt;/span&gt;score&lt;span class="p"&gt;,&lt;/span&gt;
-             &lt;span class="s"&gt;&amp;quot;Communicator&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;    &lt;span class="m"&gt;7.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-             &lt;span class="s"&gt;&amp;quot;Modeller&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;         &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;    &lt;span class="m"&gt;6.6&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-             &lt;span class="s"&gt;&amp;quot;Programmer&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;       &lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;    &lt;span class="m"&gt;6.3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-             &lt;span class="s"&gt;&amp;quot;Technologist&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;     &lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;    &lt;span class="m"&gt;6.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-             &lt;span class="s"&gt;&amp;quot;Visualiser&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;       &lt;span class="m"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;    &lt;span class="m"&gt;5.6&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-             &lt;span class="s"&gt;&amp;quot;Data Wrangler&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;    &lt;span class="m"&gt;5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;    &lt;span class="m"&gt;5.2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-best&lt;span class="o"&gt;$&lt;/span&gt;prepenalty &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="m"&gt;7&lt;/span&gt;
-
-lm&lt;span class="p"&gt;(&lt;/span&gt;score &lt;span class="o"&gt;~&lt;/span&gt; prepenalty &lt;span class="o"&gt;+&lt;/span&gt; prepenalty&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="kp"&gt;rank&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; data &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kp"&gt;rbind&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;best&lt;span class="p"&gt;,&lt;/span&gt; worst&lt;span class="p"&gt;))&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;## 
-## Call:
-## lm(formula = score ~ prepenalty + prepenalty:rank, data = rbind(best, 
-##     worst))
-## 
-## Coefficients:
-##     (Intercept)       prepenalty  prepenalty:rank  
-##        -0.02778          1.00349         -0.05029
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;That&amp;#8217;ll do!  The coefficient on the pre-penalty score is 1, as in our
-model, and the coefficient on the pre-penalty&amp;#8212;rank interaction is -0.05, a nice
-round number such as a model-builder might choose (and the right&amp;nbsp;sign).&lt;/p&gt;
-&lt;h2 id="weighting-game"&gt;Weighting&amp;nbsp;game&lt;/h2&gt;
-&lt;p&gt;We&amp;#8217;re on the home straight.  Now that we understand the penalty system, we can
-go beneath its obfuscations and sort out the statement weights.  Here, I invert
-the penalty function, and apply it to an earlier set of answers that you&amp;#8217;ll
-recognise in the&amp;nbsp;graph.&lt;/p&gt;
-&lt;div class="math"&gt;$$\text{pre-penalty} = \frac{\text{final score}}{1 - (\text{factor} \times \text{rank})}$$&lt;/div&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="err"&gt;##&lt;/span&gt; &lt;span class="nb"&gt;Error&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="nx"&gt;select&lt;/span&gt;&lt;span class="p"&gt;(.,&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;starts_with&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;q&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;attempt&lt;/span&gt; &lt;span class="nx"&gt;to&lt;/span&gt; &lt;span class="nx"&gt;apply&lt;/span&gt; &lt;span class="nx"&gt;non&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="kd"&gt;function&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;## Error in eval(expr, envir, enclos): object &amp;#39;systematic_prepenalty&amp;#39; not found
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;It does the soul good to see the pre-penalty attribute scores restored (bar&amp;nbsp;rounding).&lt;/p&gt;
-&lt;p&gt;The weight of each statement equals the amount of damage that it can do to the
-relevant attribute&amp;#8217;s score, divided by the total damage done by the other
-relevant&amp;nbsp;statements.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;## Error in eval(expr, envir, enclos): object &amp;#39;systematic_prepenalty&amp;#39; not found
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;Being nice fractions, the three systems make perfect sense (allowing yet again for minor
-rounding): &lt;span class="math"&gt;\((\frac{1}{5}\)&lt;/span&gt;, &lt;span class="math"&gt;\(\frac{1}{5}\)&lt;/span&gt;, &lt;span class="math"&gt;\(\frac{1}{5}\)&lt;/span&gt;, &lt;span class="math"&gt;\(\frac{2}{5})\)&lt;/span&gt;, &lt;span class="math"&gt;\((\frac{7}{30}\)&lt;/span&gt;, &lt;span class="math"&gt;\(\frac{7}{30}\)&lt;/span&gt;, &lt;span class="math"&gt;\(\frac{7}{30}\)&lt;/span&gt;, &lt;span class="math"&gt;\(\frac{9}{30})\)&lt;/span&gt;, and &lt;span class="math"&gt;\((\frac{2}{10}\)&lt;/span&gt;, &lt;span class="math"&gt;\(\frac{2}{10}\)&lt;/span&gt;, &lt;span class="math"&gt;\(\frac{3}{10}\)&lt;/span&gt;, &lt;span class="math"&gt;\(\frac{3}{10})\)&lt;/span&gt;.&lt;/p&gt;
-&lt;p&gt;And don&amp;#8217;t forget to re-write the model to account for the&amp;nbsp;weights.&lt;/p&gt;
-&lt;div class="math"&gt;$$\text{score}_{\text{attribute}} = \sum_{i = 1}^{4} \text{answer}_i \times
-\text{weight}_i$$&lt;/div&gt;
-&lt;p&gt; where &lt;span class="math"&gt;\(\text{weight}_i\)&lt;/span&gt; is taken from&amp;nbsp;above.&lt;/p&gt;
-&lt;h2 id="implementation-and-simulation"&gt;Implementation and&amp;nbsp;simulation&lt;/h2&gt;
-&lt;p&gt;At last, we can implement the whole thing in R, run it on thousands of random
-answer-sets, and explore the distributions.  Well, almost &amp;#8212; it turns out that R
-and JavaScript handle rounding and floating-point arithmetic differently, so I
-had to use the &lt;a href="https://github.com/jeroenooms/V8"&gt;V8&lt;/a&gt; package to implement the
-rounding steps in JavaScript, as the website does.  I give more details in a
-&lt;a href="http://nacnudus.github.io/crossprod/r-rounding-is-weird-try-javascript"&gt;previous post&lt;/a&gt;.  At least I got to display some
-&amp;#8216;Technologist&amp;#8217;&amp;nbsp;skills.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;ct &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; V8&lt;span class="o"&gt;::&lt;/span&gt;v8&lt;span class="p"&gt;()&lt;/span&gt;
-roundjs &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;,&lt;/span&gt; digits&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-  &lt;span class="kp"&gt;sapply&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;y&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;ct&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="kp"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;paste0&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Number((&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kp"&gt;sprintf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;%.16f&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; y&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;).toFixed(&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; digits&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;))&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))})&lt;/span&gt;
-&lt;span class="p"&gt;}&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;The effect of the penalty can be prettily illustrated by a scatterplot of the
-scores of two attributes.  Ties are separated, parting the cloud, slightly above
-the line &lt;span class="math"&gt;\(y = x\)&lt;/span&gt;.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="err"&gt;##&lt;/span&gt; &lt;span class="nb"&gt;Error&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="nx"&gt;select&lt;/span&gt;&lt;span class="p"&gt;(.,&lt;/span&gt; &lt;span class="nx"&gt;set&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;attribute&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;score&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;attempt&lt;/span&gt; &lt;span class="nx"&gt;to&lt;/span&gt; &lt;span class="nx"&gt;apply&lt;/span&gt; &lt;span class="nx"&gt;non&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="kd"&gt;function&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;We can also de-penalise the scores to see the effect of the penalty on the
-distribution.  Pre-penalty scores are distributed as you&amp;#8217;d expect, despite
-slightly uneven weights.  Post-penalty scores are skewed to the right, but not
-so much that you&amp;#8217;d notice in casual&amp;nbsp;use.&lt;/p&gt;
-&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/radar-penalty-skew-1.svg" title="plot of chunk radar-penalty-skew" alt="plot of chunk radar-penalty-skew" width="960px" height="540px" /&gt;&lt;/p&gt;
-&lt;p&gt;The magnitude of the penalty depends on the magnitude of the pre-penalty score
-as well as its rank, introducing a tricky extra dimension to any visualisation.
-Hexagonal bins work well, coloured according to frequency.  Penalties tend to be
-largest for middling scores, where the rank tends to be poor enough to multiply
-the penalty factor by a few times, but the magnitude of the score isn&amp;#8217;t small
-enough to scale the penalty&amp;nbsp;down.&lt;/p&gt;
-&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/radar-penalty-magnitude-1.svg" title="plot of chunk radar-penalty-magnitude" alt="plot of chunk radar-penalty-magnitude" width="960px" height="540px" /&gt;&lt;/p&gt;
-&lt;h2 id="the-whole-point"&gt;The whole&amp;nbsp;point&lt;/h2&gt;
-&lt;p&gt;It turns out that interpreting individual radars should be done more thoughtfully
-than one might have expected,&amp;nbsp;because&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;5.2 = 7.0 for data-wrangling unicorns with perfect&amp;nbsp;answers.&lt;/li&gt;
-&lt;li&gt;Scores aren&amp;#8217;t directly comparable between people, unless they&amp;#8217;re at the
-  extremes where the penalties exaggerate&amp;nbsp;less.&lt;/li&gt;
-&lt;li&gt;The correct answer to the statement &amp;#8220;On average, I spend at least 25% of my
-  time manipulating data into analysis-ready formats&amp;#8221;, if you want a high &amp;#8216;Data
-  Wrangler&amp;#8217; score, is &lt;em&gt;Strongly disagree&lt;/em&gt;.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;And the &lt;a href="https://www.mango-solutions.com/radar/?fs=true&amp;amp;r=7.0,6.6,6.3,6.0,5.6,5.2"&gt;perfect score&lt;/a&gt;?&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;## Source: local data frame [6 x 2]
-## 
-##       attribute score
-##           &amp;lt;chr&amp;gt; &amp;lt;dbl&amp;gt;
-## 1  Communicator   7.0
-## 2      Modeller   6.6
-## 3    Programmer   6.3
-## 4  Technologist   6.0
-## 5    Visualiser   5.6
-## 6 Data Wrangler   5.2
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;&lt;img alt="Mango Solutions Data Science Radar: perfect score" src="figure/radar-perfect.png" /&gt;&lt;/p&gt;
-&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
-    var align = "center",
-        indent = "0em",
-        linebreak = "false";
-
-    if (false) {
-        align = (screen.width &lt; 768) ? "left" : align;
-        indent = (screen.width &lt; 768) ? "0em" : indent;
-        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
-    }
-
-    var mathjaxscript = document.createElement('script');
-    var location_protocol = (false) ? 'https' : document.location.protocol;
-    if (location_protocol !== 'http' &amp;&amp; location_protocol !== 'https') location_protocol = 'https:';
-    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
-    mathjaxscript.type = 'text/javascript';
-    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
-    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
-        "MathJax.Hub.Config({" +
-        "    config: ['MMLorHTML.js']," +
-        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
-        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
-        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
-        "    displayAlign: '"+ align +"'," +
-        "    displayIndent: '"+ indent +"'," +
-        "    showMathMenu: true," +
-        "    messageStyle: 'normal'," +
-        "    tex2jax: { " +
-        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
-        "        displayMath: [ ['$$','$$'] ]," +
-        "        processEscapes: true," +
-        "        preview: 'TeX'," +
-        "    }, " +
-        "    'HTML-CSS': { " +
-        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
-        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
-        "    }, " +
-        "}); " +
-        "if ('default' !== 'default') {" +
-            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
-                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
-                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
-                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
-                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
-                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
-            "});" +
-            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
-                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
-                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
-                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
-                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
-                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
-            "});" +
-        "}";
-    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
-}
-&lt;/script&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Duncan Garmonsway</dc:creator><pubDate>Tue, 28 Jun 2016 00:00:00 +1200</pubDate><guid>tag:nacnudus.github.io,2016-06-28:crossprod/hacking-the-data-science-radar-with-data-science</guid><category>R</category><category>JavaScript</category><category>V8</category></item><item><title>Creating nests without tidyr</title><link>http://nacnudus.github.io/crossprod/creating-nests-without-tidyr</link><description>&lt;p&gt;Unless you begin with an unnested data frame, creating a nested data frame needs
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Crossprod</title><link>http://nacnudus.github.io/crossprod/</link><description>R, data, and frustration</description><atom:link href="http://nacnudus.github.io/crossprod/feeds/all.rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 22 Jun 2016 00:00:00 +1200</lastBuildDate><item><title>Creating nests without tidyr</title><link>http://nacnudus.github.io/crossprod/creating-nests-without-tidyr</link><description>&lt;p&gt;Unless you begin with an unnested data frame, creating a nested data frame needs
 a little trick.  Here it&amp;nbsp;is.&lt;/p&gt;
 &lt;h1 id="nested-data-frames"&gt;Nested data&amp;nbsp;frames&lt;/h1&gt;
 &lt;p&gt;The &lt;code&gt;tidyr&lt;/code&gt; package has a handy function for &lt;em&gt;nesting&lt;/em&gt; data frames.  Hadley
@@ -1377,519 +785,35 @@ none of them matches.  The &lt;code&gt;numpy&lt;/code&gt; Python package &lt;a h
 &lt;p&gt;I used &lt;code&gt;rpy2&lt;/code&gt;, but it wasn&amp;#8217;t long before I encountered a more serious problem.
 When random draws are conducted in more than one part of the code, the
 programmer can&amp;#8217;t control the order of the draws.  That&amp;#8217;s up to &lt;code&gt;SimPy&lt;/code&gt; and
-&lt;code&gt;simmer&lt;/code&gt;.  At that point, I gave&amp;nbsp;up.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Duncan Garmonsway</dc:creator><pubDate>Wed, 11 May 2016 00:00:00 +1200</pubDate><guid>tag:nacnudus.github.io,2016-05-11:crossprod/simmer-vs-simpy-the-bank-part-i</guid><category>R</category><category>Simmer</category><category>SimPy</category></item><item><title>How many StatsBloggers are there?</title><link>http://nacnudus.github.io/crossprod/how-many-statsbloggers-are-there</link><description>&lt;p&gt;This post does two&amp;nbsp;things:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Reproduces my &lt;a href="http://nacnudus.github.io/crossprod/how-many-r-bloggers-are-there"&gt;R-Bloggers post&lt;/a&gt; on the
-  &lt;a href="http://www.statsblogs.com/"&gt;StatsBlogs&lt;/a&gt; website, to discover how many
-  StatsBlogs blogs there are &lt;em&gt;really&lt;/em&gt;.&lt;/li&gt;
-&lt;li&gt;Considers how to interpret changes in diversity without knowingly observing
-  births/deaths of&amp;nbsp;blogs.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Many people who blog about statistics syndicate their posts on the the
-&lt;a href="http://www.statsblogs.com/"&gt;StatsBlogs&lt;/a&gt; website by the &lt;a href="http://www.talkstats.com/"&gt;Talk Stats
-forum&lt;/a&gt;.  The list of &amp;#8220;contributing blogs&amp;#8221; tends only
-to lengthen, but how many actual posts are there in a given week/month, from how
-many different&amp;nbsp;blogs?&lt;/p&gt;
-&lt;h2 id="the-gist-of-it"&gt;The gist of&amp;nbsp;it&lt;/h2&gt;
-&lt;p&gt;I subscribed to the &lt;a href="http://www.statsblogs.com/"&gt;StatsBlogs&lt;/a&gt; daily digest emails
-in February 2014, giving me a good time-series of posts.  See my &lt;a href="http://nacnudus.github.io/crossprod/how-many-r-bloggers-are-there"&gt;R-Bloggers
-post&lt;/a&gt; and the code at the end of this post for how I
-mined the emails for names and&amp;nbsp;dates.&lt;/p&gt;
-&lt;h2 id="the-trends"&gt;The&amp;nbsp;trends&lt;/h2&gt;
-&lt;p&gt;It turns out that there are have been about 30 blogs active in a given month,
-posting about 150 posts (the only one that regularly posts more than once per
-week is, no prizes for guessing, &lt;a href="http://andrewgelman.com/"&gt;Statistical Modeling, Causal Inference, and
-Social Science&lt;/a&gt;).  There was a change in mid-2015,
-either a step-change down from ~175 blogs/month, or the start of a decline.
-It&amp;#8217;s hard to say which.  When I first subscribed in February 2014, there were
-over 200 posts per month.  Please comment if you can suggest reasons for the&amp;nbsp;change.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;## 
-## Attaching package: &amp;#39;lubridate&amp;#39;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;## The following objects are masked from &amp;#39;package:simmer&amp;#39;:
-## 
-##     now, rollback
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;## The following object is masked from &amp;#39;package:base&amp;#39;:
-## 
-##     date
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/statsblogs-periodical-1.svg" title="plot of chunk statsblogs-periodical" alt="plot of chunk statsblogs-periodical" width="960px" height="540px" /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/statsblogs-top10-1.svg" title="plot of chunk statsblogs-top10" alt="plot of chunk statsblogs-top10" width="960px" height="540px" /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/statsblogs-rates-1.svg" title="plot of chunk statsblogs-rates" alt="plot of chunk statsblogs-rates" width="960px" height="540px" /&gt;&lt;/p&gt;
-&lt;h2 id="survival-modelling-without-birthdeath-observations"&gt;Survival modelling without birth/death&amp;nbsp;observations&lt;/h2&gt;
-&lt;p&gt;Can we do a survival analysis without knowingly observing births and deaths of
-blogs?  I haven&amp;#8217;t trawled the blogs to find their first-ever posts, and it would
-be hard even for an author to identify a last-ever post.  Without that crucial
-information, I doubt a hazard function can be estimated, though I don&amp;#8217;t know an
-awful lot about that kind of thing, so&amp;nbsp;maybe.&lt;/p&gt;
-&lt;p&gt;But what about diversity?  I think we could get somewhere even without births
-and deaths.  Here&amp;#8217;s the cumulative distribution of observed blogs (the number of
-different blogs observed), over the whole&amp;nbsp;period.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;blogs &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  &lt;span class="c1"&gt;# Get the first observation of each blog&lt;/span&gt;
-  group_by&lt;span class="p"&gt;(&lt;/span&gt;blog&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  arrange&lt;span class="p"&gt;(&lt;/span&gt;datetime&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  slice&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  ungroup &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  arrange&lt;span class="p"&gt;(&lt;/span&gt;datetime&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  mutate&lt;span class="p"&gt;(&lt;/span&gt;cumulative &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;n&lt;span class="p"&gt;())&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  ggplot&lt;span class="p"&gt;(&lt;/span&gt;aes&lt;span class="p"&gt;(&lt;/span&gt;datetime&lt;span class="p"&gt;,&lt;/span&gt; cumulative&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
-  geom_line&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
-  xlab&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
-  ylab&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Number of different blogs observed&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
-  ggtitle&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Cumulative number of different blogs observed&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/statsblogs-cumdist-1.svg" title="plot of chunk statsblogs-cumdist" alt="plot of chunk statsblogs-cumdist" width="960px" height="540px" /&gt;&lt;/p&gt;
-&lt;p&gt;Supposing the population of blogs were static, then the first six months
-of the cumulative distribution curve would make sense.  Lots of blogs post daily,
-weekly or monthly, so by the time a couple of months have gone by, many blogs
-have already been observed.  After that, things slacken, until after about six
-months the curve levels off &amp;#8212; all blogs have been&amp;nbsp;observed.&lt;/p&gt;
-&lt;p&gt;Except that it doesn&amp;#8217;t level off.  It continues to rise steadily, implying that
-new blogs are being syndicated.  On the other hand, the number of different
-blogs observed in a given month (first graph) is slowly declining, so some
-blogs must be posting less often, or ceasing altogether.  Given those slopes,
-the composition of the population must be&amp;nbsp;changing.&lt;/p&gt;
-&lt;p&gt;I&amp;#8217;m no clever clogs, so I&amp;#8217;m not about to develop a statistic to describe those
-two slopes, to figure out their distribution, or to test hypotheses.  If anyone
-knows anything about this, please&amp;nbsp;comment!&lt;/p&gt;
-&lt;h2 id="what-took-so-long"&gt;What took so&amp;nbsp;long&lt;/h2&gt;
-&lt;p&gt;Almost nothing, since this post re-used the code from my &lt;a href="http://nacnudus.github.io/crossprod/how-many-r-bloggers-are-there"&gt;R-Bloggers
-post&lt;/a&gt;.  All I
-had to do was tweak the XPath, and then take a long bath to think about
-cumulative&amp;nbsp;distributions.&lt;/p&gt;
-&lt;h2 id="code"&gt;Code&lt;/h2&gt;
-&lt;p&gt;Nothing postworthy, so see
-&lt;a href="https://github.com/nacnudus/crossprod/tree/master/content"&gt;GitHub&lt;/a&gt; if you&amp;#8217;re&amp;nbsp;interested.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Duncan Garmonsway</dc:creator><pubDate>Mon, 02 May 2016 00:00:00 +1200</pubDate><guid>tag:nacnudus.github.io,2016-05-02:crossprod/how-many-statsbloggers-are-there</guid><category>R</category></item><item><title>R rounding is weird? Try JavaScript!</title><link>http://nacnudus.github.io/crossprod/r-rounding-is-weird-try-javascript</link><description>&lt;h2 id="round05-0-eh"&gt;round(0.5) == 0?&amp;nbsp;Eh?&lt;/h2&gt;
-&lt;p&gt;A common source of confusion in R is rounding-to-even (example adapted from&amp;nbsp;?round):&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;x1 &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;seq&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;-2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; by &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;.5&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="kt"&gt;matrix&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x1&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kp"&gt;round&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x1&lt;span class="p"&gt;)),&lt;/span&gt; nrow &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; byrow &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;#-- IEEE rounding !&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;##      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10] [,11] [,12] [,13]
-## [1,]   -2 -1.5   -1 -0.5    0  0.5    1  1.5    2   2.5     3   3.5     4
-## [2,]   -2 -2.0   -1  0.0    0  0.0    1  2.0    2   2.0     3   4.0     4
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;This post does five&amp;nbsp;things:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Illustrates rounding bias with a&amp;nbsp;graph.&lt;/li&gt;
-&lt;li&gt;Discovers that JavaScript (in my browser) rounds the other&amp;nbsp;way.&lt;/li&gt;
-&lt;li&gt;Encounters floating-point difficulties when emulating&amp;nbsp;JavaScript.&lt;/li&gt;
-&lt;li&gt;Calls JavaScript itself via the &lt;code&gt;V8&lt;/code&gt; package.&lt;/li&gt;
-&lt;li&gt;Explains where all the time&amp;nbsp;goes.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id="graph-of-rounding-bias"&gt;Graph of rounding&amp;nbsp;bias&lt;/h2&gt;
-&lt;p&gt;Here is an unpolished graphical illustration of the bias introduced by rounding
-halves (0.5, 1.5, etc.) away from zero.  The details of the difference are
-neatly explained in the &lt;a href="http://www.burns-stat.com/pages/Tutor/R_inferno.pdf"&gt;R
-Inferno&lt;/a&gt;, circle&amp;nbsp;8.1.52.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c1"&gt;# Round-to-even is the R default&lt;/span&gt;
-round_to_even &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;round&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c1"&gt;# Round-away-from-zero function adapted from http://stackoverflow.com/a/12688836/937932&lt;/span&gt;
-round_away_from_zero &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;,&lt;/span&gt; digits &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-  posneg &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kp"&gt;sign&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;)&lt;/span&gt;
-  z &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kp"&gt;abs&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="m"&gt;10&lt;/span&gt;&lt;span class="o"&gt;^&lt;/span&gt;digits
-  z &lt;span class="o"&gt;=&lt;/span&gt; z &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="m"&gt;0.5&lt;/span&gt;
-  z &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kp"&gt;trunc&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;z&lt;span class="p"&gt;)&lt;/span&gt;
-  z &lt;span class="o"&gt;=&lt;/span&gt; z &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="m"&gt;10&lt;/span&gt;&lt;span class="o"&gt;^&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;digits&lt;span class="p"&gt;)&lt;/span&gt;
-  z&lt;span class="o"&gt;*&lt;/span&gt;posneg
-&lt;span class="p"&gt;}&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/rounding-bias-1-1.svg" title="plot of chunk rounding-bias-1" alt="plot of chunk rounding-bias-1" width="960px" height="540px" /&gt;&lt;/p&gt;
-&lt;h2 id="javascript-rounding-in-the-chrome-browser"&gt;JavaScript rounding in the Chrome&amp;nbsp;browser&lt;/h2&gt;
-&lt;p&gt;But when I tried to emulated a website&amp;#8217;s behaviour in R, it turned out that
-Chrome was rounding towards odd numbers after the decimal point (anyone know
-why?).  Try the following in the Chrome Developer Console (ctrl+shift+c in a&amp;nbsp;tab).&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c1"&gt;// Rounds away from zero&lt;/span&gt;
-&lt;span class="nx"&gt;console&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mf"&gt;1.5&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;toFixed&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
-&lt;span class="nx"&gt;console&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mf"&gt;0.5&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;toFixed&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
-&lt;span class="nx"&gt;console&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="mf"&gt;0.5&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;toFixed&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
-&lt;span class="nx"&gt;console&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="mf"&gt;1.5&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;toFixed&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
-
-&lt;span class="c1"&gt;// Rounds to odd&lt;/span&gt;
-&lt;span class="nx"&gt;console&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mf"&gt;0.25&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;toFixed&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
-&lt;span class="nx"&gt;console&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mf"&gt;0.15&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;toFixed&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
-&lt;span class="nx"&gt;console&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mf"&gt;0.05&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;toFixed&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
-&lt;span class="nx"&gt;console&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="mf"&gt;0.05&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;toFixed&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
-&lt;span class="nx"&gt;console&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="mf"&gt;0.15&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;toFixed&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
-&lt;span class="nx"&gt;console&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="mf"&gt;0.25&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;toFixed&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;How odd is that?  So I adapted a &lt;a href="https://www.mathworks.com/matlabcentral/fileexchange/40286-rounding-functions-collection"&gt;handy &lt;span class="caps"&gt;MATLAB&lt;/span&gt;
-implementation&lt;/a&gt;
-of rounding-to-odd, and compared it with the other two&amp;nbsp;strategies.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c1"&gt;# Round-to-odd function adapted from&lt;/span&gt;
-&lt;span class="c1"&gt;# https://www.mathworks.com/matlabcentral/fileexchange/40286-rounding-functions-collection&lt;/span&gt;
-round_to_odd &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;,&lt;/span&gt; digits &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-  y &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="m"&gt;10&lt;/span&gt;&lt;span class="o"&gt;^&lt;/span&gt;digits
-  z &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; y &lt;span class="o"&gt;%%&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="kp"&gt;sign&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;y&lt;span class="p"&gt;))&lt;/span&gt;
-  z&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="kp"&gt;is.nan&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;z&lt;span class="p"&gt;)]&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;
-  z&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="kp"&gt;abs&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;z&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="m"&gt;1.5&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;
-  z &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; round_away_from_zero&lt;span class="p"&gt;(&lt;/span&gt;y &lt;span class="o"&gt;-&lt;/span&gt; z&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-  z &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="m"&gt;10&lt;/span&gt;&lt;span class="o"&gt;^&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;digits&lt;span class="p"&gt;)&lt;/span&gt; 
-&lt;span class="p"&gt;}&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/rounding-bias-2-1.svg" title="plot of chunk rounding-bias-2" alt="plot of chunk rounding-bias-2" width="960px" height="540px" /&gt;&lt;/p&gt;
-&lt;p&gt;The graph shows that, like rounding-to-even, rounding-to-odd is unbiased, but a
-snag is that successive rounded operations will never reach zero (see comments
-on &lt;a href="http://programmers.stackexchange.com/a/256269/111311"&gt;this StackExchange
-answer&lt;/a&gt;):&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;x &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="m"&gt;77&lt;/span&gt;
-&lt;span class="kr"&gt;for&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;i &lt;span class="kr"&gt;in&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;10&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-  x &lt;span class="o"&gt;&amp;lt;&amp;lt;-&lt;/span&gt; round_to_odd&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-  &lt;span class="kp"&gt;cat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;, &amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="p"&gt;}&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;## 39 , 19 , 9 , 5 , 3 , 1 , 1 , 1 , 1 , 1 ,
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;x &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="m"&gt;77&lt;/span&gt;
-&lt;span class="kr"&gt;for&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;i &lt;span class="kr"&gt;in&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;10&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-  x &lt;span class="o"&gt;&amp;lt;&amp;lt;-&lt;/span&gt; round_to_even&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-  &lt;span class="kp"&gt;cat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;, &amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="p"&gt;}&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;## 38 , 19 , 10 , 5 , 2 , 1 , 0 , 0 , 0 , 0 ,
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;h2 id="floating-point-errors"&gt;Floating point&amp;nbsp;errors&lt;/h2&gt;
-&lt;p&gt;Using my new round-to-odd function to emulate JavaScript behaviour, I
-encountered floating point errors.  For example, take the number&amp;nbsp;6.65:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kp"&gt;sprintf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;%.16f&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;6.65&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;7&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="m"&gt;0.95&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;7&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="m"&gt;0.35&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;## [1] &amp;quot;6.6500000000000004&amp;quot; &amp;quot;6.6499999999999995&amp;quot; &amp;quot;6.6500000000000004&amp;quot;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;The tiny differences don&amp;#8217;t affect rounding in&amp;nbsp;R:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;round_to_odd&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;6.65&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;7&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="m"&gt;0.95&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;7&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="m"&gt;0.35&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;## [1] 6.7 6.7 6.7
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;But they do affect rounding in JavaScript.  Again, paste these into the browser&amp;nbsp;console:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;console.log((6.65).toFixed(1));
-console.log((7 * 0.95).toFixed(1));
-console.log((7 - 0.35).toFixed(1));
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;h2 id="calling-javascript-v8-engine-via-the-v8-package"&gt;Calling JavaScript V8 engine via the V8&amp;nbsp;package&lt;/h2&gt;
-&lt;p&gt;At this point, I gave up on emulating JavaScript behaviour in R, and resorted to
-calling JavaScript from R via the
-&lt;a href="https://cran.r-project.org/web/packages/V8/index.html"&gt;&lt;code&gt;V8&lt;/code&gt;&lt;/a&gt; package, which uses
-the V8 JavaScript engine, the same that my browser (Chrome)&amp;nbsp;uses.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;V8&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c1"&gt;# library(V8)&lt;/span&gt;
-ct &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; V8&lt;span class="o"&gt;::&lt;/span&gt;v8&lt;span class="p"&gt;()&lt;/span&gt;
-roundjs &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;,&lt;/span&gt; digits&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-  &lt;span class="kp"&gt;sapply&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;y&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;ct&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="kp"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;paste0&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Number((&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kp"&gt;sprintf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;%.16f&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; y&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;).toFixed(&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; digits&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;))&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))})&lt;/span&gt;
-&lt;span class="p"&gt;}&lt;/span&gt;
-roundjs&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;6.65&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;7&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="m"&gt;0.95&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;7&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="m"&gt;0.35&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;## [1] 6.7 6.6 6.7
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;h2 id="what-took-me-so-long"&gt;What took me so&amp;nbsp;long&lt;/h2&gt;
-&lt;p&gt;This was a particularly tricky part of a bigger project (see next week&amp;#8217;s&amp;nbsp;post).  &lt;/p&gt;
-&lt;p&gt;Most of the time went on finding, testing and correcting the two rounding
-functions for round-to-odd and round-away-from-zero.  I adapted the round-to-odd
-function from some &lt;a href="https://www.mathworks.com/matlabcentral/fileexchange/40286-rounding-functions-collection"&gt;handy &lt;span class="caps"&gt;MATLAB&lt;/span&gt;
-implementations&lt;/a&gt;
-of various rounding strategies.  Unfortunately, they depended on &lt;span class="caps"&gt;MATLAB&lt;/span&gt;&amp;#8217;s
-built-in &lt;code&gt;round&lt;/code&gt; function, which, according to its
-&lt;a href="https://uk.mathworks.com/help/matlab/ref/round.html"&gt;documentation&lt;/a&gt;, rounds
-away from zero, so I had to find a round-away-from-zero function in R first.
-Even then, it didn&amp;#8217;t work for negatives when I ported it to R, probably due to
-fundamental language&amp;nbsp;differences:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c1"&gt;# Surprising behaviour of &lt;/span&gt;
-&lt;span class="m"&gt;-1.5&lt;/span&gt; &lt;span class="o"&gt;%%&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;## [1] 0.5
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c1"&gt;# Predictable behaviour (but different to MATLAB?)&lt;/span&gt;
-&lt;span class="m"&gt;-1.0&lt;/span&gt; &lt;span class="o"&gt;%%&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;## [1] NaN
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;I also spent quite a while on the graphs of bias, where I befuddled myself by
-drawing random numbers between 0 to 1 (which is unfair on unbiased functions,
-because only 0.5 is represented, not 1.5), and by not doing preliminary rounding
-on the random draws (which meant that 0.5, 1.5, etc., weren&amp;#8217;t represented at&amp;nbsp;all).&lt;/p&gt;
-&lt;p&gt;Finally, my initial &lt;code&gt;V8&lt;/code&gt; function used the &lt;code&gt;V8&lt;/code&gt; package&amp;#8217;s own magic for passing
-values to the V8 engine, but when it didn&amp;#8217;t work, I suspected that the values
-were being passed as a string, and that R was rounding them as part of the
-conversion.  For&amp;nbsp;example:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;V8&lt;span class="p"&gt;)&lt;/span&gt;
-roundjs &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;,&lt;/span&gt; digits&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-  ct &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; V8&lt;span class="o"&gt;::&lt;/span&gt;v8&lt;span class="p"&gt;()&lt;/span&gt;
-  ct&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="kn"&gt;source&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;system.file&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;js/underscore.js&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; package&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;V8&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="c1"&gt;# Essential for _&lt;/span&gt;
-  ct&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="kp"&gt;assign&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;digits&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; digits&lt;span class="p"&gt;)&lt;/span&gt;
-  xrounded &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; 
-    ct&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="kp"&gt;call&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;_.forEach&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-            x&lt;span class="p"&gt;,&lt;/span&gt;
-            V8&lt;span class="o"&gt;::&lt;/span&gt;JS&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;function(item, index, arr) {arr[index] = Number(item.toFixed(digits));}&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
-  xrounded
-&lt;span class="p"&gt;}&lt;/span&gt;
-roundjs&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;6.65&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;7&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="m"&gt;0.95&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;7&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="m"&gt;0.35&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;## [1] 6.7 6.7 6.7
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;h2 id="code-for-the-graphs"&gt;Code for the&amp;nbsp;graphs&lt;/h2&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c1"&gt;# Compare the two systems&lt;/span&gt;
-&lt;span class="c1"&gt;# x1 &amp;lt;- seq(-2.5, 2.5)&lt;/span&gt;
-&lt;span class="c1"&gt;# matrix(c(x1,&lt;/span&gt;
-&lt;span class="c1"&gt;#          round_to_even(x1),&lt;/span&gt;
-&lt;span class="c1"&gt;#          round_to_odd(x1)),&lt;/span&gt;
-&lt;span class="c1"&gt;#        nrow = 3, byrow = TRUE)&lt;/span&gt;
-
-&lt;span class="c1"&gt;# Graph the bias of many random draws&lt;/span&gt;
-N &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="m"&gt;10000&lt;/span&gt;
-bias&lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;FUN&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-  &lt;span class="c1"&gt;# Round to one decimal place to ensure 0.5 ever appears.&lt;/span&gt;
-  &lt;span class="c1"&gt;# Draw between 0 and 2 to fairly represent both 0.5 and 1.5.&lt;/span&gt;
-  x &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;round&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;runif&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;10&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; min &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; max &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; 
-  &lt;span class="kp"&gt;mean&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;FUN&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; x&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="p"&gt;}&lt;/span&gt;
-
-bias_to_even &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;replicate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;N&lt;span class="p"&gt;,&lt;/span&gt; bias&lt;span class="p"&gt;(&lt;/span&gt;round_to_even&lt;span class="p"&gt;))&lt;/span&gt;
-bias_away_from_zero &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;replicate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;N&lt;span class="p"&gt;,&lt;/span&gt; bias&lt;span class="p"&gt;(&lt;/span&gt;round_away_from_zero&lt;span class="p"&gt;))&lt;/span&gt;
-
-limits &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;-0.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;0.5&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-par&lt;span class="p"&gt;(&lt;/span&gt;mfrow &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
-  hist&lt;span class="p"&gt;(&lt;/span&gt;bias_to_even&lt;span class="p"&gt;,&lt;/span&gt; xlim &lt;span class="o"&gt;=&lt;/span&gt; limits&lt;span class="p"&gt;,&lt;/span&gt; col &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;lightgreen&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-  hist&lt;span class="p"&gt;(&lt;/span&gt;bias_away_from_zero&lt;span class="p"&gt;,&lt;/span&gt; xlim &lt;span class="o"&gt;=&lt;/span&gt; limits&lt;span class="p"&gt;,&lt;/span&gt; col &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;lightblue&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c1"&gt;# Compare the three systems&lt;/span&gt;
-&lt;span class="c1"&gt;# x1 &amp;lt;- seq(-2.5, 2.5)&lt;/span&gt;
-&lt;span class="c1"&gt;# matrix(c(x1,&lt;/span&gt;
-&lt;span class="c1"&gt;#          round_to_even(x1),&lt;/span&gt;
-&lt;span class="c1"&gt;#          round_away_from_zero(x1),&lt;/span&gt;
-&lt;span class="c1"&gt;#          round_to_odd(x1)), nrow = 4, byrow = TRUE)&lt;/span&gt;
-
-bias_to_odd &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;replicate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;N&lt;span class="p"&gt;,&lt;/span&gt; bias&lt;span class="p"&gt;(&lt;/span&gt;round_to_odd&lt;span class="p"&gt;))&lt;/span&gt;
-
-limits &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;-0.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;0.5&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-par&lt;span class="p"&gt;(&lt;/span&gt;mfrow &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
-  hist&lt;span class="p"&gt;(&lt;/span&gt;bias_to_even&lt;span class="p"&gt;,&lt;/span&gt; xlim &lt;span class="o"&gt;=&lt;/span&gt; limits&lt;span class="p"&gt;,&lt;/span&gt; col &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;lightgreen&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-  hist&lt;span class="p"&gt;(&lt;/span&gt;bias_away_from_zero&lt;span class="p"&gt;,&lt;/span&gt; xlim &lt;span class="o"&gt;=&lt;/span&gt; limits&lt;span class="p"&gt;,&lt;/span&gt; col &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;lightblue&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-  hist&lt;span class="p"&gt;(&lt;/span&gt;bias_to_odd&lt;span class="p"&gt;,&lt;/span&gt; xlim &lt;span class="o"&gt;=&lt;/span&gt; limits&lt;span class="p"&gt;,&lt;/span&gt; col &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;pink&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Duncan Garmonsway</dc:creator><pubDate>Mon, 25 Apr 2016 00:00:00 +1200</pubDate><guid>tag:nacnudus.github.io,2016-04-25:crossprod/r-rounding-is-weird-try-javascript</guid><category>R</category><category>JavaScript</category><category>V8</category></item><item><title>How many R-Bloggers are there?</title><link>http://nacnudus.github.io/crossprod/how-many-r-bloggers-are-there</link><description>&lt;p&gt;This post does three&amp;nbsp;things:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Finds out how many R-related blogs there are &lt;em&gt;really&lt;/em&gt; (not a well-defined&amp;nbsp;question).&lt;/li&gt;
-&lt;li&gt;Shows that I can use semi-structured non-csv data (job interview&amp;nbsp;weakness).&lt;/li&gt;
-&lt;li&gt;Explains where all the time&amp;nbsp;goes.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Many people who promote R quote the number of R blogs as given on the
-&lt;a href="http://www.r-bloggers.com/"&gt;R-Bloggers&lt;/a&gt; website by Tal Galili, which syndicates
-literally hundreds of R-related blogs (573 at the time of writing).  But the
-number tends only to increase.  How many actual posts are there in a given
-week/month, from how many different&amp;nbsp;blogs?&lt;/p&gt;
-&lt;h2 id="update-30-april-2016"&gt;Update 30 April&amp;nbsp;2016&lt;/h2&gt;
-&lt;p&gt;I have a longer history of daily digest emails than I thought.  The data, and
-some of the text, has been updated to go back to October&amp;nbsp;2013.&lt;/p&gt;
-&lt;h2 id="the-gist-of-it"&gt;The gist of&amp;nbsp;it&lt;/h2&gt;
-&lt;p&gt;I subscribed to the &lt;a href="http://www.r-bloggers.com/"&gt;R-Bloggers&lt;/a&gt; daily digest emails
-in early 2014, giving me a good time-series of&amp;nbsp;posts.&lt;/p&gt;
-&lt;p&gt;The initial dump is easy from Gmail (define a filter &amp;gt; use it to apply a
-new label &amp;gt; request a dump of the labelled emails).  Since the dump is in a
-single plain-text file, and because the amazing R-community has bothered to
-generalise so many solutions to fiddly problems by making packages, all the
-remaining steps are also&amp;nbsp;easy.&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Separate the emails into individual files, using &lt;code&gt;convert_mbox_eml&lt;/code&gt; in the
-   &lt;code&gt;tm.plugin.mail&lt;/code&gt; package.&lt;/li&gt;
-&lt;li&gt;Parse the date-time in the first line of each file, using base R (hooray for&amp;nbsp;base!)&lt;/li&gt;
-&lt;li&gt;Parse the &lt;span class="caps"&gt;HTML&lt;/span&gt; email content using &lt;code&gt;read_html&lt;/code&gt; in the &lt;code&gt;xml2&lt;/code&gt; package (which
-   has its own magic to trim off the non-&lt;span class="caps"&gt;HTML&lt;/span&gt; email&amp;nbsp;headers).&lt;/li&gt;
-&lt;li&gt;Extract the names of the blogs in each email using an XPath string created by
-   the &lt;em&gt;SelectorGadget&lt;/em&gt; browser&amp;nbsp;extension/bookmarklet.&lt;/li&gt;
-&lt;li&gt;Mung and analyse the&amp;nbsp;data.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h2 id="the-answer"&gt;The&amp;nbsp;answer&lt;/h2&gt;
-&lt;p&gt;It turns out that there are about 75 blogs active in a given month, posting
-about 160 posts (Revolutions is the only one that regularly posts more than once
-per week).  Nothing much has changed in the last year.  For some arbitrary
-definition of &amp;#8220;dead blog&amp;#8221;, a survival analysis could be&amp;nbsp;done.&lt;/p&gt;
-&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/rbloggers-periodical-1.svg" title="plot of chunk rbloggers-periodical" alt="plot of chunk rbloggers-periodical" width="960px" height="540px" /&gt;&lt;/p&gt;
-&lt;h2 id="what-took-me-so-long"&gt;What took me so&amp;nbsp;long&lt;/h2&gt;
-&lt;p&gt;This was an easy project, but a few quirks soaked up a lot of&amp;nbsp;time:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;I wanted to initialise an empty list, to store information collected by
-  looping through the emails.  This is one of my favourite R idiosyncracies.
-  Consider how the following function could be any less intuitive: &lt;code&gt;empty_list
-  &amp;lt;- vector(mode = "list", length = n)&lt;/code&gt;.  I usually don&amp;#8217;t think of lists as a
-  kind of vector, and usually think of them as a class rather than a mode, but
-  perhaps that&amp;#8217;s just&amp;nbsp;me.&lt;/li&gt;
-&lt;li&gt;Gmail filters and labels &lt;em&gt;conversations&lt;/em&gt;, rather than individual emails, so
-  the occasional forward of an R-Bloggers digest scuppered the&amp;nbsp;code.&lt;/li&gt;
-&lt;li&gt;One of the digests had a glitch &amp;#8212; no links to the originial blogs.  The date
-  is given in a non-&lt;code&gt;lubridate&lt;/code&gt;-friendly order, so I had to rediscover
-  &lt;code&gt;strptime&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;Some blog names include unusual characters that appear in the plain text in a
-  funny way (e.g. &amp;#8220;=E2=80=A6&amp;#8221;).  These had to be found-and-replaced (using
-  &lt;code&gt;stringr&lt;/code&gt;).&lt;/li&gt;
-&lt;li&gt;While, &lt;code&gt;xml_find_all&lt;/code&gt; in the &lt;code&gt;xml2&lt;/code&gt; package&amp;nbsp;understands&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;3D\"itemcontentlist\"&lt;/code&gt; as part of an XPath string, I intially fell foul of
-  &lt;code&gt;html_nodes&lt;/code&gt; in the &lt;code&gt;rvest&lt;/code&gt; package, which doesn&amp;#8217;t seem to understand it as
-  part of a &lt;span class="caps"&gt;CSS&lt;/span&gt;&amp;nbsp;string.&lt;/li&gt;
-&lt;li&gt;Given a named list, how can you crate a data frame that links the names to the
-  each element of the vectors?  Finding this kind of thing out is entirely a
-  game of Google Search Term Bingo, but in this case I used part of a clever
-  &lt;a href="http://stackoverflow.com/a/16326629/937932"&gt;StackOverflow solution&lt;/a&gt; of a
-  different problem.  To save you digging around in the &lt;code&gt;purrr&lt;/code&gt; or &lt;code&gt;rlist&lt;/code&gt;
-  packages, the answer is &lt;code&gt;stack&lt;/code&gt; in (hooray!) &lt;code&gt;base&lt;/code&gt;.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;But the biggest time-sucker by far was the bizarre way that the plain text of
-the emails had been trimmed to 76 characters, by sticking an equals sign and a
-Windows-style line-ending (carriage return and line feed, i.e. &lt;code&gt;\r\n&lt;/code&gt;) after the
-75th character.  This is snag-tastic, because it&amp;#8217;s hard to find a tool that will
-both search-and-replace across line-endings, and also search-and-replace
-multiple characters.  &lt;code&gt;sed&lt;/code&gt; is one of those command-line tools that lurks for
-years before pouncing, and this was its moment, when I finally had to learn a
-bit more than merely &lt;code&gt;s/pattern/replacement/g&lt;/code&gt;.  &lt;a href="http://stackoverflow.com/a/7697604/937932"&gt;This StackOverflow
-answer&lt;/a&gt; explains how the following
-command works: &lt;code&gt;sed ':a;N;$!ba;s/=\r\n//g' dirty.mbox &amp;gt; clean.mbox&lt;/code&gt;.&lt;/p&gt;
-&lt;h2 id="reward"&gt;Reward&lt;/h2&gt;
-&lt;p&gt;Thankyou for reading. Here are some more graphs, and some code&amp;nbsp;fragments.&lt;/p&gt;
-&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/rbloggers-top10-1.svg" title="plot of chunk rbloggers-top10" alt="plot of chunk rbloggers-top10" width="960px" height="540px" /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src="http://nacnudus.github.io/crossprod/figure/rbloggers-rates-1.svg" title="plot of chunk rbloggers-rates" alt="plot of chunk rbloggers-rates" width="960px" height="540px" /&gt;&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c1"&gt;# NOTE: These are frangments of code.  They do not stand alone.&lt;/span&gt;
-
-&lt;span class="c1"&gt;# Collect the file names&lt;/span&gt;
-emails &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;list.files&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;mail_dir&lt;span class="p"&gt;,&lt;/span&gt; full.names &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-
-&lt;span class="c1"&gt;# Remove the &amp;quot;confirm email address&amp;quot; one&lt;/span&gt;
-&lt;span class="c1"&gt;# and the one that has no links to the original blogs&lt;/span&gt;
-emails &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; emails&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;-2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;-342&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
-
-&lt;span class="c1"&gt;# Remove any that are replies&lt;/span&gt;
-emails &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; emails&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="kp"&gt;vapply&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;emails&lt;span class="p"&gt;,&lt;/span&gt;
-                        &lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;filename&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-                          &lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="kp"&gt;any&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;grepl&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;^In-Reply-To: &amp;lt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-                                     &lt;span class="kp"&gt;readLines&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;filename&lt;span class="p"&gt;,&lt;/span&gt; n &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;10&lt;/span&gt;&lt;span class="p"&gt;)))},&lt;/span&gt;
-                        &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
-
-&lt;span class="c1"&gt;# Collect the datetimes in the first line of each file&lt;/span&gt;
-&lt;span class="c1"&gt;# Also collect the journals from the subject lines&lt;/span&gt;
-n &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;length&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;emails&lt;span class="p"&gt;)&lt;/span&gt;
-datetimes &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kt"&gt;vector&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;character&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; length &lt;span class="o"&gt;=&lt;/span&gt; n&lt;span class="p"&gt;)&lt;/span&gt;
-blogcounts &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kt"&gt;vector&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;character&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; length &lt;span class="o"&gt;=&lt;/span&gt; n&lt;span class="p"&gt;)&lt;/span&gt;
-blogs  &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kt"&gt;vector&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;list&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; length &lt;span class="o"&gt;=&lt;/span&gt; n&lt;span class="p"&gt;)&lt;/span&gt;
-i &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;
-&lt;span class="kr"&gt;for&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;filename &lt;span class="kr"&gt;in&lt;/span&gt; emails&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-  i &lt;span class="o"&gt;&amp;lt;&amp;lt;-&lt;/span&gt; i &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;
-  datetimes&lt;span class="p"&gt;[&lt;/span&gt;i&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;readLines&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;filename&lt;span class="p"&gt;,&lt;/span&gt; n &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-  &lt;span class="c1"&gt;# Extract the links to the original blogs&lt;/span&gt;
-  blogs&lt;span class="p"&gt;[[&lt;/span&gt;i&lt;span class="p"&gt;]]&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; 
-    read_html&lt;span class="p"&gt;(&lt;/span&gt;filename&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-    xml_find_all&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;//*[(@id = &amp;#39;3D\&amp;quot;itemcontentlist\&amp;quot;&amp;#39;)]//div//div//strong[(((count(preceding-sibling::*) + 1) = 1) and parent::*)]//a&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-    xml_text
-&lt;span class="p"&gt;}&lt;/span&gt;
-
-&lt;span class="c1"&gt;# Extract the datetime string&lt;/span&gt;
-datetimes &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt;
-  datetimes &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  str_sub&lt;span class="p"&gt;(&lt;/span&gt;start &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;34&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  &lt;span class="kp"&gt;strptime&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;format &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;%b %d %H:%M:%S %z %Y&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-
-&lt;span class="c1"&gt;# Link the datetime with individual blogs&lt;/span&gt;
-&lt;span class="kp"&gt;names&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;blogs&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; datetimes
-blogs &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; stack&lt;span class="p"&gt;(&lt;/span&gt;blogs&lt;span class="p"&gt;)&lt;/span&gt;
-
-&lt;span class="c1"&gt;# Recover the dates and clean the blog names&lt;/span&gt;
-blogs &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; 
-  blogs &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  rename&lt;span class="p"&gt;(&lt;/span&gt;blog &lt;span class="o"&gt;=&lt;/span&gt; values&lt;span class="p"&gt;,&lt;/span&gt; datetime &lt;span class="o"&gt;=&lt;/span&gt; ind&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
-  mutate&lt;span class="p"&gt;(&lt;/span&gt;datetime &lt;span class="o"&gt;=&lt;/span&gt; ymd_hms&lt;span class="p"&gt;(&lt;/span&gt;datetime&lt;span class="p"&gt;),&lt;/span&gt;
-         &lt;span class="c1"&gt;# blog = str_replace(blog, fixed(&amp;quot;=\\n&amp;quot;), &amp;quot;&amp;quot;),&lt;/span&gt;
-         blog &lt;span class="o"&gt;=&lt;/span&gt; str_replace&lt;span class="p"&gt;(&lt;/span&gt;blog&lt;span class="p"&gt;,&lt;/span&gt; fixed&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;=C2=BB&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;»&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
-         blog &lt;span class="o"&gt;=&lt;/span&gt; str_replace&lt;span class="p"&gt;(&lt;/span&gt;blog&lt;span class="p"&gt;,&lt;/span&gt; fixed&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;=E2=80=93&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;–&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
-         blog &lt;span class="o"&gt;=&lt;/span&gt; str_replace&lt;span class="p"&gt;(&lt;/span&gt;blog&lt;span class="p"&gt;,&lt;/span&gt; fixed&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;=E2=80=A6&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;…&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
-         blog &lt;span class="o"&gt;=&lt;/span&gt; str_replace&lt;span class="p"&gt;(&lt;/span&gt;blog&lt;span class="p"&gt;,&lt;/span&gt; fixed&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;=C3=A6&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;æ&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
-         blog &lt;span class="o"&gt;=&lt;/span&gt; str_replace&lt;span class="p"&gt;(&lt;/span&gt;blog&lt;span class="p"&gt;,&lt;/span&gt; fixed&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;=EA=B0=84=EB=93=9C=EB=A3=A8=EB=93=9C =ED=81=AC=EB=A6=AC=EC=8A=A4=ED=86=A0=ED=8C=8C&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;(간드루드 크리스토파)&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
-         blog &lt;span class="o"&gt;=&lt;/span&gt; str_replace&lt;span class="p"&gt;(&lt;/span&gt;blog&lt;span class="p"&gt;,&lt;/span&gt; fixed&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;=D0=AF=D1=82=D0=BE=D0=BC=D0=B8=D0=B7=D0=BE&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Ятомизо&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
-         blog &lt;span class="o"&gt;=&lt;/span&gt; str_trim&lt;span class="p"&gt;(&lt;/span&gt;blog&lt;span class="p"&gt;))&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Duncan Garmonsway</dc:creator><pubDate>Mon, 18 Apr 2016 00:00:00 +1200</pubDate><guid>tag:nacnudus.github.io,2016-04-18:crossprod/how-many-r-bloggers-are-there</guid><category>R</category></item><item><title>New R package: nzcrash</title><link>http://nacnudus.github.io/crossprod/new-r-package-nzcrash</link><description>&lt;h1 id="introducing-the-nzcrash-package"&gt;Introducing the nzcrash&amp;nbsp;package&lt;/h1&gt;
+&lt;code&gt;simmer&lt;/code&gt;.  At that point, I gave&amp;nbsp;up.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Duncan Garmonsway</dc:creator><pubDate>Wed, 11 May 2016 00:00:00 +1200</pubDate><guid>tag:nacnudus.github.io,2016-05-11:crossprod/simmer-vs-simpy-the-bank-part-i</guid><category>R</category><category>Simmer</category><category>SimPy</category></item><item><title>New R package: nzcrash</title><link>http://nacnudus.github.io/crossprod/new-r-package-nzcrash</link><description>&lt;h1 id="introducing-the-nzcrash-package"&gt;Introducing the nzcrash&amp;nbsp;package&lt;/h1&gt;
 &lt;p&gt;This &lt;a href="https://github.com/nacnudus/nzcrash"&gt;package&lt;/a&gt; redistributes crash statistics already available from the New Zealand Transport Agency, but in a more convenient&amp;nbsp;form.&lt;/p&gt;
 &lt;p&gt;It&amp;#8217;s a large package (over 20 megabytes,&amp;nbsp;compressed).&lt;/p&gt;
-&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;&lt;span class="kw"&gt;library&lt;/span&gt;(nzcrash)
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;&lt;span class="kw"&gt;library&lt;/span&gt;(nzcrash)
 &lt;span class="kw"&gt;library&lt;/span&gt;(dplyr)
 &lt;span class="kw"&gt;library&lt;/span&gt;(tidyr)
 &lt;span class="kw"&gt;library&lt;/span&gt;(magrittr)
 &lt;span class="kw"&gt;library&lt;/span&gt;(stringr)
 &lt;span class="kw"&gt;library&lt;/span&gt;(ggplot2)
 &lt;span class="kw"&gt;library&lt;/span&gt;(scales)
-&lt;span class="kw"&gt;library&lt;/span&gt;(lubridate)&lt;/code&gt;&lt;/pre&gt;
+&lt;span class="kw"&gt;library&lt;/span&gt;(lubridate)&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;h2 id="datasets"&gt;Datasets&lt;/h2&gt;
 &lt;p&gt;The &lt;code&gt;crashes&lt;/code&gt; dataset describes most facts about a crash. The datasets &lt;code&gt;causes&lt;/code&gt;, &lt;code&gt;vehicles&lt;/code&gt;, and &lt;code&gt;objects_struck&lt;/code&gt; describe facts that are in a many-to-one relationship with crashes. They can be joined to the &lt;code&gt;crashes&lt;/code&gt; dataset by the common &lt;code&gt;id&lt;/code&gt; column. The &lt;code&gt;causes&lt;/code&gt; dataset can additionally be joined to the &lt;code&gt;vehicles&lt;/code&gt; dataset by the combination of the &lt;code&gt;id&lt;/code&gt; and &lt;code&gt;vehicle_id&lt;/code&gt; columns. This is most useful when the resulting table is also joined to the &lt;code&gt;crashes&lt;/code&gt; dataset.&lt;/p&gt;
 &lt;h2 id="up-to-date-ness"&gt;Up-to-date-ness&lt;/h2&gt;
 &lt;p&gt;The data was last scraped from the &lt;span class="caps"&gt;NZTA&lt;/span&gt; website on 2015-07-20. At that time, the &lt;span class="caps"&gt;NZTA&lt;/span&gt; had published data up to the&amp;nbsp;2015-03-10.&lt;/p&gt;
-&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;&lt;span class="kw"&gt;dim&lt;/span&gt;(crashes)&lt;/code&gt;&lt;/pre&gt;
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;&lt;span class="kw"&gt;dim&lt;/span&gt;(crashes)&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 540888     32&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;&lt;span class="kw"&gt;dim&lt;/span&gt;(causes)&lt;/code&gt;&lt;/pre&gt;
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;&lt;span class="kw"&gt;dim&lt;/span&gt;(causes)&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 888072      7&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;&lt;span class="kw"&gt;dim&lt;/span&gt;(vehicles)&lt;/code&gt;&lt;/pre&gt;
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;&lt;span class="kw"&gt;dim&lt;/span&gt;(vehicles)&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 979930      3&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;&lt;span class="kw"&gt;dim&lt;/span&gt;(objects_struck)&lt;/code&gt;&lt;/pre&gt;
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;&lt;span class="kw"&gt;dim&lt;/span&gt;(objects_struck)&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 261276      3&lt;/code&gt;&lt;/pre&gt;
 &lt;h2 id="accuracy"&gt;Accuracy&lt;/h2&gt;
 &lt;p&gt;The &lt;a href="http://www.transport.govt.nz/research/roadtoll/#5"&gt;&lt;span class="caps"&gt;NZTA&lt;/span&gt;&lt;/a&gt;, doesn&amp;#8217;t agree with &lt;a href="http://www.transport.govt.nz/research/roadtoll/annualroadtollhistoricalinformation/"&gt;itself&lt;/a&gt; about recent annual road tolls, and this dataset gives a third&amp;nbsp;opinion.&lt;/p&gt;
-&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;crashes %&amp;gt;%&lt;span class="st"&gt; &lt;/span&gt;
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;crashes %&amp;gt;%&lt;span class="st"&gt; &lt;/span&gt;
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;filter&lt;/span&gt;(severity ==&lt;span class="st"&gt; &amp;quot;fatal&amp;quot;&lt;/span&gt;) %&amp;gt;%
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;group_by&lt;/span&gt;(&lt;span class="dt"&gt;year =&lt;/span&gt; &lt;span class="kw"&gt;year&lt;/span&gt;(date)) %&amp;gt;%
-&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;summarize&lt;/span&gt;(&lt;span class="dt"&gt;fatalities =&lt;/span&gt; &lt;span class="kw"&gt;sum&lt;/span&gt;(fatalities))&lt;/code&gt;&lt;/pre&gt;
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;summarize&lt;/span&gt;(&lt;span class="dt"&gt;fatalities =&lt;/span&gt; &lt;span class="kw"&gt;sum&lt;/span&gt;(fatalities))&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;pre&gt;&lt;code&gt;## Source: local data frame [16 x 2]
 ## 
 ##    year fatalities
@@ -1914,9 +838,9 @@ blogs &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt;
 &lt;p&gt;The definition of a &amp;#8216;severe&amp;#8217; injury is not&amp;nbsp;clear.&lt;/p&gt;
 &lt;p&gt;Minor and non-injury crashes are likely to be under-recorded since they often do not involve the police, who write most of the crash reports upon which these datasets are&amp;nbsp;based.&lt;/p&gt;
 &lt;p&gt;A common mistake is to confuse the number of fatal crashes with the number of&amp;nbsp;fatalities.&lt;/p&gt;
-&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;crashes %&amp;gt;%&lt;span class="st"&gt; &lt;/span&gt;&lt;span class="kw"&gt;filter&lt;/span&gt;(severity ==&lt;span class="st"&gt; &amp;quot;fatal&amp;quot;&lt;/span&gt;) %&amp;gt;%&lt;span class="st"&gt; &lt;/span&gt;nrow&lt;/code&gt;&lt;/pre&gt;
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;crashes %&amp;gt;%&lt;span class="st"&gt; &lt;/span&gt;&lt;span class="kw"&gt;filter&lt;/span&gt;(severity ==&lt;span class="st"&gt; &amp;quot;fatal&amp;quot;&lt;/span&gt;) %&amp;gt;%&lt;span class="st"&gt; &lt;/span&gt;nrow&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 5042&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;&lt;span class="kw"&gt;sum&lt;/span&gt;(crashes$fatalities)&lt;/code&gt;&lt;/pre&gt;
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;&lt;span class="kw"&gt;sum&lt;/span&gt;(crashes$fatalities)&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 5723&lt;/code&gt;&lt;/pre&gt;
 &lt;h2 id="dates-and-times"&gt;Dates and&amp;nbsp;times&lt;/h2&gt;
 &lt;p&gt;Three columns of the &lt;code&gt;crashes&lt;/code&gt; dataset describe the date and time of the crash in the &lt;span class="caps"&gt;NZST&lt;/span&gt; time zone&amp;nbsp;(Pacific/Auckland).&lt;/p&gt;
@@ -1926,7 +850,7 @@ blogs &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt;
 &lt;li&gt;&lt;code&gt;datetime&lt;/code&gt; gives the date and time in one value when both are available, and &lt;span class="caps"&gt;NA&lt;/span&gt; otherwise. &lt;code&gt;date&lt;/code&gt; is always available, however &lt;code&gt;time&lt;/code&gt; is&amp;nbsp;not.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;When aggregating by some function of the date, e.g. by year, then always start from the &lt;code&gt;date&lt;/code&gt; column unless you also need the time. This ensures against accidentally discounting crashes where a time is not&amp;nbsp;recorded.&lt;/p&gt;
-&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;crashes %&amp;gt;%
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;crashes %&amp;gt;%
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;filter&lt;/span&gt;(&lt;span class="kw"&gt;is.na&lt;/span&gt;(time)) %&amp;gt;%
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;count&lt;/span&gt;(&lt;span class="dt"&gt;year =&lt;/span&gt; &lt;span class="kw"&gt;year&lt;/span&gt;(date)) %&amp;gt;%
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;ggplot&lt;/span&gt;(&lt;span class="kw"&gt;aes&lt;/span&gt;(year, n)) +
@@ -1940,23 +864,23 @@ crashes %&amp;gt;%
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;ggplot&lt;/span&gt;(&lt;span class="kw"&gt;aes&lt;/span&gt;(year, percent)) +
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;geom_line&lt;/span&gt;() +
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;scale_y_continuous&lt;/span&gt;(&lt;span class="dt"&gt;labels =&lt;/span&gt; percent) +
-&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;ggtitle&lt;/span&gt;(&lt;span class="st"&gt;&amp;quot;Percent of crashes missing&lt;/span&gt;&lt;span class="ch"&gt;\n&lt;/span&gt;&lt;span class="st"&gt;time-of-day information&amp;quot;&lt;/span&gt;)&lt;/code&gt;&lt;/pre&gt;
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;ggtitle&lt;/span&gt;(&lt;span class="st"&gt;&amp;quot;Percent of crashes missing&lt;/span&gt;&lt;span class="ch"&gt;\n&lt;/span&gt;&lt;span class="st"&gt;time-of-day information&amp;quot;&lt;/span&gt;)&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;&lt;img src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-5-1.png" /&gt; &lt;img src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-5-2.png" /&gt;&lt;/p&gt;
 &lt;h2 id="location-coordinates"&gt;Location&amp;nbsp;coordinates&lt;/h2&gt;
 &lt;p&gt;99.9% of crashes have coordinates. These have been converted from the &lt;span class="caps"&gt;NZTM&lt;/span&gt; projection to the &lt;span class="caps"&gt;WGS84&lt;/span&gt; projection for convenience with packages like &lt;code&gt;ggmap&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;Because New Zealand is tall and skinny, you can easily spot the main population centres with a simple&amp;nbsp;boxplot.&lt;/p&gt;
-&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;crashes %&amp;gt;%
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;crashes %&amp;gt;%
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;ggplot&lt;/span&gt;(&lt;span class="kw"&gt;aes&lt;/span&gt;(northing)) +
-&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;geom_histogram&lt;/span&gt;(&lt;span class="dt"&gt;binwidth =&lt;/span&gt; .&lt;span class="dv"&gt;1&lt;/span&gt;)&lt;/code&gt;&lt;/pre&gt;
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;geom_histogram&lt;/span&gt;(&lt;span class="dt"&gt;binwidth =&lt;/span&gt; .&lt;span class="dv"&gt;1&lt;/span&gt;)&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;figure&gt;
 &lt;img src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-6-1.png" /&gt;
 &lt;/figure&gt;
 &lt;h2 id="vehicles"&gt;Vehicles&lt;/h2&gt;
 &lt;p&gt;There can be many vehicles in one crash, so vehicles are recorded in a separate &lt;code&gt;vehicles&lt;/code&gt; dataset that can be joined to &lt;code&gt;crashes&lt;/code&gt; by the common &lt;code&gt;id&lt;/code&gt; column.&lt;/p&gt;
-&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;crashes %&amp;gt;%
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;crashes %&amp;gt;%
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;inner_join&lt;/span&gt;(vehicles, &lt;span class="dt"&gt;by =&lt;/span&gt; &lt;span class="st"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;) %&amp;gt;%
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;count&lt;/span&gt;(vehicle) %&amp;gt;%&lt;span class="st"&gt; &lt;/span&gt;
-&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;arrange&lt;/span&gt;(&lt;span class="kw"&gt;desc&lt;/span&gt;(n))&lt;/code&gt;&lt;/pre&gt;
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;arrange&lt;/span&gt;(&lt;span class="kw"&gt;desc&lt;/span&gt;(n))&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;pre&gt;&lt;code&gt;## Source: local data frame [12 x 2]
 ## 
 ##               vehicle      n
@@ -1975,7 +899,7 @@ crashes %&amp;gt;%
 &lt;h2 id="objects-struck"&gt;Objects&amp;nbsp;struck&lt;/h2&gt;
 &lt;p&gt;There can be many objects struck in one crash, so these are recorded in a separate &lt;code&gt;objects_struck&lt;/code&gt; dataset that can be joined to &lt;code&gt;crashes&lt;/code&gt; by the common &lt;code&gt;id&lt;/code&gt; column.&lt;/p&gt;
 &lt;p&gt;Q: What are more fatal, trees or lamp&amp;nbsp;posts?&lt;/p&gt;
-&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;crashes %&amp;gt;%
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;crashes %&amp;gt;%
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;inner_join&lt;/span&gt;(objects_struck, &lt;span class="dt"&gt;by =&lt;/span&gt; &lt;span class="st"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;) %&amp;gt;%
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;filter&lt;/span&gt;(object %in%&lt;span class="st"&gt; &lt;/span&gt;&lt;span class="kw"&gt;c&lt;/span&gt;(&lt;span class="st"&gt;&amp;quot;Trees, shrubbery of a substantial nature&amp;quot;&lt;/span&gt;
                                , &lt;span class="st"&gt;&amp;quot;Utility pole, includes lighting columns&amp;quot;&lt;/span&gt;)
@@ -1984,7 +908,7 @@ crashes %&amp;gt;%
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;group_by&lt;/span&gt;(object) %&amp;gt;%
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;mutate&lt;/span&gt;(&lt;span class="dt"&gt;percent =&lt;/span&gt; n/&lt;span class="kw"&gt;sum&lt;/span&gt;(n)) %&amp;gt;%
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;select&lt;/span&gt;(-n) %&amp;gt;%
-&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;spread&lt;/span&gt;(severity, percent)&lt;/code&gt;&lt;/pre&gt;
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;spread&lt;/span&gt;(severity, percent)&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;pre&gt;&lt;code&gt;## Source: local data frame [2 x 4]
 ## 
 ##                                     object      fatal   serious     minor
@@ -1994,7 +918,7 @@ crashes %&amp;gt;%
 &lt;h2 id="causes"&gt;Causes&lt;/h2&gt;
 &lt;p&gt;Causes can be joined either to the &lt;code&gt;crashes&lt;/code&gt; dataset (by the common &lt;code&gt;id&lt;/code&gt; column), or to the &lt;code&gt;vehicles&lt;/code&gt; dataset (by both of the commont &lt;code&gt;id&lt;/code&gt; and &lt;code&gt;vehicle_id&lt;/code&gt;)&amp;nbsp;columns.&lt;/p&gt;
 &lt;p&gt;The main cause groups are given in the &lt;code&gt;causes_category&lt;/code&gt; column.&lt;/p&gt;
-&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;crashes %&amp;gt;%
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;crashes %&amp;gt;%
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;inner_join&lt;/span&gt;(causes, &lt;span class="dt"&gt;by =&lt;/span&gt; &lt;span class="st"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;) %&amp;gt;%
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;group_by&lt;/span&gt;(cause_category, id) %&amp;gt;%
 &lt;span class="st"&gt;  &lt;/span&gt;tally %&amp;gt;%
@@ -2004,15 +928,15 @@ crashes %&amp;gt;%
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;mutate&lt;/span&gt;(&lt;span class="dt"&gt;cause_category =&lt;/span&gt; &lt;span class="kw"&gt;factor&lt;/span&gt;(cause_category, &lt;span class="dt"&gt;levels =&lt;/span&gt; cause_category)) %&amp;gt;%
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;ggplot&lt;/span&gt;(&lt;span class="kw"&gt;aes&lt;/span&gt;(cause_category, n)) +&lt;span class="st"&gt; &lt;/span&gt;
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;geom_bar&lt;/span&gt;(&lt;span class="dt"&gt;stat =&lt;/span&gt; &lt;span class="st"&gt;&amp;quot;identity&amp;quot;&lt;/span&gt;) +
-&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;theme&lt;/span&gt;(&lt;span class="dt"&gt;axis.text.x =&lt;/span&gt; &lt;span class="kw"&gt;element_text&lt;/span&gt;(&lt;span class="dt"&gt;angle =&lt;/span&gt; &lt;span class="dv"&gt;90&lt;/span&gt;, &lt;span class="dt"&gt;hjust =&lt;/span&gt; &lt;span class="dv"&gt;1&lt;/span&gt;, &lt;span class="dt"&gt;vjust =&lt;/span&gt; .&lt;span class="dv"&gt;5&lt;/span&gt;))&lt;/code&gt;&lt;/pre&gt;
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;theme&lt;/span&gt;(&lt;span class="dt"&gt;axis.text.x =&lt;/span&gt; &lt;span class="kw"&gt;element_text&lt;/span&gt;(&lt;span class="dt"&gt;angle =&lt;/span&gt; &lt;span class="dv"&gt;90&lt;/span&gt;, &lt;span class="dt"&gt;hjust =&lt;/span&gt; &lt;span class="dv"&gt;1&lt;/span&gt;, &lt;span class="dt"&gt;vjust =&lt;/span&gt; .&lt;span class="dv"&gt;5&lt;/span&gt;))&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;figure&gt;
 &lt;img src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-9-1.png" /&gt;
 &lt;/figure&gt;
 &lt;p&gt;That&amp;#8217;s odd &amp;#8212; where are speed, alcohol, and restraints? They&amp;#8217;re given in &lt;code&gt;cause_subcategory&lt;/code&gt;.&lt;/p&gt;
-&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;causes %&amp;gt;%&lt;span class="st"&gt; &lt;/span&gt;
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;causes %&amp;gt;%&lt;span class="st"&gt; &lt;/span&gt;
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;filter&lt;/span&gt;(cause_subcategory ==&lt;span class="st"&gt; &amp;quot;Too fast for conditions&amp;quot;&lt;/span&gt;) %&amp;gt;%
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;count&lt;/span&gt;(cause) %&amp;gt;%&lt;span class="st"&gt; &lt;/span&gt;
-&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;arrange&lt;/span&gt;(&lt;span class="kw"&gt;desc&lt;/span&gt;(n))&lt;/code&gt;&lt;/pre&gt;
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;arrange&lt;/span&gt;(&lt;span class="kw"&gt;desc&lt;/span&gt;(n))&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;pre&gt;&lt;code&gt;## Source: local data frame [8 x 2]
 ## 
 ##                                cause     n
@@ -2026,7 +950,7 @@ crashes %&amp;gt;%
 ## 8 When passing stationary school bus    37&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;There&amp;#8217;s nothing there about speed limit violations, because it&amp;#8217;s impossible to tell what speed a vehicle was going at when it&amp;nbsp;crashed.&lt;/p&gt;
 &lt;p&gt;More worryingly, how is &amp;#8220;Alcohol test below limit&amp;#8221; a cause for a crash? Hopefully they filter those out when making policy&amp;nbsp;decisions.&lt;/p&gt;
-&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;&lt;span class="kw"&gt;levels&lt;/span&gt;(causes$cause) &amp;lt;-&lt;span class="st"&gt;                &lt;/span&gt;&lt;span class="co"&gt;# Wrap facet labels&lt;/span&gt;
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;&lt;span class="kw"&gt;levels&lt;/span&gt;(causes$cause) &amp;lt;-&lt;span class="st"&gt;                &lt;/span&gt;&lt;span class="co"&gt;# Wrap facet labels&lt;/span&gt;
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;str_wrap&lt;/span&gt;(&lt;span class="kw"&gt;levels&lt;/span&gt;(causes$cause), &lt;span class="dv"&gt;13&lt;/span&gt;)
 crashes %&amp;gt;%
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;inner_join&lt;/span&gt;(causes, &lt;span class="dt"&gt;by =&lt;/span&gt; &lt;span class="st"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;) %&amp;gt;%
@@ -2039,20 +963,20 @@ crashes %&amp;gt;%
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;mutate&lt;/span&gt;(&lt;span class="dt"&gt;cause=&lt;/span&gt; &lt;span class="kw"&gt;factor&lt;/span&gt;(cause, &lt;span class="dt"&gt;levels =&lt;/span&gt; cause)) %&amp;gt;%
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;ggplot&lt;/span&gt;(&lt;span class="kw"&gt;aes&lt;/span&gt;(cause, n)) +&lt;span class="st"&gt; &lt;/span&gt;
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;geom_bar&lt;/span&gt;(&lt;span class="dt"&gt;stat =&lt;/span&gt; &lt;span class="st"&gt;&amp;quot;identity&amp;quot;&lt;/span&gt;) +
-&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;theme&lt;/span&gt;(&lt;span class="dt"&gt;axis.text.x =&lt;/span&gt; &lt;span class="kw"&gt;element_text&lt;/span&gt;(&lt;span class="dt"&gt;angle =&lt;/span&gt; &lt;span class="dv"&gt;90&lt;/span&gt;, &lt;span class="dt"&gt;hjust =&lt;/span&gt; &lt;span class="dv"&gt;1&lt;/span&gt;, &lt;span class="dt"&gt;vjust =&lt;/span&gt; .&lt;span class="dv"&gt;5&lt;/span&gt;))&lt;/code&gt;&lt;/pre&gt;
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;theme&lt;/span&gt;(&lt;span class="dt"&gt;axis.text.x =&lt;/span&gt; &lt;span class="kw"&gt;element_text&lt;/span&gt;(&lt;span class="dt"&gt;angle =&lt;/span&gt; &lt;span class="dv"&gt;90&lt;/span&gt;, &lt;span class="dt"&gt;hjust =&lt;/span&gt; &lt;span class="dv"&gt;1&lt;/span&gt;, &lt;span class="dt"&gt;vjust =&lt;/span&gt; .&lt;span class="dv"&gt;5&lt;/span&gt;))&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;figure&gt;
 &lt;img src="nzcrash_release_files/figure-markdown_github/unnamed-chunk-11-1.png" /&gt;
 &lt;/figure&gt;
-&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;&lt;span class="kw"&gt;rm&lt;/span&gt;(causes)                             &lt;span class="co"&gt;# Because we messed up the factor levels&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;&lt;span class="kw"&gt;rm&lt;/span&gt;(causes)                             &lt;span class="co"&gt;# Because we messed up the factor levels&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;This time, join &lt;code&gt;causes&lt;/code&gt; to both &lt;code&gt;vehicles&lt;/code&gt; and &lt;code&gt;crashes&lt;/code&gt; to assess the drunken cyclist&amp;nbsp;menace.&lt;/p&gt;
-&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;crashes %&amp;gt;%
+&lt;div class="sourceCode"&gt;&lt;pre class="sourceCode r"&gt;&lt;code class="sourceCode r"&gt;crashes %&amp;gt;%
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;filter&lt;/span&gt;(severity ==&lt;span class="st"&gt; &amp;quot;fatal&amp;quot;&lt;/span&gt;) %&amp;gt;%
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;select&lt;/span&gt;(id) %&amp;gt;%
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;inner_join&lt;/span&gt;(vehicles, &lt;span class="dt"&gt;by =&lt;/span&gt; &lt;span class="st"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;) %&amp;gt;%&lt;span class="st"&gt; &lt;/span&gt;
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;filter&lt;/span&gt;(vehicle ==&lt;span class="st"&gt; &amp;quot;Bicycle&amp;quot;&lt;/span&gt;) %&amp;gt;%
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;inner_join&lt;/span&gt;(causes, &lt;span class="dt"&gt;by =&lt;/span&gt; &lt;span class="kw"&gt;c&lt;/span&gt;(&lt;span class="st"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;, &lt;span class="st"&gt;&amp;quot;vehicle_id&amp;quot;&lt;/span&gt;)) %&amp;gt;%&lt;span class="st"&gt; &lt;/span&gt;
 &lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;count&lt;/span&gt;(cause) %&amp;gt;%
-&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;arrange&lt;/span&gt;(&lt;span class="kw"&gt;desc&lt;/span&gt;(n))&lt;/code&gt;&lt;/pre&gt;
+&lt;span class="st"&gt;  &lt;/span&gt;&lt;span class="kw"&gt;arrange&lt;/span&gt;(&lt;span class="kw"&gt;desc&lt;/span&gt;(n))&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;pre&gt;&lt;code&gt;## Source: local data frame [55 x 2]
 ## 
 ##                                                                  cause  n
